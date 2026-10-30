@@ -15,7 +15,7 @@
 ### 0.1 当前目标与遗留状态
 
 - 目标设备平台为 **Android / PICO OS 6**，目标开发模式为 **PICO XR**。不要为该移植新增 Quest 兼容层，也不要混用 Unity OpenXR、PICO Spatial 与 PICO XR 的配置和 API。
-- 仓库目前仍包含 Meta XR、Oculus、OpenXR Meta Features、MRUK 和 Quest Manifest 配置。下文涉及 Quest 3 的内容描述的是**移植前现状**，不是需要继续支持的发行目标；这些依赖应在 PICO 功能替换完成后移除。
+- `BikeScene` 已迁移到 PICO XR，视频透视已开启，Android 仅启用 PXR_Loader，Meta SDK 包与 Meta/Oculus 资源已移除。当前金币和道具使用固定安全区域生成；PICO Scene Capture 房间感知生成是下一阶段任务。用户已明确暂时跳过真机验证，因此不得宣称 PICO OS 6 设备行为已验证。
 - 保持 Unity **2022.3.62f3** 与 URP **14.0.11**。PICO Unity SDK 6.1 文档要求 PICO XR 模式使用 Unity 2022.3.15f1 或更高版本，当前编辑器版本满足该要求。
 - PICO Unity SDK 导入地址：
   `https://github.com/Pico-Developer/PICO-Unity-SDK.git?path=/XR#main`
@@ -61,8 +61,8 @@
 - **渲染管线**：**URP 14.0.11**
   - 默认（Graphics 设置）：`Assets/Settings/PC_RPAsset.asset`
   - 移动端质量档覆盖：`Assets/Settings/Mobile_RPAsset.asset`
-- **XR 技术栈**：OpenXR（`com.unity.xr.openxr` 1.12.1）+ XR Plug-in Management 4.5.0 + **Meta XR All-in-One SDK 71.0.0**（`com.meta.xr.sdk.all`）+ XR Interaction Toolkit 3.0.7
-- **透视与无边界模式**：清单强制要求 `com.oculus.feature.PASSTHROUGH`、`com.oculus.feature.BOUNDARYLESS_APP`、`com.oculus.feature.CONTEXTUAL_BOUNDARYLESS_APP`（`Assets/Plugins/Android/AndroidManifest.xml`）。Meta 工程配置启用手部追踪、空间锚点与**场景支持 = 2（MRUK）**（`Assets/Oculus/OculusProjectConfig.asset`）。
+- **XR 技术栈**：PICO Unity SDK 6.1.1（`com.bytedance.pico.xr`）+ PXR_Loader + XR Plug-in Management 4.5.0 + XR Interaction Toolkit 3.0.7。Unity OpenXR 1.12.1 作为 PICO SDK 依赖保留，Meta SDK 包已移除。
+- **视频透视**：`PXR_ProjectSetting.asset` 已启用 `videoSeeThrough`；Main Camera 使用 Solid Color、RGBA 全 0，Mobile URP HDR 与相机后处理关闭。Quest 的 Boundaryless 配置已移除，不能照搬旧边界方案。
 - **其他关键包**：Input System 1.11.2、Adaptive Performance 5.0.0（+ Google Android provider 1.2.0）、AI Navigation 1.1.5、Timeline、Visual Scripting、uGUI、2D Sprite、Test Framework 1.1.33。
 
 产品信息：`productName: trailblazer`、`companyName: Nour Elfangary`、`bundleVersion: 0.1.0`（`ProjectSettings/ProjectSettings.asset`）。
@@ -74,12 +74,11 @@
 | 场景 | 构建索引 | 作用 |
 |---|---|---|
 | `Assets/Scenes/BikeScene.unity` | 0（启用） | **正式游戏场景**，构建中唯一启用的场景 |
-| `Assets/Scenes/BasicScene.unity` | —（禁用） | Meta XR 的 UI/UX 示例场景，仅供参考 |
 | `Assets/Samples/XR Interaction Toolkit/3.0.7/Starter Assets/DemoScene.unity` | — | 包内示例 |
 | `Assets/SkymonIconPackFree/skymon-icons-free-scene.unity` | — | 第三方图标包演示 |
 | `Assets/Simple FX Kit/Scenes/Demo.unity` | — | 第三方特效包演示 |
 
-**入口**：打开 `Assets/Scenes/BikeScene.unity` 后按 **Play**，或直接部署到 Quest 3。在 Play 模式下加载其它场景无法还原真实体验。
+**入口**：打开 `Assets/Scenes/BikeScene.unity` 后按 **Play**，或构建 APK 部署到 PICO OS 6。在 Play 模式下加载其它场景无法还原真实体验。
 
 `BikeScene` 的根对象（读取场景 YAML 得到）：`PlayerCollider`、`Trail`、`Trace`、`Outline`、`HUD`、`GameScripts`（挂载 `Game` 与 `VignetteController`）、`Gates`（gate1–gate4）、`StartingArea`、`SpawnPowerUps`、`SpawnCoinsAtStart`、`GameOver` / `TryAgain` 面板、`Score`、`Timer`、`Multiplier`。`Game` 与 `DrawTrail` 各挂载一次，`VignetteController` 挂载两次（背景晕影 + 轨迹晕影）。
 
@@ -87,7 +86,7 @@
 
 ## 3. 核心玩法架构
 
-所有玩法代码位于 `Assets/Scripts/`（11 个文件，约 670 行，**没有 asmdef**，全部编译进 `Assembly-CSharp`）。设计刻意保持精简：**由单个 `Game` 控制器驱动基于 Tag 的触发器碰撞**，表现层脚本挂在 prefab 上。
+核心玩法代码位于 `Assets/Scripts/`（既有 11 个文件，编译进 `Assembly-CSharp`）；PICO 专属代码位于 `Assets/Scripts/Pico/`，使用独立 `Trailblazer.Pico` 程序集。设计刻意保持精简：**由单个 `Game` 控制器驱动基于 Tag 的触发器碰撞**，表现层脚本挂在 prefab 上。
 
 ### 3.1 `Game.cs` —— 状态机、计分与计时
 - 四个 Gate 检查点，由 `HandleCheckpoint` 内的 `_checkpoints` switch 串联：
@@ -107,10 +106,10 @@
 - `UpdateVignetteIntensity()` 持续根据玩家与轨迹最近点的距离抬高晕影强度——这就是"危险"反馈循环。
 
 ### 3.3 拾取物与生成链路
-- `SpawnPowerUps.cs` 复用 Meta 的 `FindSpawnPositions`（MR Utility Kit）：只替换 `_spawn.SpawnObject` 并按间隔调用 `_spawn.StartSpawn()`（`spawnInterval = 5f`）。**道具生成依赖 MRUK 房间数据，在没有真实房间时不会生效。**
+- `SpawnPowerUps.cs` 与 `SpawnCoinsAtStart` 使用 `PicoSpawnPositions`：在 Inspector 可调的 `spawnBounds` 内生成。当前是固定安全区域方案，不再依赖 MRUK；后续用 PICO Scene Capture 恢复房间感知生成。
 - `Spawn.cs`：弹出式缩放动画（sin 过冲）。
 - `BouncePickUp.cs`：正弦上下浮动；`SpinPickUp.cs`：旋转（注意其中的类名是 **`AnimatePickUp`**，不是 `SpinPickUp`）。
-- `FaceCamera.cs`（引用了 `Oculus.Interaction`）与 `FollowCamera.cs`：让道具/相机朝向头显。
+- `FaceCamera.cs` 与 `FollowCamera.cs`：让道具/相机朝向 PICO 头显，Meta/Oculus using 已移除。
 - `VignetteController.cs` 通过 `MaterialPropertyBlock` 直接改写 URP Fullscreen Vignette 的着色器属性（`_Color0..2`、`_GradientPosition0..2`）。**它不是 Volume 驱动的后处理**，而是直接写 Renderer 的材质属性。
 - `HUD.cs` 用 SmoothDamp 把 HUD 平滑地保持在相机前方；`UIBounce.cs` 做 UI 缩放脉动。
 
@@ -126,8 +125,8 @@ Prefab 与 Tag 对应关系：`Coin.prefab`→`Coin`，`Boost.prefab`→`Boost`�
 - **材质**（`Assets/Materials/`）：`Trail`、`TrailOutline`、`Trace`、`Gate`、`GateFail`、`GateStart`、`Base`、`BaseUnlit`、`GateUnlit`，以及 `PowerUps/` 子目录。
 - **音频**（`Assets/Sounds/`）：`Coin`、`Boost`、`Damage`、`Error`、`Multiplier`、`MultiplierEnd`、`TimeBonus`、`Countdown*`（由 `Game` 的 `AudioClip` 字段引用；`AudioSource` 挂在 `Game` 对象上）。
 - **渲染配置**（`Assets/Settings/`）：`PC_RPAsset`、`Mobile_RPAsset`、`PC_Renderer` / `Mobile_Renderer`、`DefaultVolumeProfile`、`UniversalRenderPipelineGlobalSettings`。
-- **XR 配置**：`Assets/XR/Loaders`（OpenXR + Simulation）、`Assets/XR/Settings`（OpenXR 包设置、XR 模拟）、`Assets/XRI/Settings`、`ProjectSettings/XRPackageSettings.asset`。
-- **Meta 配置**：`Assets/Oculus/OculusProjectConfig.asset`、`Assets/Resources/OculusRuntimeSettings.asset`、`Assets/Resources/OVRBuildConfig.asset`、`Assets/Resources/InputActions.asset`、`Assets/InputSystem_Actions.inputactions`。
+- **XR 配置**：`Assets/XR/Loaders`（PXR + Simulation）、`Assets/XR/Settings`（PXR、OpenXR 包设置、XR 模拟）、`Assets/XRI/Settings`、`ProjectSettings/XRPackageSettings.asset`。Android 仅启用 PXR_Loader。
+- **输入配置**：`Assets/InputSystem_Actions.inputactions`、PICO Debugger input actions 和 XRI Starter Assets。
 - **第三方资源**：`Assets/Simple FX Kit/`、`Assets/SkymonIconPackFree/`、`Assets/TextMesh Pro/`、`Assets/Samples/XR Interaction Toolkit/3.0.7/`。这些属于引入的第三方内容，**避免修改**。
 - 注意：工作区中 `Assets/Resources/PolySpatialSettings.asset` 已被**删除**（PolySpatial 被移除）。`git status` 中会出现一批与本次任务无关的改动，**不要擅自还原**。
 
@@ -139,10 +138,10 @@ Prefab 与 Tag 对应关系：`Coin.prefab`→`Coin`，`Boost.prefab`→`Boost`�
 1. 使用 **Unity 2022.3.62f3** 打开工程。
 2. 打开 `Assets/Scenes/BikeScene.unity`。
 3. 若要在没有头显的情况下测试 XR Rig，可在 XR Plug-in Management 中启用 `Assets/XR/Loaders/SimulationLoader.asset`（**未验证**：请先检查各平台的 loader 配置）。
-4. 按 **Play**。没有 MRUK 房间数据时，动态生成的道具不会出现。
+4. 按 **Play**。金币和道具在当前 `spawnBounds` 内生成；设备行为仍需后续真机验证。
 
-### Quest 3 真机
-`File → Build Settings` → Android（已配置：IL2CPP、ARM64、min SDK 32、支持 Quest 3）→ **Build And Run**。Meta XR 与 OpenXR loader 已在 `ProjectSettings/XRPackageSettings.asset` 中接好。
+### PICO OS 6 构建
+`File → Build Settings` → Android（IL2CPP、ARM64、min SDK 32）→ **Build**。当前输出为 `Build/PICO/Trailblazer.apk`；连接设备后可运行 `adb install -r Build/PICO/Trailblazer.apk`。
 
 ### 命令行（Batchmode）
 仓库中**没有** `Assets/Editor/` 目录，也**没有** `BuildScript.cs`，因此目前无法用 `-executeMethod`。通用批处理构建命令如下：
@@ -156,7 +155,7 @@ Prefab 与 Tag 对应关系：`Coin.prefab`→`Coin`，`Boost.prefab`→`Boost`�
 该命令只会使用 `EditorBuildSettings.asset` 中已启用的场景（目前仅 `BikeScene`）。若需要可复现的构建流程，应新增 `Assets/Editor/BuildScript.cs` 并提供静态 `PerformBuild()` 方法——目前不存在（见 §9）。
 
 ### 测试
-已安装 `com.unity.test-framework` 1.1.33，但工程内**没有任何测试程序集**（包外无 `*.asmdef`，也没有 `Tests/` 目录），因此当前无可运行的测试。若后续新增测试，请放在 `Assets/Tests/` 并配独立 asmdef，通过 `Window → General → Test Runner` 运行，或用 `-runTests -testPlatform PlayMode` 批处理运行。
+已安装 `com.unity.test-framework` 1.1.33。`Assets/Tests/PlayMode/` 包含 3 个 `PicoSpawnPositions` 测试，已在独立 Unity 测试工作区通过；仍需在主工程 Test Runner 复跑。
 
 ---
 
@@ -164,7 +163,7 @@ Prefab 与 Tag 对应关系：`Coin.prefab`→`Coin`，`Boost.prefab`→`Boost`�
 
 以下约定来自 `Assets/Scripts/`（提交 `e421d18 "unified code style"` 曾统一代码风格）：
 
-- **一个文件一个 MonoBehaviour**，使用 `public class`，**不使用命名空间**，**不使用 asmdef**。
+- **一个文件一个 MonoBehaviour**，使用 `public class`，既有玩法脚本不使用命名空间或 asmdef；PICO 专属程序集用于隔离依赖和支持测试。
 - **大括号独占一行**，4 空格缩进，局部变量优先 `var`，不使用表达式体成员或 lambda 风格。
 - **私有字段**：`_camelCase`（带下划线前缀）；**可调参数**：纯 `camelCase` 的 `public` 字段，直接暴露到 Inspector。本项目**不使用** `[SerializeField] private` 模式——需要调参的字段就是 `public`。
 - **常量**：编译期常量用 `private const`，每实例的配色用 `private readonly`；着色器属性 ID 缓存为 `static readonly int XxxID = Shader.PropertyToID(...)`。
@@ -183,7 +182,7 @@ Prefab 与 Tag 对应关系：`Coin.prefab`→`Coin`，`Boost.prefab`→`Boost`�
 
 | 包 | 版本 | 作用 |
 |---|---|---|
-| `com.meta.xr.sdk.all` | 71.0.0 | MRUK、透视、交互、OVR 运行时 |
+| `com.bytedance.pico.xr` | 6.1.1（Git main 锁定 hash） | PICO XR、透视、交互与后续环境感知 |
 | `com.unity.render-pipelines.universal` | 14.0.11 | 渲染；移动端 + PC 两套资产 |
 | `com.unity.xr.openxr` | 1.12.1 | XR 运行时 |
 | `com.unity.xr.management` | 4.5.0 | Loader 配置 |
@@ -192,9 +191,9 @@ Prefab 与 Tag 对应关系：`Coin.prefab`→`Coin`，`Boost.prefab`→`Boost`�
 | `com.unity.adaptiveperformance`（+ Google Android） | 5.0.0 / 1.2.0 | Quest 上的温控与性能调优 |
 | `com.unity.ai.navigation` | 1.1.5 | NavMesh（当前脚本未使用） |
 | `com.unity.visualscripting` | 1.9.5 | 已安装，`Assets/Scripts` 未使用 |
-| `com.unity.test-framework` | 1.1.33 | 已安装，但项目无测试 |
+| `com.unity.test-framework` | 1.1.33 | `PicoSpawnPositions` PlayMode 测试 |
 
-其余条目均为 Unity 官方 `com.unity.modules.*` 引擎模块。**没有** git URL 或本地 file 依赖；唯一的额外源是 Tuanjie Packman 作用域。
+其余条目均为 Unity 官方 `com.unity.modules.*` 引擎模块。PICO SDK 使用 Git URL 依赖，具体 hash 见 `Packages/packages-lock.json`。
 
 脚本宏定义（Android 与 Standalone 相同）：
 `ISDK_OPENXR_HAND;USE_INPUT_SYSTEM_POSE_CONTROL;USE_STICK_CONTROL_THUMBSTICKS`。
@@ -215,9 +214,9 @@ Prefab 与 Tag 对应关系：`Coin.prefab`→`Coin`，`Boost.prefab`→`Boost`�
 ## 9. TODO / 未决问题
 
 - **无构建自动化**：没有 `Assets/Editor/BuildScript.cs`、没有 CI 工作流、没有 shell 脚本。批处理构建无法指定自定义场景列表。需确认发布方式（Meta 商店构建？APK 侧载？）。
-- **无测试程序集**：`com.unity.test-framework` 已安装但闲置。`Game`（计分、检查点状态机）与 `DrawTrail`（轨迹窗口、碰撞判定）是最高价值的首批测试点。
+- **测试缺口**：已有 3 个生成器 PlayMode 测试，但还需在主工程复跑；`Game` 与 `DrawTrail` 仍无测试。
 - **`Boost` 拾取物被禁用**（`Game.cs` 注释：等多人支持）。Prefab 与 Tag 仍在——在没有玩法决策前不要"修好"它。
 - **文件名与类名不一致**：`SpinPickUp.cs` → `AnimatePickUp`。本身无害，但重命名请通过 Editor 进行以保留 `.meta` 的 GUID（直接 `mv` 会破坏 prefab 引用）。
 - **遗留空 meta**：存在 `Assets/Editor.meta` 但无对应 `Assets/Editor/` 目录，属删除目录后的残留，可忽略。
-- **平台限制（Quest 遗留）**：README 说明 Quest 3 不支持大范围户外空间，并给出关闭边界的变通做法。现有 `BOUNDARYLESS_APP` / `PASSTHROUGH` 等 Quest 声明将在 PICO 功能替换完成后移除；PICO 版本必须按 PICO XR 的安全区、MR 安全防护和透视文档重新实现与验证，不能照搬 Quest 的关闭边界方案。
-- **未验证项（需真机/Editor）**：MRUK 实际生成行为、设备端帧率表现、Adaptive Performance provider 设置。建议通过 Unity Editor + Quest Link 验证。
+- **房间感知生成**：当前使用固定 `spawnBounds`；下一阶段按 PICO Scene Capture 文档查询地面/可用区域，不能照搬 Quest 的关闭边界方案。
+- **未验证项**：用户暂时跳过真机验证；PICO 透视、追踪、设备帧率和完整玩法仍未确认。
