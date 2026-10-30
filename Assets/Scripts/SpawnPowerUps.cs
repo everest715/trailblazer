@@ -1,5 +1,4 @@
 using System.Collections;
-using Meta.XR.MRUtilityKit;
 using UnityEngine;
 
 public class SpawnPowerUps : MonoBehaviour
@@ -7,11 +6,11 @@ public class SpawnPowerUps : MonoBehaviour
     public GameObject[] powerUps;
     public float spawnInterval = 5f;
     
-    private FindSpawnPositions _spawn;
+    private PicoSpawnPositions _spawn;
     
     private void Start()
     {
-        _spawn = GetComponent<FindSpawnPositions>();
+        _spawn = GetComponent<PicoSpawnPositions>();
         InvokeRepeating(nameof(SpawnObject), 0f, spawnInterval);
     }
     

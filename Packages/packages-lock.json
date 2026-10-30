@@ -1,5 +1,18 @@
 {
   "dependencies": {
+    "com.bytedance.pico.xr": {
+      "version": "https://github.com/Pico-Developer/PICO-Unity-SDK.git?path=/XR#main",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {
+        "com.unity.xr.management": "4.0.0",
+        "com.unity.xr.interaction.toolkit": "2.0.0",
+        "com.unity.xr.core-utils": "2.3.0",
+        "com.unity.ugui": "1.0.0",
+        "com.unity.textmeshpro": "3.0.6"
+      },
+      "hash": "75699354718f13fc9cb7c0a756bb4508913b7acd"
+    },
     "com.meta.xr.mrutilitykit": {
       "version": "71.0.0",
       "depth": 1,
@@ -262,7 +275,7 @@
     },
     "com.unity.textmeshpro": {
       "version": "3.0.7",
-      "depth": 2,
+      "depth": 1,
       "source": "registry",
       "dependencies": {
         "com.unity.ugui": "1.0.0"

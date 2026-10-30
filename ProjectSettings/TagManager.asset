@@ -2,7 +2,7 @@
 %TAG !u! tag:unity3d.com,2011:
 --- !u!78 &1
 TagManager:
-  serializedVersion: 3
+  serializedVersion: 2
   tags:
   - QDSUIToggleButton
   - QDSUIIcon
@@ -38,6 +38,7 @@ TagManager:
   - Gate4
   - DenyGate
   - StartingArea
+  - Camera0
   layers:
   - Default
   - TransparentFX
@@ -78,12 +79,3 @@ TagManager:
   - name: PolySpatialUI
     uniqueID: 1451464871
     locked: 0
-  m_RenderingLayers:
-  - Default
-  - Light Layer 1
-  - Light Layer 2
-  - Light Layer 3
-  - Light Layer 4
-  - Light Layer 5
-  - Light Layer 6
-  - Light Layer 7
