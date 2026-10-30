@@ -15,8 +15,7 @@ The project targets **PICO OS 6** using **PICO XR**. Quest 3 is no longer a supp
 
 Current status:
 - PICO XR camera, controller tracking and video passthrough are configured.
-- Coins and power ups currently spawn inside configurable fixed safe areas.
-- PICO Scene Capture based room-aware spawning is a later task.
+- Coins and power ups prefer PICO Scene Capture floor anchors and fall back to configurable fixed safe areas when room data is unavailable.
 - Device verification has been skipped for now; PICO OS 6 behavior is not yet confirmed on hardware.
 
 ## Requirements
@@ -47,6 +46,6 @@ adb install -r Build/PICO/Trailblazer.apk
 ```
 
 ## Spawn areas
-`SpawnPowerUps` and `SpawnCoinsAtStart` use `PicoSpawnPositions`. Adjust each component's `spawnBounds` in the Inspector so generated objects stay inside the intended safe play area and outside the player's starting position.
+`SpawnPowerUps` and `SpawnCoinsAtStart` use `PicoSceneSpawnPositions` with `PicoSceneCaptureFloorAreaProvider`. If Scene Capture cannot provide a floor, `PicoSpawnPositions` is used as the fallback. Adjust the fallback component's `spawnBounds` in the Inspector so generated objects stay inside the intended safe play area and outside the player's starting position.
 
 Do not use the old Quest boundary-disabling workaround. PICO safety, passthrough and room-calibration behavior must follow the PICO XR documentation.

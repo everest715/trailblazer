@@ -1,0 +1,17 @@
+{
+  "name": "Trailblazer.Pico.Scene",
+  "rootNamespace": "",
+  "references": [
+    "Trailblazer.Pico",
+    "ByteDance.PICO.XR"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

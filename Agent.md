@@ -15,7 +15,7 @@
 ### 0.1 当前目标与遗留状态
 
 - 目标设备平台为 **Android / PICO OS 6**，目标开发模式为 **PICO XR**。不要为该移植新增 Quest 兼容层，也不要混用 Unity OpenXR、PICO Spatial 与 PICO XR 的配置和 API。
-- `BikeScene` 已迁移到 PICO XR，视频透视已开启，Android 仅启用 PXR_Loader，Meta SDK 包与 Meta/Oculus 资源已移除。当前金币和道具使用固定安全区域生成；PICO Scene Capture 房间感知生成是下一阶段任务。用户已明确暂时跳过真机验证，因此不得宣称 PICO OS 6 设备行为已验证。
+- `BikeScene` 已迁移到 PICO XR，视频透视已开启，Android 仅启用 PXR_Loader，Meta SDK 包与 Meta/Oculus 资源已移除。金币和道具已接入 PICO Scene Capture 地面锚点，查询失败时回退到固定安全区域。用户已明确暂时跳过真机验证，因此不得宣称 PICO OS 6 设备行为已验证。
 - 保持 Unity **2022.3.62f3** 与 URP **14.0.11**。PICO Unity SDK 6.1 文档要求 PICO XR 模式使用 Unity 2022.3.15f1 或更高版本，当前编辑器版本满足该要求。
 - PICO Unity SDK 导入地址：
   `https://github.com/Pico-Developer/PICO-Unity-SDK.git?path=/XR#main`
@@ -106,7 +106,7 @@
 - `UpdateVignetteIntensity()` 持续根据玩家与轨迹最近点的距离抬高晕影强度——这就是"危险"反馈循环。
 
 ### 3.3 拾取物与生成链路
-- `SpawnPowerUps.cs` 与 `SpawnCoinsAtStart` 使用 `PicoSpawnPositions`：在 Inspector 可调的 `spawnBounds` 内生成。当前是固定安全区域方案，不再依赖 MRUK；后续用 PICO Scene Capture 恢复房间感知生成。
+- `SpawnPowerUps.cs` 与 `SpawnCoinsAtStart` 使用 `PicoSceneSpawnPositions` + `PicoSceneCaptureFloorAreaProvider`：优先在 PICO Floor 场景锚点内生成，失败时由 `PicoSpawnPositions` 在 Inspector 可调的 `spawnBounds` 内回退。回退组件的 `SpawnOnStart` 已关闭，避免重复生成。
 - `Spawn.cs`：弹出式缩放动画（sin 过冲）。
 - `BouncePickUp.cs`：正弦上下浮动；`SpinPickUp.cs`：旋转（注意其中的类名是 **`AnimatePickUp`**，不是 `SpinPickUp`）。
 - `FaceCamera.cs` 与 `FollowCamera.cs`：让道具/相机朝向 PICO 头显，Meta/Oculus using 已移除。
@@ -218,5 +218,5 @@ Prefab 与 Tag 对应关系：`Coin.prefab`→`Coin`，`Boost.prefab`→`Boost`�
 - **`Boost` 拾取物被禁用**（`Game.cs` 注释：等多人支持）。Prefab 与 Tag 仍在——在没有玩法决策前不要"修好"它。
 - **文件名与类名不一致**：`SpinPickUp.cs` → `AnimatePickUp`。本身无害，但重命名请通过 Editor 进行以保留 `.meta` 的 GUID（直接 `mv` 会破坏 prefab 引用）。
 - **遗留空 meta**：存在 `Assets/Editor.meta` 但无对应 `Assets/Editor/` 目录，属删除目录后的残留，可忽略。
-- **房间感知生成**：当前使用固定 `spawnBounds`；下一阶段按 PICO Scene Capture 文档查询地面/可用区域，不能照搬 Quest 的关闭边界方案。
+- **房间感知生成**：已按 PICO Scene Capture 文档实现 Floor 查询与固定区域回退；设备端标定流程、权限和实际生成位置仍需后续真机验证。
 - **未验证项**：用户暂时跳过真机验证；PICO 透视、追踪、设备帧率和完整玩法仍未确认。

@@ -133,6 +133,8 @@ GameObject:
   - component: {fileID: 31291500}
   - component: {fileID: 31291498}
   - component: {fileID: 31291501}
+  - component: {fileID: 31291503}
+  - component: {fileID: 31291502}
   m_Layer: 0
   m_Name: SpawnPowerUps
   m_TagString: Untagged
@@ -191,12 +193,41 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 63ce693c41f938a4895619152ba047b1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SpawnOnStart: 1
+  SpawnOnStart: 0
   SpawnObject: {fileID: 0}
   SpawnAmount: 1
   spawnBounds:
     m_Center: {x: 0, y: 0.5, z: 4}
     m_Extent: {x: 2, y: 0.5, z: 2}
+--- !u!114 &31291502
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 31291497}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b6611a25f96d1524da3beb956936983e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SpawnOnStart: 1
+  SpawnObject: {fileID: 0}
+  SpawnAmount: 1
+  surfaceClearance: 0.05
+  fallback: {fileID: 31291501}
+--- !u!114 &31291503
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 31291497}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa54b634d76efc24ea03ebde25cdc495, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &41985312
 GameObject:
   m_ObjectHideFlags: 0
@@ -1279,6 +1310,8 @@ GameObject:
   m_Component:
   - component: {fileID: 589298191}
   - component: {fileID: 589298192}
+  - component: {fileID: 589298194}
+  - component: {fileID: 589298193}
   m_Layer: 0
   m_Name: SpawnCoinsAtStart
   m_TagString: Untagged
@@ -1313,12 +1346,41 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 63ce693c41f938a4895619152ba047b1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SpawnOnStart: 1
+  SpawnOnStart: 0
   SpawnObject: {fileID: 354547556857757566, guid: eaf266e3024de4bd88298bb6cc1ead36, type: 3}
   SpawnAmount: 4
   spawnBounds:
     m_Center: {x: 0, y: 0.5, z: 4}
     m_Extent: {x: 2, y: 0.5, z: 2}
+--- !u!114 &589298193
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 589298189}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b6611a25f96d1524da3beb956936983e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SpawnOnStart: 1
+  SpawnObject: {fileID: 354547556857757566, guid: eaf266e3024de4bd88298bb6cc1ead36, type: 3}
+  SpawnAmount: 4
+  surfaceClearance: 0.05
+  fallback: {fileID: 589298192}
+--- !u!114 &589298194
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 589298189}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa54b634d76efc24ea03ebde25cdc495, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &599993779
 GameObject:
   m_ObjectHideFlags: 0

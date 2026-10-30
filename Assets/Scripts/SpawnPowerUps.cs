@@ -6,11 +6,11 @@ public class SpawnPowerUps : MonoBehaviour
     public GameObject[] powerUps;
     public float spawnInterval = 5f;
     
-    private PicoSpawnPositions _spawn;
+    private PicoSceneSpawnPositions _spawn;
     
     private void Start()
     {
-        _spawn = GetComponent<PicoSpawnPositions>();
+        _spawn = GetComponent<PicoSceneSpawnPositions>();
         InvokeRepeating(nameof(SpawnObject), 0f, spawnInterval);
     }
     
