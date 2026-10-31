@@ -4,9 +4,24 @@ public readonly struct PicoFloorArea
 {
     private readonly Vector3[] _vertices;
 
+    public float AverageHeight { get; }
+
     public PicoFloorArea(Vector3[] vertices)
     {
         _vertices = vertices;
+        if (vertices == null || vertices.Length == 0)
+        {
+            AverageHeight = 0f;
+            return;
+        }
+
+        var height = 0f;
+        foreach (var vertex in vertices)
+        {
+            height += vertex.y;
+        }
+
+        AverageHeight = height / vertices.Length;
     }
 
     public bool TryGetRandomPoint(out Vector3 point)
