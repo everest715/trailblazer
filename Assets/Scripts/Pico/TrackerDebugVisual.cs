@@ -16,7 +16,11 @@ public class TrackerDebugVisual : MonoBehaviour
         model.transform.SetParent(transform, false);
         model.transform.localPosition = Vector3.zero;
         model.transform.localRotation = Quaternion.identity;
-        model.transform.localScale = new Vector3(0.15f, 0.05f, 0.08f);
+        var parentScale = transform.localScale;
+        model.transform.localScale = new Vector3(
+            0.15f / parentScale.x,
+            0.05f / parentScale.y,
+            0.08f / parentScale.z);
         SetMaterial(model, new Color(0f, 0.8f, 1f));
         RemoveCollider(model);
 

@@ -23,6 +23,7 @@ public class TrackerDebugVisualTests
     [UnityTest]
     public IEnumerator Start_CreatesNonCollidingModelAtCarOrigin()
     {
+        _car.transform.localScale = new Vector3(0.15f, 0.05f, 0.15f);
         _car.AddComponent<TrackerDebugVisual>();
 
         yield return null;
@@ -30,7 +31,8 @@ public class TrackerDebugVisualTests
         var model = _car.transform.Find("TrackerDebugModel");
         Assert.IsNotNull(model);
         Assert.AreEqual(Vector3.zero, model.localPosition);
-        Assert.AreEqual(new Vector3(0.15f, 0.05f, 0.08f), model.localScale);
+        var worldScale = Vector3.Scale(model.localScale, _car.transform.localScale);
+        Assert.AreEqual(new Vector3(0.15f, 0.05f, 0.08f), worldScale);
         Assert.IsFalse(model.GetComponentsInChildren<Collider>().Any());
         Assert.IsNotNull(model.Find("ForwardMarker"));
     }
