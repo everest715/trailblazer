@@ -13,6 +13,7 @@ public class Game : MonoBehaviour
 {
     public float startTimeout = 6f;
     public float startThreshold = 1.5f;
+    public float trackScale = 1f;
     
     public DrawTrail drawTrail;
     public float timer = 80f;
@@ -235,8 +236,10 @@ public class Game : MonoBehaviour
         var position = g.transform.position;
         var rotation = g.transform.rotation;
         Destroy(g);
-        
-        return Instantiate(final ? finalGate : speedFault ? blockedGate : activeGate, position, rotation);
+
+        var gate = Instantiate(final ? finalGate : speedFault ? blockedGate : activeGate, position, rotation);
+        gate.transform.localScale *= trackScale;
+        return gate;
     }
 
     private IEnumerator Handle3CoinSound()

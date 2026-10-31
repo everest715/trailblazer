@@ -15,7 +15,7 @@
 ### 0.1 当前目标与遗留状态
 
 - 目标设备平台为 **Android / PICO OS 6**，目标开发模式为 **PICO XR**。不要为该移植新增 Quest 兼容层，也不要混用 Unity OpenXR、PICO Spatial 与 PICO XR 的配置和 API。
-- `BikeScene` 已迁移到 PICO XR，视频透视已开启，Android 仅启用 PXR_Loader，Meta SDK 包与 Meta/Oculus 资源已移除。金币和道具已接入 PICO Scene Capture 地面锚点，查询失败时回退到固定安全区域。头显已改为自由移动的 MR 观察者，`TrackedCar` 是唯一 Player 实体，由 PICO Motion Tracker 驱动；碰撞保留原玩法并触发独立特效。用户已明确暂时跳过真机验证，因此不得宣称 PICO OS 6 设备行为已验证。
+- `BikeScene` 已迁移到 PICO XR，视频透视已开启，Android 仅启用 PXR_Loader，Meta SDK 包与 Meta/Oculus 资源已移除。金币和道具已接入 PICO Scene Capture 地面锚点，查询失败时回退到固定安全区域。头显已改为自由移动的 MR 观察者，`TrackedCar` 是唯一 Player 实体，由 PICO Motion Tracker 驱动；碰撞保留原玩法并触发独立特效。当前赛道为前方 1.5m 的 1.5m × 1.5m 区域，车长 0.15m，Gate、道具、轨迹和特效使用 0.25 比例。用户已明确暂时跳过真机验证，因此不得宣称 PICO OS 6 设备行为已验证。
 - 保持 Unity **2022.3.62f3** 与 URP **14.0.11**。PICO Unity SDK 6.1 文档要求 PICO XR 模式使用 Unity 2022.3.15f1 或更高版本，当前编辑器版本满足该要求。
 - PICO Unity SDK 导入地址：
   `https://github.com/Pico-Developer/PICO-Unity-SDK.git?path=/XR#main`

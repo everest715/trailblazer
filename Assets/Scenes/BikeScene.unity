@@ -197,8 +197,8 @@ MonoBehaviour:
   SpawnObject: {fileID: 0}
   SpawnAmount: 1
   spawnBounds:
-    m_Center: {x: 0, y: 0.5, z: 4}
-    m_Extent: {x: 2, y: 0.5, z: 2}
+    m_Center: {x: 0, y: 0.5, z: 1.5}
+    m_Extent: {x: 0.75, y: 0.5, z: 0.75}
 --- !u!114 &31291502
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -216,8 +216,8 @@ MonoBehaviour:
   SpawnAmount: 1
   surfaceClearance: 0.05
   playAreaBounds:
-    m_Center: {x: 0, y: 0.5, z: 4}
-    m_Extent: {x: 2, y: 0.5, z: 2}
+    m_Center: {x: 0, y: 0.5, z: 1.5}
+    m_Extent: {x: 0.75, y: 0.5, z: 0.75}
   fallback: {fileID: 31291501}
 --- !u!114 &31291503
 MonoBehaviour:
@@ -362,8 +362,8 @@ Transform:
   m_GameObject: {fileID: 201118414}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -2.46}
-  m_LocalScale: {x: 10, y: 10, z: 10}
+  m_LocalPosition: {x: 0, y: 0, z: 1.5}
+  m_LocalScale: {x: 0.25, y: 0.25, z: 0.25}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -594,7 +594,7 @@ LineRenderer:
   m_Positions: []
   m_Parameters:
     serializedVersion: 3
-    widthMultiplier: 1
+    widthMultiplier: 0.25
     widthCurve:
       serializedVersion: 2
       m_Curve:
@@ -786,8 +786,8 @@ Transform:
   m_GameObject: {fileID: 387080056}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 2, y: 2, z: 2}
+  m_LocalPosition: {x: 0, y: 0, z: 1.5}
+  m_LocalScale: {x: 0.25, y: 0.25, z: 0.25}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 717856733}
@@ -858,7 +858,7 @@ LineRenderer:
   m_Positions: []
   m_Parameters:
     serializedVersion: 3
-    widthMultiplier: 1
+    widthMultiplier: 0.25
     widthCurve:
       serializedVersion: 2
       m_Curve:
@@ -1355,8 +1355,8 @@ MonoBehaviour:
   SpawnObject: {fileID: 354547556857757566, guid: eaf266e3024de4bd88298bb6cc1ead36, type: 3}
   SpawnAmount: 4
   spawnBounds:
-    m_Center: {x: 0, y: 0.5, z: 4}
-    m_Extent: {x: 2, y: 0.5, z: 2}
+    m_Center: {x: 0, y: 0.5, z: 1.5}
+    m_Extent: {x: 0.75, y: 0.5, z: 0.75}
 --- !u!114 &589298193
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1374,8 +1374,8 @@ MonoBehaviour:
   SpawnAmount: 4
   surfaceClearance: 0.05
   playAreaBounds:
-    m_Center: {x: 0, y: 0.5, z: 4}
-    m_Extent: {x: 2, y: 0.5, z: 2}
+    m_Center: {x: 0, y: 0.5, z: 1.5}
+    m_Extent: {x: 0.75, y: 0.5, z: 0.75}
   fallback: {fileID: 589298192}
 --- !u!114 &589298194
 MonoBehaviour:
@@ -2342,7 +2342,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.3, y: 9, z: 0.3}
+  m_LocalScale: {x: 0.15, y: 0.05, z: 0.15}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
@@ -2388,6 +2388,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   startTimeout: 6
   startThreshold: 1.5
+  trackScale: 0.25
   drawTrail: {fileID: 292125754}
   timer: 80
   multTimer: 7.5
@@ -2527,6 +2528,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   effectPrefab: {fileID: 417761080263594737, guid: 7800b8f6b712bfe49bd663eeb3ebe1e4, type: 3}
   lifetime: 2
+  effectScale: 0.25
 --- !u!114 &1323473305
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3121,7 +3123,7 @@ LineRenderer:
   m_Positions: []
   m_Parameters:
     serializedVersion: 3
-    widthMultiplier: 1
+    widthMultiplier: 0.25
     widthCurve:
       serializedVersion: 2
       m_Curve:
@@ -4100,6 +4102,10 @@ PrefabInstance:
       value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 2761784063978902504, guid: c1800acf6366418a9b5f610249000331, type: 3}
+      propertyPath: m_Parameters.widthMultiplier
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 2761784063978902504, guid: c1800acf6366418a9b5f610249000331, type: 3}
       propertyPath: m_Parameters.numCornerVertices
       value: 4
       objectReference: {fileID: 0}
@@ -4777,6 +4783,10 @@ PrefabInstance:
     - target: {fileID: 2761784063978902504, guid: c1800acf6366418a9b5f610249000331, type: 3}
       propertyPath: m_Parameters.numCapVertices
       value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 2761784063978902504, guid: c1800acf6366418a9b5f610249000331, type: 3}
+      propertyPath: m_Parameters.widthMultiplier
+      value: 0.25
       objectReference: {fileID: 0}
     - target: {fileID: 2761784063978902504, guid: c1800acf6366418a9b5f610249000331, type: 3}
       propertyPath: m_Parameters.numCornerVertices
@@ -5632,6 +5642,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5262083691642962929, guid: b200f6587d118224eba8467281481800, type: 3}
+      propertyPath: m_Parameters.widthMultiplier
+      value: 0.25
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -5785,6 +5799,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 202364688}
     m_Modifications:
+    - target: {fileID: 3053154067257784704, guid: 3df3e1220f2164f448701a6de8084f92, type: 3}
+      propertyPath: m_Parameters.widthMultiplier
+      value: 0.25
+      objectReference: {fileID: 0}
     - target: {fileID: 4804964734930210078, guid: 3df3e1220f2164f448701a6de8084f92, type: 3}
       propertyPath: m_Name
       value: Near-Far Interactor

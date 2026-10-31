@@ -65,4 +65,6 @@ Input is configured as **Hands Only**: the APK manifest has no `controller` requ
 ## Spawn areas
 `SpawnPowerUps` and `SpawnCoinsAtStart` use `PicoSceneSpawnPositions` with `PicoSceneCaptureFloorAreaProvider`. If Scene Capture cannot provide a floor, `PicoSpawnPositions` is used as the fallback. Adjust the fallback component's `spawnBounds` in the Inspector so generated objects stay inside the intended safe play area and outside the player's starting position.
 
+The current miniature layout uses a **1.5m x 1.5m** play area centered **1.5m ahead of the initial headset position**. The car is configured as **15cm long**, while gates, pickups, collision effects and trail width use **25%** scale. `playAreaBounds` filters both Scene Capture and fallback candidates.
+
 Do not use the old Quest boundary-disabling workaround. PICO safety, passthrough and room-calibration behavior must follow the PICO XR documentation.
