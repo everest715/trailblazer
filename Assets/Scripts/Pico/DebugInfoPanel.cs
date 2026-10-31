@@ -21,7 +21,7 @@ public class DebugInfoPanel : MonoBehaviour
     {
         if (output == null) output = GetComponent<TextMeshProUGUI>();
         if (tracker == null) tracker = GetComponent<ITrackerDebugInfo>();
-        if (spawners == null || spawners.Length == 0) spawners = FindObjectsOfType<PicoSceneSpawnPositions>();
+        if (spawners == null || spawners.Length == 0) spawners = Resources.FindObjectsOfTypeAll<PicoSceneSpawnPositions>();
         Refresh();
     }
 
@@ -58,6 +58,7 @@ public class DebugInfoPanel : MonoBehaviour
                 {
                     text.AppendLine($"Floor anchors: {provider.DebugFloorAreaCount}");
                 }
+                text.AppendLine($"Ground height: {spawner.LastGroundHeightMethod} | y={spawner.LastGroundHeight:F2}");
                 text.AppendLine($"Last point: {spawner.LastSpawnPoint:F2}");
                 text.AppendLine($"playArea: c={spawner.playAreaBounds.center:F2} s={spawner.playAreaBounds.size:F2}");
             }

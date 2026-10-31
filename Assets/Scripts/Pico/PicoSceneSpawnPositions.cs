@@ -15,6 +15,8 @@ public class PicoSceneSpawnPositions : MonoBehaviour
 
     public string LastSpawnSource { get; private set; } = "Not spawned";
     public Vector3 LastSpawnPoint { get; private set; }
+    public float LastGroundHeight { get; private set; }
+    public string LastGroundHeightMethod { get; private set; } = "Not detected";
 
     private void Start()
     {
@@ -37,7 +39,9 @@ public class PicoSceneSpawnPositions : MonoBehaviour
             var provider = GetComponent<IPicoFloorAreaProvider>();
             if (provider == null)
             {
-                LastSpawnSource = "Fallback";
+                LastGroundHeight = fallback.spawnBounds.center.y;
+                LastGroundHeightMethod = "Fixed bounds";
+                LastSpawnSource = "固定区域";
                 fallback.StartSpawn();
                 return;
             }
@@ -58,12 +62,16 @@ public class PicoSceneSpawnPositions : MonoBehaviour
 
             if (spawnPoints.Count != SpawnAmount)
             {
-                LastSpawnSource = "Fallback";
+                LastGroundHeight = fallback.spawnBounds.center.y;
+                LastGroundHeightMethod = "Fixed bounds";
+                LastSpawnSource = "固定区域";
                 fallback.StartSpawn();
                 return;
             }
 
             LastSpawnSource = "SceneCapture";
+            LastGroundHeight = spawnPoints[0].y;
+            LastGroundHeightMethod = "SceneCapture floor anchors";
             LastSpawnPoint = spawnPoints[0];
             foreach (var point in spawnPoints)
             {
@@ -72,7 +80,9 @@ public class PicoSceneSpawnPositions : MonoBehaviour
         }
         catch (Exception)
         {
-            LastSpawnSource = "Fallback";
+            LastGroundHeight = fallback.spawnBounds.center.y;
+            LastGroundHeightMethod = "Fixed bounds";
+            LastSpawnSource = "固定区域";
             Debug.LogWarning("Scene capture spawn failed; using fallback");
             fallback.StartSpawn();
         }

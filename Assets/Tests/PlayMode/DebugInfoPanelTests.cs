@@ -6,6 +6,18 @@ using UnityEngine;
 
 public class DebugInfoPanelTests
 {
+    private readonly List<GameObject> _roots = new List<GameObject>();
+
+    [TearDown]
+    public void TearDown()
+    {
+        foreach (var root in _roots)
+        {
+            if (root != null) Object.DestroyImmediate(root);
+        }
+        _roots.Clear();
+    }
+
     private sealed class FakeTracker : MonoBehaviour, ITrackerDebugInfo
     {
         public long DebugTrackerId => 7;
@@ -35,9 +47,31 @@ public class DebugInfoPanelTests
     }
 
     [Test]
+    public void Start_FindsInactiveSpawners()
+    {
+        var root = new GameObject("DebugRoot");
+        _roots.Add(root);
+        var output = root.AddComponent<TextMeshProUGUI>();
+        var panel = root.AddComponent<DebugInfoPanel>();
+        var tracker = root.AddComponent<FakeTracker>();
+        var spawnerObject = new GameObject("InactiveSpawner");
+        _roots.Add(spawnerObject);
+        spawnerObject.AddComponent<PicoSceneSpawnPositions>();
+        spawnerObject.SetActive(false);
+        panel.output = output;
+        panel.tracker = tracker;
+        panel.spawners = null;
+
+        panel.SendMessage("Start");
+
+        Assert.AreEqual(1, panel.spawners.Length);
+    }
+
+    [Test]
     public void Refresh_ShowsTrackerAndSceneCaptureInfo()
     {
         var root = new GameObject("DebugRoot");
+        _roots.Add(root);
         var output = root.AddComponent<TextMeshProUGUI>();
         var panel = root.AddComponent<DebugInfoPanel>();
         var tracker = root.AddComponent<FakeTracker>();
@@ -59,6 +93,7 @@ public class DebugInfoPanelTests
         StringAssert.Contains("SceneCapture", output.text);
         StringAssert.Contains("Floor anchors: 1", output.text);
         StringAssert.Contains("playArea", output.text);
-        Object.DestroyImmediate(root);
+        StringAssert.Contains("Ground height", output.text);
+        StringAssert.Contains("SceneCapture floor anchors", output.text);
     }
 }
