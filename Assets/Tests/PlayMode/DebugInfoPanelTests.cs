@@ -47,6 +47,25 @@ public class DebugInfoPanelTests
     }
 
     [Test]
+    public void Start_AssignsTrackerFromScene()
+    {
+        var root = new GameObject("DebugRoot");
+        _roots.Add(root);
+        var output = root.AddComponent<TextMeshProUGUI>();
+        var panel = root.AddComponent<DebugInfoPanel>();
+        var trackerObject = new GameObject("TrackerObject");
+        _roots.Add(trackerObject);
+        var tracker = trackerObject.AddComponent<FakeTracker>();
+        panel.output = output;
+        panel.tracker = null;
+        panel.spawners = new PicoSceneSpawnPositions[0];
+
+        panel.SendMessage("Start");
+
+        Assert.AreEqual(tracker, panel.tracker);
+    }
+
+    [Test]
     public void Start_FindsInactiveSpawners()
     {
         var root = new GameObject("DebugRoot");

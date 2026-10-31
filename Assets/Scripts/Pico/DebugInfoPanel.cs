@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Text;
 using TMPro;
 using UnityEngine;
@@ -20,7 +21,7 @@ public class DebugInfoPanel : MonoBehaviour
     private void Start()
     {
         if (output == null) output = GetComponent<TextMeshProUGUI>();
-        if (tracker == null) tracker = GetComponent<ITrackerDebugInfo>();
+        if (tracker == null) tracker = FindObjectsOfType<MonoBehaviour>().OfType<ITrackerDebugInfo>().FirstOrDefault();
         if (spawners == null || spawners.Length == 0) spawners = Resources.FindObjectsOfTypeAll<PicoSceneSpawnPositions>();
         Refresh();
     }

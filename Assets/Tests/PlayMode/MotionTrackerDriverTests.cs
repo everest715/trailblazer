@@ -56,6 +56,23 @@ public class MotionTrackerDriverTests
     }
 
     [UnityTest]
+    public IEnumerator Update_SynchronizesTransformImmediately()
+    {
+        _source.HasPose = true;
+        _source.Position = new Vector3(2f, 0f, 3f);
+        _source.Rotation = Quaternion.Euler(0f, 90f, 0f);
+        var driver = _car.AddComponent<MotionTrackerDriver>();
+        driver.positionOffset = new Vector3(0.5f, 0f, 0f);
+        driver.rotationOffset = Quaternion.Euler(0f, 15f, 0f);
+
+        driver.Update();
+
+        Assert.AreEqual(new Vector3(2.5f, 0f, 3f), _car.transform.position);
+        Assert.Less(Quaternion.Angle(_source.Rotation * driver.rotationOffset, _car.transform.rotation), 0.01f);
+        yield break;
+    }
+
+    [UnityTest]
     public IEnumerator FixedUpdate_InvalidPoseKeepsRigidbodyStill()
     {
         var initialPosition = new Vector3(1f, 2f, 3f);
