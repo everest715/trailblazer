@@ -7,6 +7,7 @@ public class DebugInfoPanel : MonoBehaviour
 {
     public TextMeshProUGUI output;
     public ITrackerDebugInfo tracker;
+    public MotionTrackerDriver trackerDriver;
     public PicoSceneSpawnPositions[] spawners;
     public float refreshInterval = 0.5f;
 
@@ -22,6 +23,7 @@ public class DebugInfoPanel : MonoBehaviour
     {
         if (output == null) output = GetComponent<TextMeshProUGUI>();
         if (tracker == null) tracker = FindObjectsOfType<MonoBehaviour>().OfType<ITrackerDebugInfo>().FirstOrDefault();
+        if (trackerDriver == null) trackerDriver = FindAnyObjectByType<MotionTrackerDriver>();
         if (spawners == null || spawners.Length == 0) spawners = Resources.FindObjectsOfTypeAll<PicoSceneSpawnPositions>();
         Refresh();
     }
@@ -45,7 +47,8 @@ public class DebugInfoPanel : MonoBehaviour
         else
         {
             text.AppendLine($"Tracker: {tracker.DebugRequestStatus} | id={tracker.DebugTrackerId} | valid={tracker.DebugPoseValid}");
-            text.AppendLine($"Position: {tracker.DebugPosition:F2}");
+            var position = trackerDriver == null ? tracker.DebugPosition : trackerDriver.DebugWorldPosition;
+            text.AppendLine($"Position: {position:F2}");
         }
 
         if (spawners != null)

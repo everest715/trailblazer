@@ -56,6 +56,26 @@ public class MotionTrackerDriverTests
     }
 
     [UnityTest]
+    public IEnumerator Update_ConvertsTrackerLocalPoseToWorld()
+    {
+        var origin = new GameObject("HMDOrigin");
+        origin.transform.position = new Vector3(10f, 0f, 0f);
+        origin.transform.rotation = Quaternion.Euler(0f, 90f, 0f);
+        _source.HasPose = true;
+        _source.Position = new Vector3(1f, 0f, 0f);
+        _source.Rotation = Quaternion.Euler(0f, 15f, 0f);
+        var driver = _car.AddComponent<MotionTrackerDriver>();
+        driver.trackingOrigin = origin.transform;
+
+        driver.Update();
+
+        Assert.Less(Vector3.Distance(new Vector3(10f, 0f, -1f), _car.transform.position), 0.0001f);
+        Assert.Less(Quaternion.Angle(origin.transform.rotation * _source.Rotation, _car.transform.rotation), 0.01f);
+        Object.DestroyImmediate(origin);
+        yield break;
+    }
+
+    [UnityTest]
     public IEnumerator Update_SynchronizesTransformImmediately()
     {
         _source.HasPose = true;
