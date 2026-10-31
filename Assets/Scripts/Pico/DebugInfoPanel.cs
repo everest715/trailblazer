@@ -10,6 +10,12 @@ public class DebugInfoPanel : MonoBehaviour
     public float refreshInterval = 0.5f;
 
     private float _nextRefresh;
+    private bool _loggedFirstRefresh;
+
+    private void Awake()
+    {
+        Debug.Log("DebugInfoPanel Awake");
+    }
 
     private void Start()
     {
@@ -58,5 +64,10 @@ public class DebugInfoPanel : MonoBehaviour
         }
 
         output.text = text.ToString();
+        if (!_loggedFirstRefresh)
+        {
+            _loggedFirstRefresh = true;
+            Debug.Log($"DebugInfoPanel refreshed:\n{output.text}");
+        }
     }
 }
