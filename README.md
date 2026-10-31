@@ -15,7 +15,9 @@ The project targets **PICO OS 6** using **PICO XR**. Quest 3 is no longer a supp
 
 Current status:
 - PICO XR camera, controller tracking and video passthrough are configured.
+- The headset is a free-moving MR observer. `TrackedCar` is the only player collider and is driven by a PICO Motion Tracker.
 - Coins and power ups prefer PICO Scene Capture floor anchors and fall back to configurable fixed safe areas when room data is unavailable.
+- Car collisions keep the existing game interactions and create a local effect.
 - Device verification has been skipped for now; PICO OS 6 behavior is not yet confirmed on hardware.
 
 ## Requirements
@@ -44,6 +46,19 @@ Install with ADB when a PICO device is connected:
 ```bash
 adb install -r Build/PICO/Trailblazer.apk
 ```
+
+## Observer and tracked car
+
+The headset only renders the MR scene and does not drive the player, trail or gates. `MotionTrackerDriver` moves `TrackedCar` using valid poses from `PicoMotionTrackerPoseSource`; invalid poses leave the car stationary.
+
+Before using the car:
+
+1. Enable **Body Tracking** in `PXR_Manager` (already enabled in project settings).
+2. Pair one PICO Motion Tracker in the PICO tracker app and use motion tracking mode.
+3. Keep the tracker within about one meter and visible to the headset.
+4. Adjust `MotionTrackerDriver.positionOffset` and `rotationOffset` for the tracker's mounting orientation.
+
+The original Quest `FollowCamera` behavior has been removed. `DrawTrail.player` now references `TrackedCar`.
 
 ## Spawn areas
 `SpawnPowerUps` and `SpawnCoinsAtStart` use `PicoSceneSpawnPositions` with `PicoSceneCaptureFloorAreaProvider`. If Scene Capture cannot provide a floor, `PicoSpawnPositions` is used as the fallback. Adjust the fallback component's `spawnBounds` in the Inspector so generated objects stay inside the intended safe play area and outside the player's starting position.

@@ -215,6 +215,9 @@ MonoBehaviour:
   SpawnObject: {fileID: 0}
   SpawnAmount: 1
   surfaceClearance: 0.05
+  playAreaBounds:
+    m_Center: {x: 0, y: 0.5, z: 4}
+    m_Extent: {x: 2, y: 0.5, z: 2}
   fallback: {fileID: 31291501}
 --- !u!114 &31291503
 MonoBehaviour:
@@ -489,11 +492,13 @@ GameObject:
   - component: {fileID: 1323473299}
   - component: {fileID: 1323473298}
   - component: {fileID: 1323473300}
-  - component: {fileID: 1323473301}
   - component: {fileID: 1323473302}
   - component: {fileID: 1323473303}
+  - component: {fileID: 1323473306}
+  - component: {fileID: 1323473305}
+  - component: {fileID: 1323473304}
   m_Layer: 0
-  m_Name: PlayerCollider
+  m_Name: TrackedCar
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -530,7 +535,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b0c3f9dced7d49188194e5e3ff65657, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: {fileID: 1767192433}
+  player: {fileID: 272445418}
   trace: {fileID: 445761735}
   outline: {fileID: 1608918535}
   vignette: {fileID: 973350458}
@@ -1368,6 +1373,9 @@ MonoBehaviour:
   SpawnObject: {fileID: 354547556857757566, guid: eaf266e3024de4bd88298bb6cc1ead36, type: 3}
   SpawnAmount: 4
   surfaceClearance: 0.05
+  playAreaBounds:
+    m_Center: {x: 0, y: 0.5, z: 4}
+    m_Extent: {x: 2, y: 0.5, z: 2}
   fallback: {fileID: 589298192}
 --- !u!114 &589298194
 MonoBehaviour:
@@ -2366,19 +2374,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &1323473301
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 272445418}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0410bef2f6a8547f8915b4366b6e3936, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  camera: {fileID: 1767192433}
 --- !u!114 &1323473302
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2418,6 +2413,7 @@ MonoBehaviour:
   blockedGate: {fileID: 4572971211421011699, guid: b3dd8d80b0fdd4729a1754005760cab9, type: 3}
   finalGate: {fileID: 4572971211421011699, guid: 1b9aa582b8ca2410f98ec23c65eaa29c, type: 3}
   vignette: {fileID: 887983040}
+  collisionEffects: {fileID: 1323473304}
   tryAgainText: {fileID: 1339786242}
   playAgainText: {fileID: 1724582890}
   startingArea: {fileID: 201118414}
@@ -2517,6 +2513,46 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &1323473304
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 272445418}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d55bc3635af013944b33e7b5edbc6e06, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  effectPrefab: {fileID: 417761080263594737, guid: 7800b8f6b712bfe49bd663eeb3ebe1e4, type: 3}
+  lifetime: 2
+--- !u!114 &1323473305
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 272445418}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 34ea8f78f0fec8d4eb8d8cba92c53b57, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  positionOffset: {x: 0, y: 0, z: 0}
+  rotationOffset: {x: 0, y: 0, z: 0, w: 1}
+--- !u!114 &1323473306
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 272445418}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 046fdc2c6837bf8489c4b4ab03ccd6f8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1339786242
 GameObject:
   m_ObjectHideFlags: 0

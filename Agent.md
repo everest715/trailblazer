@@ -15,7 +15,7 @@
 ### 0.1 当前目标与遗留状态
 
 - 目标设备平台为 **Android / PICO OS 6**，目标开发模式为 **PICO XR**。不要为该移植新增 Quest 兼容层，也不要混用 Unity OpenXR、PICO Spatial 与 PICO XR 的配置和 API。
-- `BikeScene` 已迁移到 PICO XR，视频透视已开启，Android 仅启用 PXR_Loader，Meta SDK 包与 Meta/Oculus 资源已移除。金币和道具已接入 PICO Scene Capture 地面锚点，查询失败时回退到固定安全区域。用户已明确暂时跳过真机验证，因此不得宣称 PICO OS 6 设备行为已验证。
+- `BikeScene` 已迁移到 PICO XR，视频透视已开启，Android 仅启用 PXR_Loader，Meta SDK 包与 Meta/Oculus 资源已移除。金币和道具已接入 PICO Scene Capture 地面锚点，查询失败时回退到固定安全区域。头显已改为自由移动的 MR 观察者，`TrackedCar` 是唯一 Player 实体，由 PICO Motion Tracker 驱动；碰撞保留原玩法并触发独立特效。用户已明确暂时跳过真机验证，因此不得宣称 PICO OS 6 设备行为已验证。
 - 保持 Unity **2022.3.62f3** 与 URP **14.0.11**。PICO Unity SDK 6.1 文档要求 PICO XR 模式使用 Unity 2022.3.15f1 或更高版本，当前编辑器版本满足该要求。
 - PICO Unity SDK 导入地址：
   `https://github.com/Pico-Developer/PICO-Unity-SDK.git?path=/XR#main`
@@ -99,6 +99,7 @@
 - 晕影反馈：`SetVignette(color)` 按拾取类型淡入不同颜色的晕影；调色板以 `readonly Color` 字段集中在类顶部定义。
 
 ### 3.2 `DrawTrail.cs` —— 核心机制
+- `player` 引用 `TrackedCar`，不再引用头显相机；轨迹只记录小车路径。
 - 用**三个 `LineRenderer`**（`line`、`outline`、`trace`）绘制玩家路径，并通过 `LineRenderer.BakeMesh` 在运行时生成 `MeshCollider`。
 - `InvokeRepeating`：`QueuePosition()` 每 `segmentDuration`（0.25 秒）在固定 `trailHeight` 上采样玩家 XZ 坐标；`AddSegment()` 延迟 `offset` 秒消费队列，使轨迹滞后于玩家。
 - `segmentTotal`（初值 `minimumLineLength = 150`）限制存活段数；`RemoveOldSegment()` 通过整体前移坐标实现"尾巴窗口"。`Game` 每次拾取都会增大该值。
@@ -106,7 +107,7 @@
 - `UpdateVignetteIntensity()` 持续根据玩家与轨迹最近点的距离抬高晕影强度——这就是"危险"反馈循环。
 
 ### 3.3 拾取物与生成链路
-- `SpawnPowerUps.cs` 与 `SpawnCoinsAtStart` 使用 `PicoSceneSpawnPositions` + `PicoSceneCaptureFloorAreaProvider`：优先在 PICO Floor 场景锚点内生成，失败时由 `PicoSpawnPositions` 在 Inspector 可调的 `spawnBounds` 内回退。回退组件的 `SpawnOnStart` 已关闭，避免重复生成。
+- `SpawnPowerUps.cs` 与 `SpawnCoinsAtStart` 使用 `PicoSceneSpawnPositions` + `PicoSceneCaptureFloorAreaProvider`：优先在 PICO Floor 场景锚点内生成，失败时由 `PicoSpawnPositions` 在 Inspector 可调的 `spawnBounds` 内回退。`playAreaBounds` 会过滤赛道外候选点；回退组件的 `SpawnOnStart` 已关闭，避免重复生成。
 - `Spawn.cs`：弹出式缩放动画（sin 过冲）。
 - `BouncePickUp.cs`：正弦上下浮动；`SpinPickUp.cs`：旋转（注意其中的类名是 **`AnimatePickUp`**，不是 `SpinPickUp`）。
 - `FaceCamera.cs` 与 `FollowCamera.cs`：让道具/相机朝向 PICO 头显，Meta/Oculus using 已移除。
@@ -219,4 +220,4 @@ Prefab 与 Tag 对应关系：`Coin.prefab`→`Coin`，`Boost.prefab`→`Boost`�
 - **文件名与类名不一致**：`SpinPickUp.cs` → `AnimatePickUp`。本身无害，但重命名请通过 Editor 进行以保留 `.meta` 的 GUID（直接 `mv` 会破坏 prefab 引用）。
 - **遗留空 meta**：存在 `Assets/Editor.meta` 但无对应 `Assets/Editor/` 目录，属删除目录后的残留，可忽略。
 - **房间感知生成**：已按 PICO Scene Capture 文档实现 Floor 查询与固定区域回退；设备端标定流程、权限和实际生成位置仍需后续真机验证。
-- **未验证项**：用户暂时跳过真机验证；PICO 透视、追踪、设备帧率和完整玩法仍未确认。
+- **未验证项**：PICO 透视、设备帧率和完整玩法仍未全面确认。Tracker 的配对、安装偏移、有效位姿、丢失追踪行为和小车碰撞需单独做实机验证。
