@@ -36,9 +36,15 @@ public class PicoMotionTrackerPoseSource : MonoBehaviour, IPicoTrackerPoseSource
         if (data.result == PxrResult.SUCCESS && data.trackerCount > 0)
         {
             _trackerId = data.trackerIds[0];
+            DebugRequestStatus = "Connected";
+        }
+        else
+        {
+            _trackerId = -1;
+            DebugRequestStatus = data.result == PxrResult.SUCCESS ? "Not connected" : $"Failed: {data.result}";
         }
 
-        DebugRequestStatus = data.result == PxrResult.SUCCESS ? $"Connected: {data.trackerCount}" : $"Failed: {data.result}";
+        Debug.Log($"Motion tracker request complete: result={data.result}, count={data.trackerCount}, id={_trackerId}");
         Debug.Log($"Motion tracker request complete: result={data.result}, count={data.trackerCount}, id={_trackerId}");
     }
 

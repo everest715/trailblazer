@@ -14,10 +14,6 @@ public class MotionTrackerDriver : MonoBehaviour
     {
         _body = GetComponent<Rigidbody>();
         _poseSource = GetComponent<IPicoTrackerPoseSource>();
-        if (trackingOrigin == null && Camera.main != null)
-        {
-            trackingOrigin = Camera.main.transform;
-        }
     }
 
     public void Update()
