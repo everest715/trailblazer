@@ -1,20 +1,27 @@
 using ByteDance.PICO.XR;
 using UnityEngine;
 
-public class PicoMotionTrackerPoseSource : MonoBehaviour, IPicoTrackerPoseSource
+public class PicoMotionTrackerPoseSource : MonoBehaviour, IPicoTrackerPoseSource, ITrackerDebugInfo
 {
     private long _trackerId = -1;
     private MotionTrackerLocation _location;
     private float _nextPoseLogTime;
     private bool _hasLoggedValidPose;
 
+    public long DebugTrackerId => _trackerId;
+    public bool DebugPoseValid { get; private set; }
+    public Vector3 DebugPosition { get; private set; }
+    public string DebugRequestStatus { get; private set; } = "Not requested";
+
     private void Start()
     {
         PXR_MotionTracking.RequestMotionTrackerCompleteAction += OnRequestComplete;
+        DebugRequestStatus = "Requesting";
         Debug.Log("Motion tracker request sent");
         var result = PXR_MotionTracking.CheckMotionTrackerNumber(MotionTrackerNum.ONE);
         if (result != 0)
         {
+            DebugRequestStatus = $"Failed: {result}";
             Debug.LogWarning($"Motion tracker request failed: {result}");
         }
     }
@@ -31,6 +38,7 @@ public class PicoMotionTrackerPoseSource : MonoBehaviour, IPicoTrackerPoseSource
             _trackerId = data.trackerIds[0];
         }
 
+        DebugRequestStatus = data.result == PxrResult.SUCCESS ? $"Connected: {data.trackerCount}" : $"Failed: {data.result}";
         Debug.Log($"Motion tracker request complete: result={data.result}, count={data.trackerCount}, id={_trackerId}");
     }
 
@@ -45,6 +53,7 @@ public class PicoMotionTrackerPoseSource : MonoBehaviour, IPicoTrackerPoseSource
 
         var isValidPose = false;
         var result = PXR_MotionTracking.GetMotionTrackerLocation(_trackerId, ref _location, ref isValidPose);
+        DebugPoseValid = isValidPose;
         if (result != 0 || !isValidPose)
         {
             if (Time.unscaledTime >= _nextPoseLogTime)
@@ -58,6 +67,7 @@ public class PicoMotionTrackerPoseSource : MonoBehaviour, IPicoTrackerPoseSource
 
         position = _location.pose.Position.ToVector3();
         rotation = _location.pose.Orientation.ToQuat();
+        DebugPosition = position;
         if (!_hasLoggedValidPose)
         {
             _hasLoggedValidPose = true;

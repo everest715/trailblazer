@@ -13,6 +13,9 @@ public class PicoSceneSpawnPositions : MonoBehaviour
 
     private bool _isSpawning;
 
+    public string LastSpawnSource { get; private set; } = "Not spawned";
+    public Vector3 LastSpawnPoint { get; private set; }
+
     private void Start()
     {
         if (SpawnOnStart)
@@ -34,6 +37,7 @@ public class PicoSceneSpawnPositions : MonoBehaviour
             var provider = GetComponent<IPicoFloorAreaProvider>();
             if (provider == null)
             {
+                LastSpawnSource = "Fallback";
                 fallback.StartSpawn();
                 return;
             }
@@ -54,10 +58,13 @@ public class PicoSceneSpawnPositions : MonoBehaviour
 
             if (spawnPoints.Count != SpawnAmount)
             {
+                LastSpawnSource = "Fallback";
                 fallback.StartSpawn();
                 return;
             }
 
+            LastSpawnSource = "SceneCapture";
+            LastSpawnPoint = spawnPoints[0];
             foreach (var point in spawnPoints)
             {
                 Instantiate(SpawnObject, point, SpawnObject.transform.rotation);
@@ -65,6 +72,7 @@ public class PicoSceneSpawnPositions : MonoBehaviour
         }
         catch (Exception)
         {
+            LastSpawnSource = "Fallback";
             Debug.LogWarning("Scene capture spawn failed; using fallback");
             fallback.StartSpawn();
         }

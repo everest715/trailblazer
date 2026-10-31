@@ -1,7 +1,9 @@
 {
   "name": "Trailblazer.Pico",
   "rootNamespace": "",
-  "references": [],
+  "references": [
+    "Unity.TextMeshPro"
+  ],
   "includePlatforms": [],
   "excludePlatforms": [],
   "allowUnsafeCode": false,

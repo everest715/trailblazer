@@ -3,6 +3,7 @@
   "rootNamespace": "",
   "references": [
     "Trailblazer.Pico",
+    "Unity.TextMeshPro",
     "UnityEngine.TestRunner",
     "UnityEditor.TestRunner"
   ],
