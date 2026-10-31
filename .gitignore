@@ -76,4 +76,5 @@ crashlytics-build.properties
 
 # Unity temp files
 .utmp/
+.superpowers/
 mono_crash.0.0.json
