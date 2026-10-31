@@ -81,6 +81,7 @@ public class PicoSceneSpawnPositionsTests
         var spawn = CreateSceneSpawner();
         var provider = _spawner.AddComponent<FakeProvider>();
         provider.Areas = new[] { Rectangle() };
+        spawn.playAreaBounds = new Bounds(Vector3.zero, new Vector3(4f, 1f, 4f));
 
         spawn.StartSpawn();
 
@@ -90,6 +91,20 @@ public class PicoSceneSpawnPositionsTests
         Assert.GreaterOrEqual(instance.transform.position.z, -1f);
         Assert.LessOrEqual(instance.transform.position.z, 1f);
         Assert.AreEqual(0.3f, instance.transform.position.y, 0.0001f);
+    }
+
+    [Test]
+    public void StartSpawn_FloorPointOutsidePlayAreaUsesFallback()
+    {
+        var spawn = CreateSceneSpawner();
+        var provider = _spawner.AddComponent<FakeProvider>();
+        provider.Areas = new[] { Rectangle() };
+        spawn.playAreaBounds = new Bounds(new Vector3(10f, 0f, 10f), new Vector3(2f, 1f, 2f));
+
+        spawn.StartSpawn();
+
+        var instance = UnityEngine.Object.FindObjectsOfType<GameObject>().Single(item => item.name.StartsWith("SpawnProbe("));
+        Assert.IsTrue(_fallback.spawnBounds.Contains(instance.transform.position));
     }
 
     [Test]
