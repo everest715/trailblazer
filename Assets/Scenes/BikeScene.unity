@@ -197,8 +197,8 @@ MonoBehaviour:
   SpawnObject: {fileID: 0}
   SpawnAmount: 1
   spawnBounds:
-    m_Center: {x: 0, y: 0.5, z: 1.5}
-    m_Extent: {x: 0.75, y: 0.5, z: 0.75}
+    m_Center: {x: 0, y: 0.05, z: 1.5}
+    m_Extent: {x: 0.75, y: 0.05, z: 0.75}
 --- !u!114 &31291502
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -216,8 +216,8 @@ MonoBehaviour:
   SpawnAmount: 1
   surfaceClearance: 0.05
   playAreaBounds:
-    m_Center: {x: 0, y: 0.5, z: 1.5}
-    m_Extent: {x: 0.75, y: 0.5, z: 0.75}
+    m_Center: {x: 0, y: 0.05, z: 1.5}
+    m_Extent: {x: 0.75, y: 0.05, z: 0.75}
   fallback: {fileID: 31291501}
 --- !u!114 &31291503
 MonoBehaviour:
@@ -1355,8 +1355,8 @@ MonoBehaviour:
   SpawnObject: {fileID: 354547556857757566, guid: eaf266e3024de4bd88298bb6cc1ead36, type: 3}
   SpawnAmount: 4
   spawnBounds:
-    m_Center: {x: 0, y: 0.5, z: 1.5}
-    m_Extent: {x: 0.75, y: 0.5, z: 0.75}
+    m_Center: {x: 0, y: 0.05, z: 1.5}
+    m_Extent: {x: 0.75, y: 0.05, z: 0.75}
 --- !u!114 &589298193
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1374,8 +1374,8 @@ MonoBehaviour:
   SpawnAmount: 4
   surfaceClearance: 0.05
   playAreaBounds:
-    m_Center: {x: 0, y: 0.5, z: 1.5}
-    m_Extent: {x: 0.75, y: 0.5, z: 0.75}
+    m_Center: {x: 0, y: 0.05, z: 1.5}
+    m_Extent: {x: 0.75, y: 0.05, z: 0.75}
   fallback: {fileID: 589298192}
 --- !u!114 &589298194
 MonoBehaviour:
