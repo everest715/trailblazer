@@ -60,6 +60,8 @@ Before using the car:
 
 The original Quest `FollowCamera` behavior has been removed. `DrawTrail.player` now references `TrackedCar`.
 
+Input is configured as **Hands Only**: the APK manifest has no `controller` requirement. On Swan, also enable **Settings > Lab > Hand Tracking** and use **Hands and controllers auto-switch**. The two controller objects in `BikeScene` are disabled.
+
 ## Spawn areas
 `SpawnPowerUps` and `SpawnCoinsAtStart` use `PicoSceneSpawnPositions` with `PicoSceneCaptureFloorAreaProvider`. If Scene Capture cannot provide a floor, `PicoSpawnPositions` is used as the fallback. Adjust the fallback component's `spawnBounds` in the Inspector so generated objects stay inside the intended safe play area and outside the player's starting position.
 
