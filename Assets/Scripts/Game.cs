@@ -14,6 +14,7 @@ public class Game : MonoBehaviour
     public float startTimeout = 6f;
     public float startThreshold = 1.5f;
     public float trackScale = 1f;
+    public float groundHeight;
     
     public DrawTrail drawTrail;
     public float timer = 80f;
@@ -69,9 +70,38 @@ public class Game : MonoBehaviour
     private readonly Color _multiplierColor = new Color(0.4f, 0.9f, 0.4f);
     private const float VignetteIntensity = 0.4f;
 
-    private void Start()
+    private async void Start()
     {
         _audioSource = GetComponent<AudioSource>();
+        await AlignGatesToGround();
+    }
+
+    private async System.Threading.Tasks.Task AlignGatesToGround()
+    {
+        var provider = FindAnyObjectByType<PicoSceneCaptureFloorAreaProvider>();
+        if (provider != null)
+        {
+            try
+            {
+                var areas = await provider.GetFloorAreasAsync();
+                if (areas.Count > 0)
+                {
+                    groundHeight = areas[0].AverageHeight;
+                }
+            }
+            catch (System.Exception)
+            {
+                // keep the fallback height when scene capture is unavailable
+            }
+        }
+
+        foreach (var gate in new[] { gate1, gate2, gate3, gate4 })
+        {
+            if (gate != null)
+            {
+                gate.transform.position = new Vector3(gate.transform.position.x, groundHeight, gate.transform.position.z);
+            }
+        }
     }
     
     private void StartGame()
@@ -234,6 +264,7 @@ public class Game : MonoBehaviour
         _checkpoints++;
         
         var position = g.transform.position;
+        position.y = groundHeight;
         var rotation = g.transform.rotation;
         Destroy(g);
 
