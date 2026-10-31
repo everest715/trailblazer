@@ -56,6 +56,21 @@ public class MotionTrackerDriverTests
     }
 
     [UnityTest]
+    public IEnumerator Update_MirrorsXAxisOnly()
+    {
+        _source.HasPose = true;
+        _source.Position = new Vector3(1f, 2f, 3f);
+        _source.Rotation = Quaternion.identity;
+        var driver = _car.AddComponent<MotionTrackerDriver>();
+        driver.positionScale = new Vector3(-1f, 1f, 1f);
+
+        driver.Update();
+
+        Assert.AreEqual(new Vector3(-1f, 2f, 3f), _car.transform.position);
+        yield break;
+    }
+
+    [UnityTest]
     public IEnumerator Update_ConvertsTrackerLocalPoseToWorld()
     {
         var origin = new GameObject("HMDOrigin");

@@ -3,6 +3,7 @@ using UnityEngine;
 public class MotionTrackerDriver : MonoBehaviour
 {
     public Vector3 positionOffset;
+    public Vector3 positionScale = Vector3.one;
     public Quaternion rotationOffset = Quaternion.identity;
     public Transform trackingOrigin;
     public Vector3 DebugWorldPosition { get; private set; }
@@ -24,8 +25,8 @@ public class MotionTrackerDriver : MonoBehaviour
         }
 
         var worldPosition = trackingOrigin == null
-            ? position + positionOffset
-            : trackingOrigin.TransformPoint(position + positionOffset);
+            ? Vector3.Scale(position, positionScale) + positionOffset
+            : trackingOrigin.TransformPoint(Vector3.Scale(position, positionScale) + positionOffset);
         var worldRotation = trackingOrigin == null
             ? rotation * rotationOffset
             : trackingOrigin.rotation * rotation * rotationOffset;
@@ -41,8 +42,8 @@ public class MotionTrackerDriver : MonoBehaviour
         }
 
         var worldPosition = trackingOrigin == null
-            ? position + positionOffset
-            : trackingOrigin.TransformPoint(position + positionOffset);
+            ? Vector3.Scale(position, positionScale) + positionOffset
+            : trackingOrigin.TransformPoint(Vector3.Scale(position, positionScale) + positionOffset);
         var worldRotation = trackingOrigin == null
             ? rotation * rotationOffset
             : trackingOrigin.rotation * rotation * rotationOffset;

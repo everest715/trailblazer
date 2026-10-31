@@ -2769,6 +2769,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   positionOffset: {x: 0, y: 0, z: 0}
+  positionScale: {x: -1, y: 1, z: 1}
   rotationOffset: {x: 0, y: 0, z: 0, w: 1}
 --- !u!114 &1323473306
 MonoBehaviour:
