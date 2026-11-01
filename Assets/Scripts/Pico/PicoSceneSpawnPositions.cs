@@ -53,7 +53,7 @@ public class PicoSceneSpawnPositions : MonoBehaviour
                 for (var i = 0; i < SpawnAmount && areas.Count > 0; i++)
                 {
                     var area = areas[UnityEngine.Random.Range(0, areas.Count)];
-                    if (area.TryGetRandomPoint(out var point) && playAreaBounds.Contains(point))
+                    if (area.TryGetRandomPoint(out var point))
                     {
                         spawnPoints.Add(point + Vector3.up * surfaceClearance);
                     }
