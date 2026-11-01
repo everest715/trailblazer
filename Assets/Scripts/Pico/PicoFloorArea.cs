@@ -4,6 +4,8 @@ public readonly struct PicoFloorArea
 {
     private readonly Vector3[] _vertices;
 
+    public Vector3[] Vertices => _vertices;
+
     public float AverageHeight { get; }
 
     public PicoFloorArea(Vector3[] vertices)

@@ -51,21 +51,11 @@ public class DebugInfoPanel : MonoBehaviour
             text.AppendLine($"Position: {position:F2}");
         }
 
-        if (spawners != null)
+        var spawner = spawners != null && spawners.Length > 0 ? spawners[0] : null;
+        if (spawner != null)
         {
-            for (var i = 0; i < spawners.Length; i++)
-            {
-                var spawner = spawners[i];
-                var provider = spawner.GetComponent<ISceneCaptureDebugInfo>();
-                text.AppendLine($"Spawn {i + 1}: {spawner.LastSpawnSource} | {provider?.DebugQueryStatus}");
-                if (provider != null)
-                {
-                    text.AppendLine($"Floor anchors: {provider.DebugFloorAreaCount}");
-                }
-                text.AppendLine($"Ground height: {spawner.LastGroundHeightMethod} | y={spawner.LastGroundHeight:F2}");
-                text.AppendLine($"Last point: {spawner.LastSpawnPoint:F2}");
-                text.AppendLine($"playArea: c={spawner.playAreaBounds.center:F2} s={spawner.playAreaBounds.size:F2}");
-            }
+            text.AppendLine($"Ground detection: {spawner.LastGroundHeightMethod}");
+            text.AppendLine($"Ground height: {spawner.LastGroundHeight:F2}");
         }
 
         output.text = text.ToString();

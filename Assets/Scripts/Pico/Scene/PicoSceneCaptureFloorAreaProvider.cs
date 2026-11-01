@@ -9,6 +9,15 @@ public class PicoSceneCaptureFloorAreaProvider : MonoBehaviour, IPicoFloorAreaPr
     private bool _providerStarted;
     private bool _captureRequested;
 
+    [Header("Debug Meshes")]
+    public bool showDebugMeshes = true;
+    public Color averageHeightColor = new Color(0.1f, 1f, 0.3f, 0.35f);
+    public Color verticesColor = new Color(1f, 0.25f, 0.2f, 0.35f);
+
+    private Transform _debugMeshRoot;
+    private Material _averageHeightMaterial;
+    private Material _verticesMaterial;
+
     public int DebugFloorAreaCount { get; private set; }
     public string DebugQueryStatus { get; private set; } = "Not queried";
 
@@ -78,7 +87,34 @@ public class PicoSceneCaptureFloorAreaProvider : MonoBehaviour, IPicoFloorAreaPr
 
         DebugQueryStatus = $"Floor anchors: {areas.Count}";
         DebugFloorAreaCount = areas.Count;
+        RebuildDebugMeshes(areas);
         return areas;
+    }
+
+    private void RebuildDebugMeshes(IReadOnlyList<PicoFloorArea> areas)
+    {
+        if (_debugMeshRoot == null)
+        {
+            _debugMeshRoot = new GameObject("FloorAreaDebugMeshes").transform;
+        }
+
+        if (!showDebugMeshes)
+        {
+            for (var i = _debugMeshRoot.childCount - 1; i >= 0; i--)
+            {
+                Destroy(_debugMeshRoot.GetChild(i).gameObject);
+            }
+            return;
+        }
+
+        _averageHeightMaterial ??= CreateDebugMaterial(averageHeightColor);
+        _verticesMaterial ??= CreateDebugMaterial(verticesColor);
+        PicoFloorAreaDebugMeshBuilder.Rebuild(_debugMeshRoot, areas, _averageHeightMaterial, _verticesMaterial);
+    }
+
+    private static Material CreateDebugMaterial(Color color)
+    {
+        return new Material(Shader.Find("Sprites/Default")) { color = color };
     }
 
     private void OnDestroy()
@@ -86,6 +122,21 @@ public class PicoSceneCaptureFloorAreaProvider : MonoBehaviour, IPicoFloorAreaPr
         if (_providerStarted)
         {
             PXR_MixedReality.StopSenseDataProvider(PxrSenseDataProviderType.SceneCapture);
+        }
+
+        if (_debugMeshRoot != null)
+        {
+            Destroy(_debugMeshRoot.gameObject);
+        }
+
+        if (_averageHeightMaterial != null)
+        {
+            Destroy(_averageHeightMaterial);
+        }
+
+        if (_verticesMaterial != null)
+        {
+            Destroy(_verticesMaterial);
         }
     }
 }

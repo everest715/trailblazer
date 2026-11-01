@@ -87,7 +87,7 @@ public class DebugInfoPanelTests
     }
 
     [Test]
-    public void Refresh_ShowsTrackerAndSceneCaptureInfo()
+    public void Refresh_ShowsGroundDetectionMethodAndHeight()
     {
         var root = new GameObject("DebugRoot");
         _roots.Add(root);
@@ -109,10 +109,10 @@ public class DebugInfoPanelTests
         panel.Refresh();
 
         StringAssert.Contains("Tracker", output.text);
-        StringAssert.Contains("SceneCapture", output.text);
-        StringAssert.Contains("Floor anchors: 1", output.text);
-        StringAssert.Contains("playArea", output.text);
-        StringAssert.Contains("Ground height", output.text);
+        StringAssert.Contains("Ground detection", output.text);
         StringAssert.Contains("SceneCapture floor anchors", output.text);
+        StringAssert.Contains("Ground height", output.text);
+        StringAssert.DoesNotContain("playArea", output.text);
+        StringAssert.DoesNotContain("Floor anchors: 1", output.text);
     }
 }
