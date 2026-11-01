@@ -175,6 +175,39 @@ public class GateGroundAlignmentTests
     }
 
     [Test]
+    public void EnableGate_PreservesWorldScaleWithoutChangingParent()
+    {
+        var gameType = AppDomain.CurrentDomain.GetAssemblies()
+            .SelectMany(assembly => assembly.GetTypes())
+            .First(type => type.Name == "Game");
+        var car = new GameObject("Car");
+        car.AddComponent<AudioSource>();
+        var game = car.AddComponent(gameType);
+        var parent = new GameObject("Gates");
+        parent.transform.localScale = Vector3.one * 0.25f;
+        var original = new GameObject("OldGate");
+        original.transform.SetParent(parent.transform);
+        var prefab = new GameObject("GatePrefab");
+        prefab.transform.localScale = Vector3.one * 2f;
+        var serialized = new SerializedObject(game);
+        serialized.FindProperty("activeGate").objectReferenceValue = prefab;
+        serialized.ApplyModifiedProperties();
+        gameType.GetField("_audioSource", BindingFlags.Instance | BindingFlags.NonPublic)
+            .SetValue(game, car.GetComponent<AudioSource>());
+
+        var method = gameType.GetMethod("EnableGate", BindingFlags.Instance | BindingFlags.NonPublic);
+        var gate = (GameObject)method.Invoke(game, new object[] { original, false, false });
+
+        Assert.IsNull(gate.transform.parent);
+        Assert.AreEqual(Vector3.one * 0.25f, gate.transform.lossyScale);
+        UnityEngine.Object.DestroyImmediate(gate);
+        UnityEngine.Object.DestroyImmediate(original);
+        UnityEngine.Object.DestroyImmediate(prefab);
+        UnityEngine.Object.DestroyImmediate(parent);
+        UnityEngine.Object.DestroyImmediate(car);
+    }
+
+    [Test]
     public void EnableGate_UsesDetectedGroundHeight()
     {
         var gameType = AppDomain.CurrentDomain.GetAssemblies()

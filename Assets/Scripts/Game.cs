@@ -404,10 +404,11 @@ public class Game : MonoBehaviour
         var position = g.transform.position;
         position.y = groundHeight;
         var rotation = g.transform.rotation;
+        var scale = g.transform.lossyScale;
         Destroy(g);
 
         var gate = Instantiate(final ? finalGate : speedFault ? blockedGate : activeGate, position, rotation);
-        gate.transform.localScale *= trackScale;
+        gate.transform.localScale = scale;
         return gate;
     }
 

@@ -133,7 +133,6 @@ GameObject:
   - component: {fileID: 31291500}
   - component: {fileID: 31291498}
   - component: {fileID: 31291501}
-  - component: {fileID: 31291503}
   - component: {fileID: 31291502}
   m_Layer: 0
   m_Name: SpawnPowerUps
@@ -219,22 +218,6 @@ MonoBehaviour:
     m_Center: {x: 0, y: 0.05, z: 1.5}
     m_Extent: {x: 0.75, y: 0.05, z: 0.75}
   fallback: {fileID: 31291501}
---- !u!114 &31291503
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 31291497}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fa54b634d76efc24ea03ebde25cdc495, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  surfaceLabel: 7
-  showDebugMeshes: 1
-  averageHeightColor: {r: 0.1, g: 1, b: 0.3, a: 0.35}
-  verticesColor: {r: 1, g: 0.25, b: 0.2, a: 0.35}
 --- !u!1 &41985312
 GameObject:
   m_ObjectHideFlags: 0
@@ -784,7 +767,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &340711467
 RectTransform:
   m_ObjectHideFlags: 0
@@ -944,7 +927,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 1.5}
-  m_LocalScale: {x: 0.25, y: 0.25, z: 0.25}
+  m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 717856733}
@@ -1547,7 +1530,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   surfaceLabel: 7
-  showDebugMeshes: 0
+  useTrackerForTableHeight: 1
+  trackerTableHeightOffset: 0.1
+  showDebugMeshes: 1
   averageHeightColor: {r: 0.1, g: 1, b: 0.3, a: 0.35}
   verticesColor: {r: 1, g: 0.25, b: 0.2, a: 0.35}
 --- !u!1 &599993779
@@ -2765,7 +2750,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   effectPrefab: {fileID: 417761080263594737, guid: 7800b8f6b712bfe49bd663eeb3ebe1e4, type: 3}
   lifetime: 2
-  effectScale: 1
+  effectScale: 0.01
 --- !u!114 &1323473305
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2806,7 +2791,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a4e853ec9f5822c49a9916e6f9e6a2e0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  showDebugVisual: 1
+  showDebugVisual: 0
   trackingOrigin: {fileID: 1680501587}
   debugModelPrefab: {fileID: 2804511081350798348, guid: 63143cda72d8c124eb39d3ecf7db4ccd, type: 3}
   showRawDebugModel: 0

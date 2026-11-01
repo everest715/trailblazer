@@ -31,6 +31,23 @@ public class CarCollisionEffectsTests
     }
 
     [Test]
+    public void Play_SetsParticleScalingModeToHierarchy()
+    {
+        var particleSystem = _effectPrefab.AddComponent<ParticleSystem>();
+        var main = particleSystem.main;
+        main.scalingMode = ParticleSystemScalingMode.Shape;
+        var effects = _car.AddComponent<CarCollisionEffects>();
+        effects.effectPrefab = _effectPrefab;
+        effects.effectScale = 0.5f;
+
+        effects.Play(_other.GetComponent<Collider>(), _car.transform);
+
+        var instance = Object.FindObjectsOfType<GameObject>().Single(item => item.name.StartsWith("EffectProbe("));
+        Assert.AreEqual(ParticleSystemScalingMode.Hierarchy,
+            instance.GetComponent<ParticleSystem>().main.scalingMode);
+    }
+
+    [Test]
     public void Play_CreatesSingleEffectAtClosestPoint()
     {
         var effects = _car.AddComponent<CarCollisionEffects>();
