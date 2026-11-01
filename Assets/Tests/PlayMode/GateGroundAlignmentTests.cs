@@ -82,11 +82,11 @@ public class GateGroundAlignmentTests
         foreach (var gate in gates)
         {
             Assert.IsTrue(area.ContainsXZ(gate.transform.position));
-            Assert.AreEqual(area.SurfaceHeight, gate.transform.position.y, 1e-5f);
+            Assert.AreEqual(area.SurfaceHeight + 0.1f, gate.transform.position.y, 1e-5f);
         }
         Assert.AreEqual(10f, gatesRoot.transform.position.x, 1e-5f);
         Assert.AreEqual(20f, gatesRoot.transform.position.z, 1e-5f);
-        Assert.AreEqual(0.75f, (float)gameType.GetField("groundHeight").GetValue(game), 1e-5f);
+        Assert.AreEqual(0.85f, (float)gameType.GetField("groundHeight").GetValue(game), 1e-5f);
         Assert.Less(Vector3.Distance(gates[0].transform.position, gates[1].transform.position), 8f);
         UnityEngine.Object.DestroyImmediate(gatesRoot);
         UnityEngine.Object.DestroyImmediate(car);
@@ -127,7 +127,7 @@ public class GateGroundAlignmentTests
         foreach (var gate in gates)
         {
             Assert.IsFalse(float.IsNaN(gate.transform.position.x));
-            Assert.AreEqual(new Vector3(0f, 0.2f, 0f), gate.transform.position);
+            Assert.AreEqual(new Vector3(0f, 0.3f, 0f), gate.transform.position);
         }
         UnityEngine.Object.DestroyImmediate(gatesRoot);
         UnityEngine.Object.DestroyImmediate(car);

@@ -106,16 +106,32 @@ public class DrawTrail : MonoBehaviour
 
     private void StartDrawTrail()
     {
+        _collider.enabled = false;
+        Invoke(nameof(EnableTrailCollider), offset + grace);
         _line.positionCount = 1;
         _trace.positionCount = 1;
         _outline.positionCount = 1;
 
-        _line.SetPosition(0, new Vector3(player.transform.position.x, trailHeight, player.transform.position.z));
-        _trace.SetPosition(0, new Vector3(player.transform.position.x, trailHeight, player.transform.position.z));
-        _outline.SetPosition(0, new Vector3(player.transform.position.x, trailHeight, player.transform.position.z));
+        var startPosition = GetPlayerTrailPosition();
+        _line.SetPosition(0, startPosition);
+        _trace.SetPosition(0, startPosition);
+        _outline.SetPosition(0, startPosition);
 
         InvokeRepeating(nameof(QueuePosition), 0f, segmentDuration);
         InvokeRepeating(nameof(AddSegment), offset, segmentDuration);
+    }
+
+    private Vector3 GetPlayerTrailPosition()
+    {
+        return new Vector3(
+            player.transform.position.x,
+            player.transform.position.y + trailHeight,
+            player.transform.position.z);
+    }
+
+    private void EnableTrailCollider()
+    {
+        _collider.enabled = true;
     }
 
     private void AddSegment()
@@ -140,7 +156,7 @@ public class DrawTrail : MonoBehaviour
 
     private void QueuePosition()
     {
-        var currentPosition = new Vector3(player.transform.position.x, trailHeight, player.transform.position.z);
+        var currentPosition = GetPlayerTrailPosition();
 
         _positionQueue.Enqueue(currentPosition);
 

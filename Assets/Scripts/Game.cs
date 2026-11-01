@@ -16,6 +16,7 @@ public class Game : MonoBehaviour
     public float startThreshold = 1.5f;
     public float trackScale = 1f;
     public float groundHeight;
+    public float gateHeightOffset = 0.1f;
     
     public DrawTrail drawTrail;
     public float timer = 80f;
@@ -146,7 +147,7 @@ public class Game : MonoBehaviour
             return;
         }
 
-        groundHeight = area.SurfaceHeight;
+        groundHeight = area.SurfaceHeight + gateHeightOffset;
         var target = area.PlanarBounds.center;
         target.y = groundHeight;
         if (!area.ContainsXZ(target))

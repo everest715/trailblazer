@@ -8,9 +8,13 @@ public class SpawnPowerUps : MonoBehaviour
     
     private PicoSceneSpawnPositions _spawn;
     
-    private void Start()
+    private void Awake()
     {
         _spawn = GetComponent<PicoSceneSpawnPositions>();
+    }
+
+    private void Start()
+    {
         InvokeRepeating(nameof(SpawnObject), spawnInterval, spawnInterval);
     }
 
