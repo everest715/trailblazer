@@ -26,6 +26,12 @@ public static class PicoSignedBuild
     {
         if (!File.Exists(RequestPath)) return;
         File.Delete(RequestPath);
+        BuildSignedApk();
+    }
+
+    [MenuItem("Tools/PICO/Build Signed APK")]
+    public static void BuildSignedApk()
+    {
         File.Delete(ResultPath);
         try
         {

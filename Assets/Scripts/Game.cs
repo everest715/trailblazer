@@ -107,7 +107,7 @@ public class Game : MonoBehaviour
 
     private async System.Threading.Tasks.Task AlignGatesToGround()
     {
-        var provider = FindAnyObjectByType<PicoSceneCaptureFloorAreaProvider>();
+        var provider = FindAnyObjectByType<PicoSceneCaptureFloorAreaProvider>(FindObjectsInactive.Include, FindObjectsSortMode.None);
         if (provider != null)
         {
             try

@@ -89,6 +89,27 @@ public class DebugInfoPanelTests
     }
 
     [Test]
+    public void Start_FindsInactiveSceneCaptureProvider()
+    {
+        var root = new GameObject("DebugRoot");
+        _roots.Add(root);
+        var output = root.AddComponent<TextMeshProUGUI>();
+        var panel = root.AddComponent<DebugInfoPanel>();
+        var tracker = root.AddComponent<FakeTracker>();
+        var providerObject = new GameObject("InactiveProvider");
+        _roots.Add(providerObject);
+        providerObject.AddComponent<FakeProvider>();
+        providerObject.SetActive(false);
+        panel.output = output;
+        panel.tracker = tracker;
+        panel.spawners = new PicoSceneSpawnPositions[0];
+
+        panel.SendMessage("Start");
+
+        StringAssert.Contains("Ground query: Floor anchors: 1", output.text);
+    }
+
+    [Test]
     public void Refresh_UsesGameGroundHeightWhenAvailable()
     {
         var root = new GameObject("DebugRoot");
@@ -106,6 +127,7 @@ public class DebugInfoPanelTests
 
         StringAssert.Contains("Ground detection: SceneCapture floor anchors", output.text);
         StringAssert.Contains("Ground height: 1.25", output.text);
+        StringAssert.Contains("Ground query: Floor anchors: 1", output.text);
         StringAssert.DoesNotContain("Not detected", output.text);
     }
 

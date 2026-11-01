@@ -94,6 +94,7 @@ public class PicoSceneCaptureFloorAreaProvider : MonoBehaviour, IPicoFloorAreaPr
             DebugGroundHeight = areas[0].AverageHeight;
             DebugGroundHeightMethod = "SceneCapture floor anchors";
         }
+        Debug.Log($"Scene capture query: {DebugQueryStatus}");
         RebuildDebugMeshes(areas);
         return areas;
     }
