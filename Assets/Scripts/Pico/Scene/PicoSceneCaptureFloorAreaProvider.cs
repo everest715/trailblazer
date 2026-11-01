@@ -10,6 +10,9 @@ public class PicoSceneCaptureFloorAreaProvider : MonoBehaviour, IPicoFloorAreaPr
     private bool _providerStarted;
     private bool _captureRequested;
 
+    [Header("Scene Capture")]
+    public PxrSemanticLabel surfaceLabel = PxrSemanticLabel.Floor;
+
     [Header("Debug Meshes")]
     public bool showDebugMeshes = true;
     public Color averageHeightColor = new Color(0.1f, 1f, 0.3f, 0.35f);
@@ -60,7 +63,7 @@ public class PicoSceneCaptureFloorAreaProvider : MonoBehaviour, IPicoFloorAreaPr
 
     private async Task<List<PicoFloorArea>> QueryFloorAreasAsync()
     {
-        var query = await PXR_MixedReality.QuerySceneAnchorAsync(new[] { PxrSemanticLabel.Floor });
+        var query = await PXR_MixedReality.QuerySceneAnchorAsync(new[] { surfaceLabel });
         if (query.result != PxrResult.SUCCESS)
         {
             DebugQueryStatus = $"Query failed: {query.result}";
@@ -70,11 +73,6 @@ public class PicoSceneCaptureFloorAreaProvider : MonoBehaviour, IPicoFloorAreaPr
         var areas = new List<PicoFloorArea>();
         foreach (var anchorHandle in query.anchorHandleList)
         {
-            if (PXR_MixedReality.GetScenePolygonData(anchorHandle, out var vertices) != PxrResult.SUCCESS || vertices.Length < 3)
-            {
-                continue;
-            }
-
             if (PXR_MixedReality.LocateAnchor(anchorHandle, out var position, out var rotation) != PxrResult.SUCCESS)
             {
                 continue;
@@ -83,6 +81,21 @@ public class PicoSceneCaptureFloorAreaProvider : MonoBehaviour, IPicoFloorAreaPr
             if (areas.Count == 0)
             {
                 DebugAnchorPosition = position;
+            }
+
+            if (surfaceLabel == PxrSemanticLabel.Table)
+            {
+                if (PXR_MixedReality.GetSceneBox3DData(anchorHandle, out var localPosition, out _, out var extent) == PxrResult.SUCCESS)
+                {
+                    areas.Add(PicoFloorArea.FromBox3D(position, rotation, localPosition, extent));
+                }
+                continue;
+            }
+
+            if (surfaceLabel != PxrSemanticLabel.Floor ||
+                PXR_MixedReality.GetScenePolygonData(anchorHandle, out var vertices) != PxrResult.SUCCESS || vertices.Length < 3)
+            {
+                continue;
             }
 
             var worldVertices = new Vector3[vertices.Length];
@@ -94,12 +107,14 @@ public class PicoSceneCaptureFloorAreaProvider : MonoBehaviour, IPicoFloorAreaPr
             areas.Add(new PicoFloorArea(worldVertices));
         }
 
-        DebugQueryStatus = $"Floor anchors: {areas.Count}";
+        DebugQueryStatus = $"{surfaceLabel} anchors: {areas.Count}";
         DebugFloorAreaCount = areas.Count;
         if (areas.Count > 0)
         {
-            DebugGroundHeight = areas[0].AverageHeight;
-            DebugGroundHeightMethod = "SceneCapture floor anchors";
+            DebugGroundHeight = areas[0].SurfaceHeight;
+            DebugGroundHeightMethod = surfaceLabel == PxrSemanticLabel.Table
+                ? "SceneCapture table top"
+                : "SceneCapture floor anchors";
         }
         Debug.Log($"Scene capture query: {DebugQueryStatus}");
         RebuildDebugMeshes(areas);

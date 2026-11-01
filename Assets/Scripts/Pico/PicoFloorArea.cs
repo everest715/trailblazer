@@ -8,22 +8,55 @@ public readonly struct PicoFloorArea
 
     public float AverageHeight { get; }
 
-    public PicoFloorArea(Vector3[] vertices)
+    public float SurfaceHeight { get; }
+
+    public Bounds PlanarBounds { get; }
+
+    public PicoFloorArea(Vector3[] vertices, bool useHighestVertexHeight = false)
     {
         _vertices = vertices;
+        AverageHeight = 0f;
+        SurfaceHeight = 0f;
+        PlanarBounds = new Bounds();
         if (vertices == null || vertices.Length == 0)
         {
-            AverageHeight = 0f;
             return;
         }
 
         var height = 0f;
+        var highest = float.MinValue;
+        var bounds = new Bounds(vertices[0], Vector3.zero);
         foreach (var vertex in vertices)
         {
             height += vertex.y;
+            highest = Mathf.Max(highest, vertex.y);
+            bounds.Encapsulate(vertex);
         }
 
+        PlanarBounds = bounds;
         AverageHeight = height / vertices.Length;
+        SurfaceHeight = useHighestVertexHeight ? highest : AverageHeight;
+    }
+
+    public static PicoFloorArea FromBox3D(Vector3 anchorPosition, Quaternion anchorRotation, Vector3 localPosition, Vector3 extent)
+    {
+        var top = extent.y * 0.5f;
+        var halfX = extent.x * 0.5f;
+        var halfZ = extent.z * 0.5f;
+        var vertices = new[]
+        {
+            localPosition + new Vector3(-halfX, top, -halfZ),
+            localPosition + new Vector3(halfX, top, -halfZ),
+            localPosition + new Vector3(halfX, top, halfZ),
+            localPosition + new Vector3(-halfX, top, halfZ)
+        };
+
+        for (var i = 0; i < vertices.Length; i++)
+        {
+            vertices[i] = anchorPosition + anchorRotation * vertices[i];
+        }
+
+        return new PicoFloorArea(vertices, useHighestVertexHeight: true);
     }
 
     public bool TryGetRandomPoint(out Vector3 point)
@@ -34,39 +67,34 @@ public readonly struct PicoFloorArea
             return false;
         }
 
-        var minX = float.MaxValue;
-        var maxX = float.MinValue;
-        var minZ = float.MaxValue;
-        var maxZ = float.MinValue;
-        var height = 0f;
-        foreach (var vertex in _vertices)
-        {
-            minX = Mathf.Min(minX, vertex.x);
-            maxX = Mathf.Max(maxX, vertex.x);
-            minZ = Mathf.Min(minZ, vertex.z);
-            maxZ = Mathf.Max(maxZ, vertex.z);
-            height += vertex.y;
-        }
-
-        height /= _vertices.Length;
         for (var i = 0; i < 100; i++)
         {
-            var x = Random.Range(minX, maxX);
-            var z = Random.Range(minZ, maxZ);
+            var x = Random.Range(PlanarBounds.min.x, PlanarBounds.max.x);
+            var z = Random.Range(PlanarBounds.min.z, PlanarBounds.max.z);
             if (!ContainsXZ(x, z))
             {
                 continue;
             }
 
-            point = new Vector3(x, height, z);
+            point = new Vector3(x, SurfaceHeight, z);
             return true;
         }
 
         return false;
     }
 
+    public bool ContainsXZ(Vector3 point)
+    {
+        return ContainsXZ(point.x, point.z);
+    }
+
     private bool ContainsXZ(float x, float z)
     {
+        if (_vertices == null || _vertices.Length < 3)
+        {
+            return false;
+        }
+
         var inside = false;
         for (int i = 0, j = _vertices.Length - 1; i < _vertices.Length; j = i++)
         {

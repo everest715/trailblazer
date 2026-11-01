@@ -73,7 +73,6 @@ public class Game : MonoBehaviour
     private async void Start()
     {
         _audioSource = GetComponent<AudioSource>();
-        AlignGatesToHeadset();
         await AlignGatesToGround();
     }
 
@@ -116,7 +115,7 @@ public class Game : MonoBehaviour
                 var areas = await provider.GetFloorAreasAsync();
                 if (areas.Count > 0)
                 {
-                    groundHeight = areas[0].AverageHeight;
+                    AlignGatesToArea(areas[0]);
                 }
             }
             catch (System.Exception)
@@ -134,6 +133,90 @@ public class Game : MonoBehaviour
         }
     }
     
+    private void AlignGatesToArea(PicoFloorArea area)
+    {
+        var gates = new[] { gate1, gate2, gate3, gate4 };
+        if (area.Vertices == null || area.Vertices.Length < 3 ||
+            gate1 == null || gate2 == null || gate3 == null || gate4 == null)
+        {
+            return;
+        }
+
+        groundHeight = area.SurfaceHeight;
+        var target = area.PlanarBounds.center;
+        target.y = groundHeight;
+        if (!area.ContainsXZ(target))
+        {
+            if (!area.TryGetRandomPoint(out target))
+            {
+                return;
+            }
+        }
+
+        var currentBounds = new Bounds(gates[0].transform.position, Vector3.zero);
+        foreach (var gate in gates)
+        {
+            currentBounds.Encapsulate(gate.transform.position);
+        }
+
+        var scale = 1f;
+        if (currentBounds.size.x > 0.001f)
+        {
+            scale = Mathf.Min(scale, area.PlanarBounds.size.x * 0.9f / currentBounds.size.x);
+        }
+        if (currentBounds.size.z > 0.001f)
+        {
+            scale = Mathf.Min(scale, area.PlanarBounds.size.z * 0.9f / currentBounds.size.z);
+        }
+
+        var fitted = new Vector3[gates.Length];
+        for (var attempt = 0; attempt < 20; attempt++)
+        {
+            for (var i = 0; i < gates.Length; i++)
+            {
+                var offset = gates[i].transform.position - currentBounds.center;
+                fitted[i] = target + offset * scale;
+                fitted[i].y = groundHeight;
+            }
+
+            if (AllPointsInside(fitted, area))
+            {
+                break;
+            }
+            scale *= 0.9f;
+        }
+
+        if (!AllPointsInside(fitted, area))
+        {
+            for (var i = 0; i < fitted.Length; i++)
+            {
+                fitted[i] = target;
+            }
+        }
+
+        var gatesRoot = gate1.transform.parent;
+        if (gatesRoot != null)
+        {
+            gatesRoot.position = new Vector3(target.x, gatesRoot.position.y, target.z);
+        }
+        for (var i = 0; i < gates.Length; i++)
+        {
+            gates[i].transform.position = fitted[i];
+        }
+    }
+
+    private static bool AllPointsInside(Vector3[] points, PicoFloorArea area)
+    {
+        foreach (var point in points)
+        {
+            if (!area.ContainsXZ(point))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
     private void StartGame()
     {
         if (_gameStarted) return;

@@ -231,6 +231,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa54b634d76efc24ea03ebde25cdc495, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  surfaceLabel: 7
+  showDebugMeshes: 1
+  averageHeightColor: {r: 0.1, g: 1, b: 0.3, a: 0.35}
+  verticesColor: {r: 1, g: 0.25, b: 0.2, a: 0.35}
 --- !u!1 &41985312
 GameObject:
   m_ObjectHideFlags: 0
@@ -1542,6 +1546,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa54b634d76efc24ea03ebde25cdc495, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  surfaceLabel: 7
+  showDebugMeshes: 0
+  averageHeightColor: {r: 0.1, g: 1, b: 0.3, a: 0.35}
+  verticesColor: {r: 1, g: 0.25, b: 0.2, a: 0.35}
 --- !u!1 &599993779
 GameObject:
   m_ObjectHideFlags: 0
@@ -2801,6 +2809,7 @@ MonoBehaviour:
   showDebugVisual: 1
   trackingOrigin: {fileID: 1680501587}
   debugModelPrefab: {fileID: 2804511081350798348, guid: 63143cda72d8c124eb39d3ecf7db4ccd, type: 3}
+  showRawDebugModel: 0
 --- !u!1 &1339786242
 GameObject:
   m_ObjectHideFlags: 0
