@@ -510,7 +510,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &292125754
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1532,7 +1532,7 @@ MonoBehaviour:
   surfaceLabel: 7
   useTrackerForTableHeight: 1
   trackerTableHeightOffset: 0.1
-  showDebugMeshes: 1
+  showDebugMeshes: 0
   averageHeightColor: {r: 0.1, g: 1, b: 0.3, a: 0.35}
   verticesColor: {r: 1, g: 0.25, b: 0.2, a: 0.35}
 --- !u!1 &599993779
@@ -2611,6 +2611,7 @@ MonoBehaviour:
   startThreshold: 1.5
   trackScale: 0.25
   groundHeight: 0
+  gateHeightOffset: 0.1
   drawTrail: {fileID: 292125754}
   timer: 80
   multTimer: 7.5

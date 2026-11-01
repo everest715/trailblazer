@@ -246,6 +246,7 @@ public class Game : MonoBehaviour
         var powerUpSpawner = gameScripts.GetComponentInChildren<SpawnPowerUps>(true);
         if (powerUpSpawner != null)
         {
+            powerUpSpawner.gameObject.SetActive(true);
             powerUpSpawner.SpawnNow();
         }
         StartCoroutine(Timer());
