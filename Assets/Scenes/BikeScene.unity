@@ -814,6 +814,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   output: {fileID: 340711469}
+  trackerDriver: {fileID: 0}
   spawners: []
   refreshInterval: 0.5
 --- !u!114 &340711469
@@ -2616,6 +2617,7 @@ MonoBehaviour:
   startTimeout: 6
   startThreshold: 1.5
   trackScale: 0.25
+  groundHeight: 0
   drawTrail: {fileID: 292125754}
   timer: 80
   multTimer: 7.5
@@ -2769,8 +2771,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   positionOffset: {x: 0, y: 0, z: 0}
-  positionScale: {x: -1, y: 1, z: 1}
+  positionScale: {x: 1, y: 1, z: 1}
   rotationOffset: {x: 0, y: 0, z: 0, w: 1}
+  trackingOrigin: {fileID: 0}
 --- !u!114 &1323473306
 MonoBehaviour:
   m_ObjectHideFlags: 0

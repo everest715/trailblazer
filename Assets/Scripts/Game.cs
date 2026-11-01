@@ -73,7 +73,36 @@ public class Game : MonoBehaviour
     private async void Start()
     {
         _audioSource = GetComponent<AudioSource>();
+        AlignGatesToHeadset();
         await AlignGatesToGround();
+    }
+
+    private void AlignGatesToHeadset()
+    {
+        if (gate1 == null || gate1.transform.parent == null || Camera.main == null)
+        {
+            return;
+        }
+
+        var headset = Camera.main.transform;
+        var forward = headset.forward;
+        forward.y = 0f;
+        if (forward.sqrMagnitude < 0.001f)
+        {
+            return;
+        }
+
+        forward.Normalize();
+        var gatesRoot = gate1.transform.parent;
+        var distance = new Vector2(gatesRoot.localPosition.x, gatesRoot.localPosition.z).magnitude;
+        if (distance < 0.01f)
+        {
+            distance = 1.5f;
+        }
+
+        var position = headset.position + forward * distance;
+        position.y = gatesRoot.position.y;
+        gatesRoot.SetPositionAndRotation(position, Quaternion.LookRotation(forward, Vector3.up));
     }
 
     private async System.Threading.Tasks.Task AlignGatesToGround()

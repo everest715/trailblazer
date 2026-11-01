@@ -13,6 +13,7 @@ public class DebugInfoPanel : MonoBehaviour
 
     private float _nextRefresh;
     private bool _loggedFirstRefresh;
+    private ISceneCaptureDebugInfo _sceneCapture;
 
     private void Awake()
     {
@@ -25,6 +26,7 @@ public class DebugInfoPanel : MonoBehaviour
         if (tracker == null) tracker = FindObjectsOfType<MonoBehaviour>().OfType<ITrackerDebugInfo>().FirstOrDefault();
         if (trackerDriver == null) trackerDriver = FindAnyObjectByType<MotionTrackerDriver>();
         if (spawners == null || spawners.Length == 0) spawners = Resources.FindObjectsOfTypeAll<PicoSceneSpawnPositions>();
+        if (_sceneCapture == null) _sceneCapture = FindObjectsOfType<MonoBehaviour>().OfType<ISceneCaptureDebugInfo>().FirstOrDefault();
         Refresh();
     }
 
@@ -51,11 +53,19 @@ public class DebugInfoPanel : MonoBehaviour
             text.AppendLine($"Position: {position:F2}");
         }
 
-        var spawner = spawners != null && spawners.Length > 0 ? spawners[0] : null;
-        if (spawner != null)
+        if (_sceneCapture != null)
         {
-            text.AppendLine($"Ground detection: {spawner.LastGroundHeightMethod}");
-            text.AppendLine($"Ground height: {spawner.LastGroundHeight:F2}");
+            text.AppendLine($"Ground detection: {_sceneCapture.DebugGroundHeightMethod}");
+            text.AppendLine($"Ground height: {_sceneCapture.DebugGroundHeight:F2}");
+        }
+        else
+        {
+            var spawner = spawners != null && spawners.Length > 0 ? spawners[0] : null;
+            if (spawner != null)
+            {
+                text.AppendLine($"Ground detection: {spawner.LastGroundHeightMethod}");
+                text.AppendLine($"Ground height: {spawner.LastGroundHeight:F2}");
+            }
         }
 
         output.text = text.ToString();

@@ -20,6 +20,8 @@ public class PicoSceneCaptureFloorAreaProvider : MonoBehaviour, IPicoFloorAreaPr
 
     public int DebugFloorAreaCount { get; private set; }
     public string DebugQueryStatus { get; private set; } = "Not queried";
+    public float DebugGroundHeight { get; private set; }
+    public string DebugGroundHeightMethod { get; private set; } = "Not detected";
 
     public async Task<IReadOnlyList<PicoFloorArea>> GetFloorAreasAsync()
     {
@@ -87,6 +89,11 @@ public class PicoSceneCaptureFloorAreaProvider : MonoBehaviour, IPicoFloorAreaPr
 
         DebugQueryStatus = $"Floor anchors: {areas.Count}";
         DebugFloorAreaCount = areas.Count;
+        if (areas.Count > 0)
+        {
+            DebugGroundHeight = areas[0].AverageHeight;
+            DebugGroundHeightMethod = "SceneCapture floor anchors";
+        }
         RebuildDebugMeshes(areas);
         return areas;
     }

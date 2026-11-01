@@ -30,6 +30,8 @@ public class DebugInfoPanelTests
     {
         public int DebugFloorAreaCount => 1;
         public string DebugQueryStatus => "Floor anchors: 1";
+        public float DebugGroundHeight => 1.25f;
+        public string DebugGroundHeightMethod => "SceneCapture floor anchors";
 
         public Task<IReadOnlyList<PicoFloorArea>> GetFloorAreasAsync()
         {
@@ -84,6 +86,27 @@ public class DebugInfoPanelTests
         panel.SendMessage("Start");
 
         Assert.AreEqual(1, panel.spawners.Length);
+    }
+
+    [Test]
+    public void Refresh_UsesGameGroundHeightWhenAvailable()
+    {
+        var root = new GameObject("DebugRoot");
+        _roots.Add(root);
+        var output = root.AddComponent<TextMeshProUGUI>();
+        var panel = root.AddComponent<DebugInfoPanel>();
+        var tracker = root.AddComponent<FakeTracker>();
+        var spawner = root.AddComponent<PicoSceneSpawnPositions>();
+        root.AddComponent<FakeProvider>();
+        panel.output = output;
+        panel.tracker = tracker;
+        panel.spawners = new[] { spawner };
+
+        panel.SendMessage("Start");
+
+        StringAssert.Contains("Ground detection: SceneCapture floor anchors", output.text);
+        StringAssert.Contains("Ground height: 1.25", output.text);
+        StringAssert.DoesNotContain("Not detected", output.text);
     }
 
     [Test]

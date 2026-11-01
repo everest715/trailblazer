@@ -4,12 +4,17 @@ public class TrackerDebugVisual : MonoBehaviour
 {
     public bool showDebugVisual = true;
 
+    private ITrackerDebugInfo _tracker;
+    private GameObject _rawModel;
+
     private void Start()
     {
         if (!showDebugVisual)
         {
             return;
         }
+
+        _tracker = GetComponent<ITrackerDebugInfo>();
 
         var model = GameObject.CreatePrimitive(PrimitiveType.Cube);
         model.name = "TrackerDebugModel";
@@ -31,6 +36,24 @@ public class TrackerDebugVisual : MonoBehaviour
         marker.transform.localScale = new Vector3(0.03f, 0.02f, 0.03f);
         SetMaterial(marker, Color.yellow);
         RemoveCollider(marker);
+
+        if (_tracker != null)
+        {
+            _rawModel = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            _rawModel.name = "TrackerRawDebugModel";
+            _rawModel.transform.position = _tracker.DebugPosition;
+            _rawModel.transform.localScale = new Vector3(0.18f, 0.06f, 0.096f);
+            SetMaterial(_rawModel, Color.red);
+            RemoveCollider(_rawModel);
+        }
+    }
+
+    private void LateUpdate()
+    {
+        if (_rawModel != null && _tracker != null)
+        {
+            _rawModel.transform.position = _tracker.DebugPosition;
+        }
     }
 
     private static void SetMaterial(GameObject target, Color color)
