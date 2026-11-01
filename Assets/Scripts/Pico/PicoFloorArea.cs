@@ -40,22 +40,36 @@ public readonly struct PicoFloorArea
 
     public static PicoFloorArea FromBox3D(Vector3 anchorPosition, Quaternion anchorRotation, Vector3 localPosition, Vector3 extent)
     {
-        var top = extent.y * 0.5f;
-        var halfX = extent.x * 0.5f;
-        var halfZ = extent.z * 0.5f;
-        var vertices = new[]
+        var half = extent * 0.5f;
+        var highest = float.MinValue;
+        var minX = float.MaxValue;
+        var maxX = float.MinValue;
+        var minZ = float.MaxValue;
+        var maxZ = float.MinValue;
+        for (var x = -1; x <= 1; x += 2)
         {
-            localPosition + new Vector3(-halfX, top, -halfZ),
-            localPosition + new Vector3(halfX, top, -halfZ),
-            localPosition + new Vector3(halfX, top, halfZ),
-            localPosition + new Vector3(-halfX, top, halfZ)
-        };
-
-        for (var i = 0; i < vertices.Length; i++)
-        {
-            vertices[i] = anchorPosition + anchorRotation * vertices[i];
+            for (var y = -1; y <= 1; y += 2)
+            {
+                for (var z = -1; z <= 1; z += 2)
+                {
+                    var corner = localPosition + Vector3.Scale(half, new Vector3(x, y, z));
+                    var worldCorner = anchorPosition + anchorRotation * corner;
+                    highest = Mathf.Max(highest, worldCorner.y);
+                    minX = Mathf.Min(minX, worldCorner.x);
+                    maxX = Mathf.Max(maxX, worldCorner.x);
+                    minZ = Mathf.Min(minZ, worldCorner.z);
+                    maxZ = Mathf.Max(maxZ, worldCorner.z);
+                }
+            }
         }
 
+        var vertices = new[]
+        {
+            new Vector3(minX, highest, minZ),
+            new Vector3(maxX, highest, minZ),
+            new Vector3(maxX, highest, maxZ),
+            new Vector3(minX, highest, maxZ)
+        };
         return new PicoFloorArea(vertices, useHighestVertexHeight: true);
     }
 

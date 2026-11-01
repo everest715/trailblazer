@@ -60,6 +60,22 @@ public class PicoFloorAreaTests
     }
 
     [Test]
+    public void FromBox3D_RotatedBoxUsesHighestCornerAndHorizontalTopFace()
+    {
+        var area = PicoFloorArea.FromBox3D(
+            Vector3.zero, Quaternion.Euler(90f, 0f, 0f),
+            Vector3.zero, new Vector3(2f, 1f, 4f));
+
+        Assert.AreEqual(2f, area.SurfaceHeight, 1e-5f);
+        foreach (var vertex in area.Vertices)
+        {
+            Assert.AreEqual(2f, vertex.y, 1e-5f);
+        }
+        Assert.AreEqual(2f, area.PlanarBounds.size.x, 1e-5f);
+        Assert.AreEqual(1f, area.PlanarBounds.size.z, 1e-5f);
+    }
+
+    [Test]
     public void TryGetRandomPoint_UsesSurfaceHeight()
     {
         var area = new PicoFloorArea(new[]
