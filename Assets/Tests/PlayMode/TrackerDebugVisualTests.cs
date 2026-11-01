@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Linq;
 using NUnit.Framework;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.TestTools;
 
@@ -31,6 +32,22 @@ public class TrackerDebugVisualTests
     }
 
     [UnityTest]
+    public IEnumerator Start_UsesAssignedTrackerPrefab()
+    {
+        _car.transform.localScale = new Vector3(0.15f, 0.05f, 0.15f);
+        var visual = _car.AddComponent<TrackerDebugVisual>();
+        visual.debugModelPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/ObjectTracking/ObjectTracker 1.prefab");
+
+        yield return null;
+
+        var model = _car.transform.Find("TrackerDebugModel");
+        Assert.IsNotNull(model);
+        Assert.AreEqual(Vector3.one, model.lossyScale);
+        Assert.IsNotNull(model.GetComponentInChildren<MeshFilter>());
+        Assert.IsNull(model.Find("ForwardMarker"));
+    }
+
+    [UnityTest]
     public IEnumerator Update_RootModelAppliesTrackingOrigin()
     {
         var origin = new GameObject("CameraOffset");
@@ -39,6 +56,7 @@ public class TrackerDebugVisualTests
         tracker.DebugPosition = new Vector3(1f, 2f, 3f);
         var visual = _car.AddComponent<TrackerDebugVisual>();
         visual.trackingOrigin = origin.transform;
+        visual.showRawDebugModel = true;
 
         yield return null;
 
@@ -51,7 +69,8 @@ public class TrackerDebugVisualTests
     public IEnumerator Update_RootModelUsesRawTrackerPosition()
     {
         var tracker = _car.AddComponent<FakeTracker>();
-        _car.AddComponent<TrackerDebugVisual>();
+        var visual = _car.AddComponent<TrackerDebugVisual>();
+        visual.showRawDebugModel = true;
 
         yield return null;
 
@@ -66,6 +85,17 @@ public class TrackerDebugVisualTests
         StringAssert.Contains("Sphere", _rawModel.GetComponent<MeshFilter>().sharedMesh.name);
         Assert.AreEqual(new Vector3(0.18f, 0.06f, 0.096f), _rawModel.transform.localScale);
         Assert.IsFalse(_rawModel.GetComponent<Collider>());
+    }
+
+    [UnityTest]
+    public IEnumerator Start_DoesNotCreateRawModelByDefault()
+    {
+        _car.AddComponent<FakeTracker>();
+        _car.AddComponent<TrackerDebugVisual>();
+
+        yield return null;
+
+        Assert.IsNull(GameObject.Find("TrackerRawDebugModel"));
     }
 
     [UnityTest]

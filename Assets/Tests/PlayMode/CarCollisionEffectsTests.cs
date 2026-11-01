@@ -35,7 +35,8 @@ public class CarCollisionEffectsTests
     {
         var effects = _car.AddComponent<CarCollisionEffects>();
         effects.effectPrefab = _effectPrefab;
-        effects.effectScale = 0.25f;
+        effects.effectScale = 1f;
+        _car.transform.localScale = new Vector3(0.15f, 0.05f, 0.15f);
         _car.transform.position = new Vector3(1.25f, 0f, 0f);
         var otherCollider = _other.GetComponent<Collider>();
 
@@ -43,6 +44,6 @@ public class CarCollisionEffectsTests
 
         var instance = Object.FindObjectsOfType<GameObject>().Single(item => item.name.StartsWith("EffectProbe("));
         Assert.AreEqual(new Vector3(0.5f, 0f, 0f), instance.transform.position);
-        Assert.AreEqual(0.25f, instance.transform.localScale.x);
+        Assert.AreEqual(_car.transform.lossyScale, instance.transform.localScale);
     }
 }

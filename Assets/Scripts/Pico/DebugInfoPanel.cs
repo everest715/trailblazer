@@ -26,7 +26,7 @@ public class DebugInfoPanel : MonoBehaviour
         if (tracker == null) tracker = FindObjectsOfType<MonoBehaviour>().OfType<ITrackerDebugInfo>().FirstOrDefault();
         if (trackerDriver == null) trackerDriver = FindAnyObjectByType<MotionTrackerDriver>();
         if (spawners == null || spawners.Length == 0) spawners = Resources.FindObjectsOfTypeAll<PicoSceneSpawnPositions>();
-        if (_sceneCapture == null) _sceneCapture = FindObjectsOfType<MonoBehaviour>(FindObjectsInactive.Include, FindObjectsSortMode.None).OfType<ISceneCaptureDebugInfo>().FirstOrDefault();
+        if (_sceneCapture == null) _sceneCapture = Resources.FindObjectsOfTypeAll<MonoBehaviour>().OfType<ISceneCaptureDebugInfo>().FirstOrDefault();
         Refresh();
     }
 

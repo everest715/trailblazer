@@ -15,7 +15,7 @@ public class CarCollisionEffects : MonoBehaviour
 
         var position = other.ClosestPoint(car.position);
         var effect = Instantiate(effectPrefab, position, effectPrefab.transform.rotation);
-        effect.transform.localScale *= effectScale;
+        effect.transform.localScale = Vector3.Scale(effect.transform.localScale, car.lossyScale) * effectScale;
         Destroy(effect, lifetime);
     }
 }

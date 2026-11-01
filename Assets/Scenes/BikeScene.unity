@@ -2757,7 +2757,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   effectPrefab: {fileID: 417761080263594737, guid: 7800b8f6b712bfe49bd663eeb3ebe1e4, type: 3}
   lifetime: 2
-  effectScale: 0.25
+  effectScale: 1
 --- !u!114 &1323473305
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2800,6 +2800,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   showDebugVisual: 1
   trackingOrigin: {fileID: 1680501587}
+  debugModelPrefab: {fileID: 2804511081350798348, guid: 63143cda72d8c124eb39d3ecf7db4ccd, type: 3}
 --- !u!1 &1339786242
 GameObject:
   m_ObjectHideFlags: 0
