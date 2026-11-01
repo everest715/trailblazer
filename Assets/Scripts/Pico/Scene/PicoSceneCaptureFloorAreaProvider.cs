@@ -9,6 +9,8 @@ public class PicoSceneCaptureFloorAreaProvider : MonoBehaviour, IPicoFloorAreaPr
 {
     private bool _providerStarted;
     private bool _captureRequested;
+    private bool _eventsSubscribed;
+    private bool _isQuerying;
 
     [Header("Scene Capture")]
     public PxrSemanticLabel surfaceLabel = PxrSemanticLabel.Floor;
@@ -21,12 +23,26 @@ public class PicoSceneCaptureFloorAreaProvider : MonoBehaviour, IPicoFloorAreaPr
     private Transform _debugMeshRoot;
     private Material _averageHeightMaterial;
     private Material _verticesMaterial;
+    private readonly List<DebugBox> _debugBoxes = new List<DebugBox>();
+
+    private struct DebugBox
+    {
+        public Vector3 Center;
+        public Quaternion Rotation;
+        public Vector3 Extent;
+    }
 
     public int DebugFloorAreaCount { get; private set; }
+    public event Action<IReadOnlyList<PicoFloorArea>> AreasUpdated;
     public string DebugQueryStatus { get; private set; } = "Not queried";
     public float DebugGroundHeight { get; private set; }
     public string DebugGroundHeightMethod { get; private set; } = "Not detected";
     public Vector3 DebugAnchorPosition { get; private set; }
+    public Vector3 DebugBoxLocalPosition { get; private set; }
+    public Vector3 DebugBoxExtent { get; private set; }
+    public Vector3 DebugAnchorEuler { get; private set; }
+    public Vector3 DebugBoxLocalEuler { get; private set; }
+    public Vector3 DebugBoxCenter { get; private set; }
 
     public async Task<IReadOnlyList<PicoFloorArea>> GetFloorAreasAsync()
     {
@@ -41,6 +57,7 @@ public class PicoSceneCaptureFloorAreaProvider : MonoBehaviour, IPicoFloorAreaPr
 
             _providerStarted = true;
             DebugQueryStatus = "Provider started";
+            SubscribeToAnchorUpdates();
         }
 
         var areas = await QueryFloorAreasAsync();
@@ -61,6 +78,52 @@ public class PicoSceneCaptureFloorAreaProvider : MonoBehaviour, IPicoFloorAreaPr
         return areas;
     }
 
+    private void SubscribeToAnchorUpdates()
+    {
+        if (_eventsSubscribed) return;
+        PXR_Manager.SceneAnchorDataUpdated += OnSceneAnchorDataUpdated;
+        _eventsSubscribed = true;
+    }
+
+    private void UnsubscribeFromAnchorUpdates()
+    {
+        if (!_eventsSubscribed) return;
+        PXR_Manager.SceneAnchorDataUpdated -= OnSceneAnchorDataUpdated;
+        _eventsSubscribed = false;
+    }
+
+    private async void OnSceneAnchorDataUpdated()
+    {
+        if (_isQuerying) return;
+        _isQuerying = true;
+        try
+        {
+            var areas = await QueryFloorAreasAsync();
+            AreasUpdated?.Invoke(areas);
+        }
+        catch (Exception exception)
+        {
+            Debug.LogWarning($"Scene anchor update failed: {exception.Message}");
+        }
+        finally
+        {
+            _isQuerying = false;
+        }
+    }
+
+    private void OnEnable()
+    {
+        if (_providerStarted)
+        {
+            SubscribeToAnchorUpdates();
+        }
+    }
+
+    private void OnDisable()
+    {
+        UnsubscribeFromAnchorUpdates();
+    }
+
     private async Task<List<PicoFloorArea>> QueryFloorAreasAsync()
     {
         var query = await PXR_MixedReality.QuerySceneAnchorAsync(new[] { surfaceLabel });
@@ -71,6 +134,7 @@ public class PicoSceneCaptureFloorAreaProvider : MonoBehaviour, IPicoFloorAreaPr
         }
 
         var areas = new List<PicoFloorArea>();
+        _debugBoxes.Clear();
         foreach (var anchorHandle in query.anchorHandleList)
         {
             if (PXR_MixedReality.LocateAnchor(anchorHandle, out var position, out var rotation) != PxrResult.SUCCESS)
@@ -81,12 +145,23 @@ public class PicoSceneCaptureFloorAreaProvider : MonoBehaviour, IPicoFloorAreaPr
             if (areas.Count == 0)
             {
                 DebugAnchorPosition = position;
+                DebugAnchorEuler = rotation.eulerAngles;
             }
 
             if (surfaceLabel == PxrSemanticLabel.Table)
             {
-                if (PXR_MixedReality.GetSceneBox3DData(anchorHandle, out var localPosition, out _, out var extent) == PxrResult.SUCCESS)
+                if (PXR_MixedReality.GetSceneBox3DData(anchorHandle, out var localPosition, out var localRotation, out var extent) == PxrResult.SUCCESS)
                 {
+                    DebugBoxLocalPosition = localPosition;
+                    DebugBoxExtent = extent;
+                    DebugBoxLocalEuler = localRotation.eulerAngles;
+                    DebugBoxCenter = position + rotation * localPosition;
+                    _debugBoxes.Add(new DebugBox
+                    {
+                        Center = position + rotation * localPosition,
+                        Rotation = rotation,
+                        Extent = extent
+                    });
                     areas.Add(PicoFloorArea.FromBox3D(position, rotation, localPosition, extent));
                 }
                 continue;
@@ -140,6 +215,25 @@ public class PicoSceneCaptureFloorAreaProvider : MonoBehaviour, IPicoFloorAreaPr
         _averageHeightMaterial ??= CreateDebugMaterial(averageHeightColor);
         _verticesMaterial ??= CreateDebugMaterial(verticesColor);
         PicoFloorAreaDebugMeshBuilder.Rebuild(_debugMeshRoot, areas, _averageHeightMaterial, _verticesMaterial);
+        for (var i = 0; i < _debugBoxes.Count; i++)
+        {
+            CreateDebugBox(_debugMeshRoot, _debugBoxes[i], i);
+        }
+    }
+
+    private void CreateDebugBox(Transform root, DebugBox debugBox, int index)
+    {
+        var box = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        box.name = $"TableBox{index}_Debug";
+        box.transform.SetParent(root, false);
+        box.transform.SetPositionAndRotation(debugBox.Center, debugBox.Rotation);
+        box.transform.localScale = debugBox.Extent;
+        box.GetComponent<MeshRenderer>().sharedMaterial = _verticesMaterial;
+        var collider = box.GetComponent<Collider>();
+        if (collider != null)
+        {
+            Destroy(collider);
+        }
     }
 
     private static Material CreateDebugMaterial(Color color)
@@ -163,6 +257,7 @@ public class PicoSceneCaptureFloorAreaProvider : MonoBehaviour, IPicoFloorAreaPr
 
     private void OnDestroy()
     {
+        UnsubscribeFromAnchorUpdates();
         if (_providerStarted)
         {
             PXR_MixedReality.StopSenseDataProvider(PxrSenseDataProviderType.SceneCapture);

@@ -33,6 +33,11 @@ public class DebugInfoPanelTests
         public float DebugGroundHeight => 1.25f;
         public string DebugGroundHeightMethod => "SceneCapture floor anchors";
         public Vector3 DebugAnchorPosition => new Vector3(0f, -1.59f, 2f);
+        public Vector3 DebugBoxLocalPosition => Vector3.zero;
+        public Vector3 DebugBoxExtent => Vector3.zero;
+        public Vector3 DebugAnchorEuler => Vector3.zero;
+        public Vector3 DebugBoxLocalEuler => Vector3.zero;
+        public Vector3 DebugBoxCenter => Vector3.zero;
 
         public Task<IReadOnlyList<PicoFloorArea>> GetFloorAreasAsync()
         {

@@ -60,6 +60,11 @@ public class DebugInfoPanel : MonoBehaviour
             text.AppendLine($"Ground height: {_sceneCapture.DebugGroundHeight:F2}");
             text.AppendLine($"Ground query: {_sceneCapture.DebugQueryStatus}");
             text.AppendLine($"Ground anchor: {_sceneCapture.DebugAnchorPosition:F2}");
+            text.AppendLine($"Box local: {_sceneCapture.DebugBoxLocalPosition:F2}");
+            text.AppendLine($"Box extent: {_sceneCapture.DebugBoxExtent:F2}");
+            text.AppendLine($"Box center: {_sceneCapture.DebugBoxCenter:F2}");
+            text.AppendLine($"Anchor rot: {_sceneCapture.DebugAnchorEuler:F1}");
+            text.AppendLine($"Box local rot: {_sceneCapture.DebugBoxLocalEuler:F1}");
             if (Camera.main != null)
             {
                 text.AppendLine($"Headset: {Camera.main.transform.position:F2}");

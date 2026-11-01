@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using System.Net.Mail;
 using TMPro;
 using Unity.Mathematics;
@@ -62,6 +63,7 @@ public class Game : MonoBehaviour
 
     private float _startTime;
     private AudioSource _audioSource;
+    private PicoSceneCaptureFloorAreaProvider _surfaceProvider;
     
     private readonly Color _defaultColor = new Color(0f, 0.7f, 0.7f);
     private readonly Color _coinColor = new Color(0.9f, 0.9f, 0.4f);
@@ -110,6 +112,8 @@ public class Game : MonoBehaviour
         var provider = providers.Length > 0 ? providers[0] : null;
         if (provider != null)
         {
+            _surfaceProvider = provider;
+            _surfaceProvider.AreasUpdated += OnSurfaceAreasUpdated;
             try
             {
                 var areas = await provider.GetFloorAreasAsync();
@@ -215,6 +219,22 @@ public class Game : MonoBehaviour
             }
         }
         return true;
+    }
+
+    private void OnSurfaceAreasUpdated(IReadOnlyList<PicoFloorArea> areas)
+    {
+        if (areas.Count > 0)
+        {
+            AlignGatesToArea(areas[0]);
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (_surfaceProvider != null)
+        {
+            _surfaceProvider.AreasUpdated -= OnSurfaceAreasUpdated;
+        }
     }
 
     private void StartGame()
