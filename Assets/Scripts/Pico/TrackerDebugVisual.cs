@@ -3,6 +3,7 @@ using UnityEngine;
 public class TrackerDebugVisual : MonoBehaviour
 {
     public bool showDebugVisual = true;
+    public Transform trackingOrigin;
 
     private ITrackerDebugInfo _tracker;
     private GameObject _rawModel;
@@ -41,7 +42,7 @@ public class TrackerDebugVisual : MonoBehaviour
         {
             _rawModel = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             _rawModel.name = "TrackerRawDebugModel";
-            _rawModel.transform.position = _tracker.DebugPosition;
+            _rawModel.transform.position = GetWorldPosition();
             _rawModel.transform.localScale = new Vector3(0.18f, 0.06f, 0.096f);
             SetMaterial(_rawModel, Color.red);
             RemoveCollider(_rawModel);
@@ -52,8 +53,15 @@ public class TrackerDebugVisual : MonoBehaviour
     {
         if (_rawModel != null && _tracker != null)
         {
-            _rawModel.transform.position = _tracker.DebugPosition;
+            _rawModel.transform.position = GetWorldPosition();
         }
+    }
+
+    private Vector3 GetWorldPosition()
+    {
+        return trackingOrigin == null
+            ? _tracker.DebugPosition
+            : trackingOrigin.TransformPoint(_tracker.DebugPosition);
     }
 
     private static void SetMaterial(GameObject target, Color color)

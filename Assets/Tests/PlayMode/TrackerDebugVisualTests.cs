@@ -31,6 +31,23 @@ public class TrackerDebugVisualTests
     }
 
     [UnityTest]
+    public IEnumerator Update_RootModelAppliesTrackingOrigin()
+    {
+        var origin = new GameObject("CameraOffset");
+        origin.transform.position = new Vector3(0f, 1.36f, 0f);
+        var tracker = _car.AddComponent<FakeTracker>();
+        tracker.DebugPosition = new Vector3(1f, 2f, 3f);
+        var visual = _car.AddComponent<TrackerDebugVisual>();
+        visual.trackingOrigin = origin.transform;
+
+        yield return null;
+
+        _rawModel = GameObject.Find("TrackerRawDebugModel");
+        Assert.AreEqual(origin.transform.TransformPoint(tracker.DebugPosition), _rawModel.transform.position);
+        Object.DestroyImmediate(origin);
+    }
+
+    [UnityTest]
     public IEnumerator Update_RootModelUsesRawTrackerPosition()
     {
         var tracker = _car.AddComponent<FakeTracker>();
