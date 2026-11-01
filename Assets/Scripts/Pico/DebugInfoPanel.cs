@@ -59,6 +59,11 @@ public class DebugInfoPanel : MonoBehaviour
             text.AppendLine($"Ground detection: {_sceneCapture.DebugGroundHeightMethod}");
             text.AppendLine($"Ground height: {_sceneCapture.DebugGroundHeight:F2}");
             text.AppendLine($"Ground query: {_sceneCapture.DebugQueryStatus}");
+            text.AppendLine($"Ground anchor: {_sceneCapture.DebugAnchorPosition:F2}");
+            if (Camera.main != null)
+            {
+                text.AppendLine($"Headset: {Camera.main.transform.position:F2}");
+            }
         }
         else
         {

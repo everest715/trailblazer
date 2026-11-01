@@ -32,6 +32,7 @@ public class DebugInfoPanelTests
         public string DebugQueryStatus => "Floor anchors: 1";
         public float DebugGroundHeight => 1.25f;
         public string DebugGroundHeightMethod => "SceneCapture floor anchors";
+        public Vector3 DebugAnchorPosition => new Vector3(0f, -1.59f, 2f);
 
         public Task<IReadOnlyList<PicoFloorArea>> GetFloorAreasAsync()
         {
@@ -128,6 +129,7 @@ public class DebugInfoPanelTests
         StringAssert.Contains("Ground detection: SceneCapture floor anchors", output.text);
         StringAssert.Contains("Ground height: 1.25", output.text);
         StringAssert.Contains("Ground query: Floor anchors: 1", output.text);
+        StringAssert.Contains("Ground anchor: (0.00, -1.59, 2.00)", output.text);
         StringAssert.DoesNotContain("Not detected", output.text);
     }
 

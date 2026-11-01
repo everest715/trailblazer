@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using ByteDance.PICO.XR;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class PicoSceneCaptureFloorAreaProvider : MonoBehaviour, IPicoFloorAreaProvider, ISceneCaptureDebugInfo
 {
@@ -22,6 +23,7 @@ public class PicoSceneCaptureFloorAreaProvider : MonoBehaviour, IPicoFloorAreaPr
     public string DebugQueryStatus { get; private set; } = "Not queried";
     public float DebugGroundHeight { get; private set; }
     public string DebugGroundHeightMethod { get; private set; } = "Not detected";
+    public Vector3 DebugAnchorPosition { get; private set; }
 
     public async Task<IReadOnlyList<PicoFloorArea>> GetFloorAreasAsync()
     {
@@ -78,10 +80,15 @@ public class PicoSceneCaptureFloorAreaProvider : MonoBehaviour, IPicoFloorAreaPr
                 continue;
             }
 
+            if (areas.Count == 0)
+            {
+                DebugAnchorPosition = position;
+            }
+
             var worldVertices = new Vector3[vertices.Length];
             for (var i = 0; i < vertices.Length; i++)
             {
-                worldVertices[i] = position + rotation * new Vector3(vertices[i].x, 0f, vertices[i].y);
+                worldVertices[i] = position + rotation * new Vector3(vertices[i].x, vertices[i].y, 0f);
             }
 
             areas.Add(new PicoFloorArea(worldVertices));
@@ -122,7 +129,21 @@ public class PicoSceneCaptureFloorAreaProvider : MonoBehaviour, IPicoFloorAreaPr
 
     private static Material CreateDebugMaterial(Color color)
     {
-        return new Material(Shader.Find("Sprites/Default")) { color = color };
+        var shader = Shader.Find("Universal Render Pipeline/Unlit");
+        if (shader == null)
+        {
+            return new Material(Shader.Find("Sprites/Default")) { color = color };
+        }
+
+        var material = new Material(shader) { color = color };
+        material.SetFloat("_Surface", 1f);
+        material.SetFloat("_Blend", 0f);
+        material.SetFloat("_ZWrite", 0f);
+        material.SetInt("_SrcBlend", (int)BlendMode.SrcAlpha);
+        material.SetInt("_DstBlend", (int)BlendMode.OneMinusSrcAlpha);
+        material.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
+        material.renderQueue = (int)RenderQueue.Transparent;
+        return material;
     }
 
     private void OnDestroy()
