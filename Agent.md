@@ -221,4 +221,4 @@ Prefab 与 Tag 对应关系：`Coin.prefab`→`Coin`，`Boost.prefab`→`Boost`�
 - **遗留空 meta**：存在 `Assets/Editor.meta` 但无对应 `Assets/Editor/` 目录，属删除目录后的残留，可忽略。
 - **房间感知生成**：已按 PICO Scene Capture 文档实现 Floor 查询与固定区域回退；设备端标定流程、权限和实际生成位置仍需后续真机验证。
 - **未验证项**：PICO 透视、设备帧率和完整玩法仍未全面确认。Tracker 的配对、安装偏移、有效位姿、丢失追踪行为和小车碰撞需单独做实机验证。
-- **Table 锚点高度偏差待查**：桌体 Box 尺寸与实物接近，但顶面仍低于真实桌面；测试中 tracker 放在桌面上时 Y≈1.10，而原始 Table 顶面计算 Y≈0.44。`LocateAnchorAligned`/`modelScale` 方案已回退，保留 Box3D 局部中心 Z 转换。后续需对比同一时刻的 tracker 位姿、原始锚点数据和官方 `PXR_SceneCaptureManager` 显示结果，区分标定误差、坐标参考点和接口语义；不要把临时 tracker 高度硬编码为桌面高度。
+- **Table 锚点高度偏差待查**：桌体 Box 尺寸与实物接近，但顶面仍低于真实桌面；测试中 tracker 放在桌面上时 Y≈1.10，而原始 Table 顶面计算 Y≈0.44。`LocateAnchorAligned`/`modelScale` 方案已回退，保留 Box3D 局部中心 Z 转换。后续需对比同一时刻的 tracker 位姿、原始锚点数据和官方 `PXR_SceneCaptureManager` 显示结果，区分标定误差、坐标参考点和接口语义。临时方案：将 tracker 高度向下偏移少量安装高度，作为桌面高度使用。

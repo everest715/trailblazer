@@ -12,9 +12,12 @@ public readonly struct PicoFloorArea
 
     public Bounds PlanarBounds { get; }
 
-    public PicoFloorArea(Vector3[] vertices, bool useHighestVertexHeight = false)
+    public Quaternion SurfaceRotation { get; }
+
+    public PicoFloorArea(Vector3[] vertices, bool useHighestVertexHeight = false, Quaternion? surfaceRotation = null)
     {
         _vertices = vertices;
+        SurfaceRotation = surfaceRotation ?? Quaternion.identity;
         AverageHeight = 0f;
         SurfaceHeight = 0f;
         PlanarBounds = new Bounds();
@@ -41,36 +44,67 @@ public readonly struct PicoFloorArea
     public static PicoFloorArea FromBox3D(Vector3 anchorPosition, Quaternion anchorRotation, Vector3 localPosition, Vector3 extent)
     {
         var half = extent * 0.5f;
-        var highest = float.MinValue;
-        var minX = float.MaxValue;
-        var maxX = float.MinValue;
-        var minZ = float.MaxValue;
-        var maxZ = float.MinValue;
-        for (var x = -1; x <= 1; x += 2)
+        var bestDot = float.MinValue;
+        var bestFace = new Vector3[0];
+        for (var axis = 0; axis < 3; axis++)
         {
-            for (var y = -1; y <= 1; y += 2)
+            for (var sign = -1; sign <= 1; sign += 2)
             {
-                for (var z = -1; z <= 1; z += 2)
+                var normal = anchorRotation * GetFaceNormal(axis, sign);
+                var dot = Vector3.Dot(normal, Vector3.up);
+                if (dot <= bestDot)
                 {
-                    var corner = localPosition + Vector3.Scale(half, new Vector3(x, y, z));
-                    var worldCorner = anchorPosition + anchorRotation * corner;
-                    highest = Mathf.Max(highest, worldCorner.y);
-                    minX = Mathf.Min(minX, worldCorner.x);
-                    maxX = Mathf.Max(maxX, worldCorner.x);
-                    minZ = Mathf.Min(minZ, worldCorner.z);
-                    maxZ = Mathf.Max(maxZ, worldCorner.z);
+                    continue;
                 }
+
+                bestDot = dot;
+                bestFace = GetFaceVertices(axis, sign, half);
             }
         }
 
-        var vertices = new[]
+        for (var i = 0; i < bestFace.Length; i++)
         {
-            new Vector3(minX, highest, minZ),
-            new Vector3(maxX, highest, minZ),
-            new Vector3(maxX, highest, maxZ),
-            new Vector3(minX, highest, maxZ)
-        };
-        return new PicoFloorArea(vertices, useHighestVertexHeight: true);
+            bestFace[i] = anchorPosition + anchorRotation * (localPosition + bestFace[i]);
+        }
+        return new PicoFloorArea(bestFace, useHighestVertexHeight: true, surfaceRotation: anchorRotation);
+    }
+
+    private static Vector3 GetFaceNormal(int axis, int sign)
+    {
+        var normal = Vector3.zero;
+        normal[axis] = sign;
+        return normal;
+    }
+
+    private static Vector3[] GetFaceVertices(int axis, int sign, Vector3 half)
+    {
+        switch (axis)
+        {
+            case 0:
+                return new[]
+                {
+                    new Vector3(sign * half.x, -half.y, -half.z),
+                    new Vector3(sign * half.x, half.y, -half.z),
+                    new Vector3(sign * half.x, half.y, half.z),
+                    new Vector3(sign * half.x, -half.y, half.z)
+                };
+            case 1:
+                return new[]
+                {
+                    new Vector3(-half.x, sign * half.y, -half.z),
+                    new Vector3(-half.x, sign * half.y, half.z),
+                    new Vector3(half.x, sign * half.y, half.z),
+                    new Vector3(half.x, sign * half.y, -half.z)
+                };
+            default:
+                return new[]
+                {
+                    new Vector3(-half.x, -half.y, sign * half.z),
+                    new Vector3(half.x, -half.y, sign * half.z),
+                    new Vector3(half.x, half.y, sign * half.z),
+                    new Vector3(-half.x, half.y, sign * half.z)
+                };
+        }
     }
 
     public bool TryGetRandomPoint(out Vector3 point)

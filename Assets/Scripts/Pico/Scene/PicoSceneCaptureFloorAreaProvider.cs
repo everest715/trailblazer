@@ -11,12 +11,18 @@ public class PicoSceneCaptureFloorAreaProvider : MonoBehaviour, IPicoFloorAreaPr
     private bool _captureRequested;
     private bool _eventsSubscribed;
     private bool _isQuerying;
+    private bool _refreshPending;
+    private PicoMotionTrackerPoseSource _tracker;
 
     [Header("Scene Capture")]
     public PxrSemanticLabel surfaceLabel = PxrSemanticLabel.Floor;
 
+    [Header("Temporary Table Height")]
+    public bool useTrackerForTableHeight = true;
+    public float trackerTableHeightOffset = 0.05f;
+
     [Header("Debug Meshes")]
-    public bool showDebugMeshes = true;
+    public bool showDebugMeshes;
     public Color averageHeightColor = new Color(0.1f, 1f, 0.3f, 0.35f);
     public Color verticesColor = new Color(1f, 0.25f, 0.2f, 0.35f);
 
@@ -92,9 +98,24 @@ public class PicoSceneCaptureFloorAreaProvider : MonoBehaviour, IPicoFloorAreaPr
         _eventsSubscribed = false;
     }
 
-    private async void OnSceneAnchorDataUpdated()
+    private void OnSceneAnchorDataUpdated()
     {
-        if (_isQuerying) return;
+        RefreshAreas();
+    }
+
+    private void OnTrackerPoseValid()
+    {
+        RefreshAreas();
+    }
+
+    private async void RefreshAreas()
+    {
+        if (_isQuerying)
+        {
+            _refreshPending = true;
+            return;
+        }
+
         _isQuerying = true;
         try
         {
@@ -108,6 +129,11 @@ public class PicoSceneCaptureFloorAreaProvider : MonoBehaviour, IPicoFloorAreaPr
         finally
         {
             _isQuerying = false;
+            if (_refreshPending)
+            {
+                _refreshPending = false;
+                RefreshAreas();
+            }
         }
     }
 
@@ -116,12 +142,26 @@ public class PicoSceneCaptureFloorAreaProvider : MonoBehaviour, IPicoFloorAreaPr
         if (_providerStarted)
         {
             SubscribeToAnchorUpdates();
+            if (_tracker != null)
+            {
+                _tracker.PoseBecameValid -= OnTrackerPoseValid;
+                _tracker.PoseBecameValid += OnTrackerPoseValid;
+            }
         }
     }
 
     private void OnDisable()
     {
         UnsubscribeFromAnchorUpdates();
+        UnsubscribeFromTracker();
+    }
+
+    private void UnsubscribeFromTracker()
+    {
+        if (_tracker != null)
+        {
+            _tracker.PoseBecameValid -= OnTrackerPoseValid;
+        }
     }
 
     private async Task<List<PicoFloorArea>> QueryFloorAreasAsync()
@@ -182,7 +222,7 @@ public class PicoSceneCaptureFloorAreaProvider : MonoBehaviour, IPicoFloorAreaPr
                 worldVertices[i] = position + rotation * new Vector3(vertices[i].x, vertices[i].y, 0f);
             }
 
-            areas.Add(new PicoFloorArea(worldVertices));
+            areas.Add(new PicoFloorArea(worldVertices, surfaceRotation: rotation));
         }
 
         DebugQueryStatus = $"{surfaceLabel} anchors: {areas.Count}";
@@ -193,10 +233,63 @@ public class PicoSceneCaptureFloorAreaProvider : MonoBehaviour, IPicoFloorAreaPr
             DebugGroundHeightMethod = surfaceLabel == PxrSemanticLabel.Table
                 ? "SceneCapture table top"
                 : "SceneCapture floor anchors";
+            ApplyTrackerTableHeight(areas);
         }
         Debug.Log($"Scene capture query: {DebugQueryStatus}");
         RebuildDebugMeshes(areas);
         return areas;
+    }
+
+    private void ApplyTrackerTableHeight(List<PicoFloorArea> areas)
+    {
+        if (surfaceLabel != PxrSemanticLabel.Table || !useTrackerForTableHeight)
+        {
+            return;
+        }
+
+        var tracker = FindAnyObjectByType<PicoMotionTrackerPoseSource>();
+        if (tracker == null)
+        {
+            return;
+        }
+
+        if (_tracker != tracker)
+        {
+            UnsubscribeFromTracker();
+            _tracker = tracker;
+            _tracker.PoseBecameValid += OnTrackerPoseValid;
+        }
+
+        if (!tracker.DebugPoseValid)
+        {
+            return;
+        }
+
+        var trackerDriver = FindAnyObjectByType<MotionTrackerDriver>();
+        var trackerPosition = trackerDriver == null
+            ? tracker.DebugPosition
+            : trackerDriver.DebugWorldPosition;
+        var height = trackerPosition.y - trackerTableHeightOffset;
+        for (var i = 0; i < areas.Count; i++)
+        {
+            var heightDelta = height - areas[i].SurfaceHeight;
+            if (i < _debugBoxes.Count)
+            {
+                var debugBox = _debugBoxes[i];
+                debugBox.Center.y += heightDelta;
+                _debugBoxes[i] = debugBox;
+            }
+
+            var vertices = (Vector3[])areas[i].Vertices.Clone();
+            for (var vertexIndex = 0; vertexIndex < vertices.Length; vertexIndex++)
+            {
+                vertices[vertexIndex] += Vector3.up * heightDelta;
+            }
+            areas[i] = new PicoFloorArea(vertices, useHighestVertexHeight: true, surfaceRotation: areas[i].SurfaceRotation);
+        }
+
+        DebugGroundHeight = height;
+        DebugGroundHeightMethod = $"Tracker height - {trackerTableHeightOffset:F2}m";
     }
 
     private void RebuildDebugMeshes(IReadOnlyList<PicoFloorArea> areas)
@@ -205,6 +298,7 @@ public class PicoSceneCaptureFloorAreaProvider : MonoBehaviour, IPicoFloorAreaPr
         {
             _debugMeshRoot = new GameObject("FloorAreaDebugMeshes").transform;
         }
+        _debugMeshRoot.gameObject.SetActive(showDebugMeshes);
 
         if (!showDebugMeshes)
         {
@@ -239,6 +333,14 @@ public class PicoSceneCaptureFloorAreaProvider : MonoBehaviour, IPicoFloorAreaPr
         }
     }
 
+    private void OnValidate()
+    {
+        if (_debugMeshRoot != null)
+        {
+            _debugMeshRoot.gameObject.SetActive(showDebugMeshes);
+        }
+    }
+
     private static Material CreateDebugMaterial(Color color)
     {
         var shader = Shader.Find("Universal Render Pipeline/Unlit");
@@ -261,6 +363,7 @@ public class PicoSceneCaptureFloorAreaProvider : MonoBehaviour, IPicoFloorAreaPr
     private void OnDestroy()
     {
         UnsubscribeFromAnchorUpdates();
+        UnsubscribeFromTracker();
         if (_providerStarted)
         {
             PXR_MixedReality.StopSenseDataProvider(PxrSenseDataProviderType.SceneCapture);

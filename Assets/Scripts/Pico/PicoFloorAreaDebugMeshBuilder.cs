@@ -7,12 +7,21 @@ public static class PicoFloorAreaDebugMeshBuilder
     {
         var mesh = new Mesh();
         var meshVertices = new Vector3[vertices.Count];
+        var heightOffset = 0f;
+        if (uniformHeight.HasValue && vertices.Count > 0)
+        {
+            var averageHeight = 0f;
+            foreach (var vertex in vertices)
+            {
+                averageHeight += vertex.y;
+            }
+            averageHeight /= vertices.Count;
+            heightOffset = uniformHeight.Value - averageHeight;
+        }
+
         for (var i = 0; i < vertices.Count; i++)
         {
-            var vertex = vertices[i];
-            meshVertices[i] = uniformHeight.HasValue
-                ? new Vector3(vertex.x, uniformHeight.Value, vertex.z)
-                : vertex;
+            meshVertices[i] = vertices[i] + Vector3.up * heightOffset;
         }
 
         var triangles = new List<int>();

@@ -54,6 +54,8 @@ public class PicoFloorAreaTests
             Vector3.zero, Quaternion.Euler(0f, 90f, 0f),
             Vector3.zero, new Vector3(2f, 1f, 4f));
 
+        Assert.AreEqual(Quaternion.Euler(0f, 90f, 0f), area.SurfaceRotation);
+
         Assert.AreEqual(0.5f, area.SurfaceHeight, 1e-5f);
         Assert.AreEqual(4f, area.PlanarBounds.size.x, 1e-5f);
         Assert.AreEqual(2f, area.PlanarBounds.size.z, 1e-5f);

@@ -48,15 +48,18 @@ public class FloorAreaDebugMeshTests
     }
 
     [Test]
-    public void CreatePlaneMesh_FlattensToUniformHeight()
+    public void CreatePlaneMesh_PreservesRotationAndMovesAverageHeight()
     {
-        var mesh = PicoFloorAreaDebugMeshBuilder.CreatePlaneMesh(UnevenQuad, 0.25f);
+        var mesh = PicoFloorAreaDebugMeshBuilder.CreatePlaneMesh(UnevenQuad, 0.5f);
         _meshes.Add(mesh);
 
-        foreach (var vertex in mesh.vertices)
+        var averageHeight = 0f;
+        for (var i = 0; i < mesh.vertices.Length; i++)
         {
-            Assert.AreEqual(0.25f, vertex.y, 1e-5f);
+            averageHeight += mesh.vertices[i].y;
+            Assert.AreEqual(UnevenQuad[i].y + 0.25f, mesh.vertices[i].y, 1e-5f);
         }
+        Assert.AreEqual(0.5f, averageHeight / mesh.vertices.Length, 1e-5f);
         Assert.AreEqual(UnevenQuad[2].x, mesh.vertices[2].x);
         Assert.AreEqual(UnevenQuad[2].z, mesh.vertices[2].z);
     }

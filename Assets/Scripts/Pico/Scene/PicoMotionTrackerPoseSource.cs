@@ -12,6 +12,7 @@ public class PicoMotionTrackerPoseSource : MonoBehaviour, IPicoTrackerPoseSource
     public bool DebugPoseValid { get; private set; }
     public Vector3 DebugPosition { get; private set; }
     public string DebugRequestStatus { get; private set; } = "Not requested";
+    public event System.Action PoseBecameValid;
 
     private void Start()
     {
@@ -78,6 +79,7 @@ public class PicoMotionTrackerPoseSource : MonoBehaviour, IPicoTrackerPoseSource
         {
             _hasLoggedValidPose = true;
             Debug.Log($"Motion tracker pose acquired: {position}");
+            PoseBecameValid?.Invoke();
         }
 
         return true;
