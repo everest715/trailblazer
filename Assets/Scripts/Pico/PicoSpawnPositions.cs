@@ -17,6 +17,11 @@ public class PicoSpawnPositions : MonoBehaviour
 
     public void StartSpawn()
     {
+        StartSpawn(null);
+    }
+
+    public void StartSpawn(float? fixedHeight)
+    {
         if (SpawnObject == null)
         {
             return;
@@ -26,7 +31,7 @@ public class PicoSpawnPositions : MonoBehaviour
         {
             var localPosition = new Vector3(
                 Random.Range(spawnBounds.min.x, spawnBounds.max.x),
-                Random.Range(spawnBounds.min.y, spawnBounds.max.y),
+                fixedHeight ?? Random.Range(spawnBounds.min.y, spawnBounds.max.y),
                 Random.Range(spawnBounds.min.z, spawnBounds.max.z));
             var worldPosition = transform.TransformPoint(localPosition);
             Instantiate(SpawnObject, worldPosition, SpawnObject.transform.rotation);

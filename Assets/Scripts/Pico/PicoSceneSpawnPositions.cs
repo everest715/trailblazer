@@ -12,6 +12,7 @@ public class PicoSceneSpawnPositions : MonoBehaviour
     public PicoSpawnPositions fallback;
 
     private bool _isSpawning;
+    private float? _cachedSpawnHeight;
 
     public string LastSpawnSource { get; private set; } = "Not spawned";
     public Vector3 LastSpawnPoint { get; private set; }
@@ -39,15 +40,16 @@ public class PicoSceneSpawnPositions : MonoBehaviour
             var provider = GetComponent<IPicoFloorAreaProvider>();
             if (provider == null)
             {
-                LastGroundHeight = fallback.spawnBounds.center.y;
-                LastGroundHeightMethod = "Fixed bounds";
-                LastSpawnSource = "固定区域";
-                fallback.StartSpawn();
+                // LastGroundHeight = fallback.spawnBounds.center.y;
+                // LastGroundHeightMethod = "Fixed bounds";
+                // LastSpawnSource = "固定区域";
+                // fallback.StartSpawn();
                 return;
             }
 
             var areas = await provider.GetFloorAreasAsync();
             var spawnPoints = new List<Vector3>();
+            var batchHeight = _cachedSpawnHeight;
             if (areas != null)
             {
                 for (var i = 0; i < SpawnAmount && areas.Count > 0; i++)
@@ -55,20 +57,25 @@ public class PicoSceneSpawnPositions : MonoBehaviour
                     var area = areas[UnityEngine.Random.Range(0, areas.Count)];
                     if (area.TryGetRandomPoint(out var point))
                     {
-                        spawnPoints.Add(point + Vector3.up * surfaceClearance);
+                        if (!batchHeight.HasValue)
+                        {
+                            batchHeight = point.y + surfaceClearance;
+                        }
+                        spawnPoints.Add(new Vector3(point.x, batchHeight.Value, point.z));
                     }
                 }
             }
 
             if (spawnPoints.Count != SpawnAmount)
             {
-                LastGroundHeight = fallback.spawnBounds.center.y;
-                LastGroundHeightMethod = "Fixed bounds";
-                LastSpawnSource = "固定区域";
-                fallback.StartSpawn();
+                // LastGroundHeight = fallback.spawnBounds.center.y;
+                // LastGroundHeightMethod = "Fixed bounds";
+                // LastSpawnSource = "固定区域";
+                // fallback.StartSpawn();
                 return;
             }
 
+            _cachedSpawnHeight = batchHeight;
             LastSpawnSource = "SceneCapture";
             LastGroundHeight = spawnPoints[0].y;
             LastGroundHeightMethod = "SceneCapture floor anchors";
@@ -80,11 +87,11 @@ public class PicoSceneSpawnPositions : MonoBehaviour
         }
         catch (Exception)
         {
-            LastGroundHeight = fallback.spawnBounds.center.y;
-            LastGroundHeightMethod = "Fixed bounds";
+            LastGroundHeight = _cachedSpawnHeight ?? fallback.spawnBounds.center.y;
+            LastGroundHeightMethod = _cachedSpawnHeight.HasValue ? "Cached first spawn height" : "Fixed bounds";
             LastSpawnSource = "固定区域";
             Debug.LogWarning("Scene capture spawn failed; using fallback");
-            fallback.StartSpawn();
+            fallback.StartSpawn(_cachedSpawnHeight);
         }
         finally
         {

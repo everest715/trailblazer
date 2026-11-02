@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class BouncePickUp : MonoBehaviour
 {
-    public float height = 0.3f;
+    public float height = 0.01f;
     public float speed = 1f;
 
     private Vector3 _startPosition;
@@ -14,7 +14,7 @@ public class BouncePickUp : MonoBehaviour
 
     private void Update()
     {
-        var newY = _startPosition.y + Mathf.Sin(Time.time * speed) * height;
+        var newY = _startPosition.y + (Mathf.Sin(Time.time * speed) + 1) * height;
         transform.position = new Vector3(_startPosition.x, newY, _startPosition.z);
     }
 }
