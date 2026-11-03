@@ -31,7 +31,7 @@ public class CarCollisionEffectsTests
     }
 
     [Test]
-    public void Play_SetsParticleScalingModeToHierarchy()
+    public void Play_PreservesPrefabParticleScalingMode()
     {
         var particleSystem = _effectPrefab.AddComponent<ParticleSystem>();
         var main = particleSystem.main;
@@ -43,8 +43,43 @@ public class CarCollisionEffectsTests
         effects.Play(_other.GetComponent<Collider>(), _car.transform);
 
         var instance = Object.FindObjectsOfType<GameObject>().Single(item => item.name.StartsWith("EffectProbe("));
-        Assert.AreEqual(ParticleSystemScalingMode.Hierarchy,
+        Assert.AreEqual(ParticleSystemScalingMode.Shape,
             instance.GetComponent<ParticleSystem>().main.scalingMode);
+    }
+
+    [Test]
+    public void Play_ScalesGravityForHierarchyParticles()
+    {
+        var particleSystem = _effectPrefab.AddComponent<ParticleSystem>();
+        var main = particleSystem.main;
+        main.scalingMode = ParticleSystemScalingMode.Hierarchy;
+        main.gravityModifier = 1f;
+        var effects = _car.AddComponent<CarCollisionEffects>();
+        effects.effectPrefab = _effectPrefab;
+        effects.effectScale = 0.01f;
+
+        effects.Play(_other.GetComponent<Collider>(), _car.transform);
+
+        var instance = Object.FindObjectsOfType<GameObject>().Single(item => item.name.StartsWith("EffectProbe("));
+        Assert.AreEqual(0.01f, instance.GetComponent<ParticleSystem>().main.gravityModifier.constant, 0.0001f);
+    }
+
+    [Test]
+    public void Play_AppliesParticleSpeedMultiplierToHierarchyParticles()
+    {
+        var particleSystem = _effectPrefab.AddComponent<ParticleSystem>();
+        var main = particleSystem.main;
+        main.scalingMode = ParticleSystemScalingMode.Hierarchy;
+        main.startSpeed = 2f;
+        var effects = _car.AddComponent<CarCollisionEffects>();
+        effects.effectPrefab = _effectPrefab;
+        effects.effectScale = 0.01f;
+        effects.particleSpeedMultiplier = 3f;
+
+        effects.Play(_other.GetComponent<Collider>(), _car.transform);
+
+        var instance = Object.FindObjectsOfType<GameObject>().Single(item => item.name.StartsWith("EffectProbe("));
+        Assert.AreEqual(6f, instance.GetComponent<ParticleSystem>().main.startSpeedMultiplier, 0.0001f);
     }
 
     [Test]

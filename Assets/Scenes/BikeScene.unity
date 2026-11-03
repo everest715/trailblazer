@@ -153,16 +153,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   powerUps:
-  - {fileID: 354547556857757566, guid: eaf266e3024de4bd88298bb6cc1ead36, type: 3}
-  - {fileID: 354547556857757566, guid: eaf266e3024de4bd88298bb6cc1ead36, type: 3}
-  - {fileID: 354547556857757566, guid: eaf266e3024de4bd88298bb6cc1ead36, type: 3}
-  - {fileID: 354547556857757566, guid: eaf266e3024de4bd88298bb6cc1ead36, type: 3}
-  - {fileID: 354547556857757566, guid: eaf266e3024de4bd88298bb6cc1ead36, type: 3}
-  - {fileID: 3069505792593458651, guid: ed4f6c88c67f848d38897d13859f04d9, type: 3}
-  - {fileID: 3069505792593458651, guid: ed4f6c88c67f848d38897d13859f04d9, type: 3}
-  - {fileID: 666588485384422944, guid: 55c5f06b925bf4141b0fea9c4d2abc89, type: 3}
-  - {fileID: 666588485384422944, guid: 55c5f06b925bf4141b0fea9c4d2abc89, type: 3}
-  - {fileID: 2587555554550897904, guid: 1cb3716c041294766a5c20ab55289f83, type: 3}
+  - {fileID: 354547556857757566, guid: 83e0cf4082042d9498f1f95abfc2f003, type: 3}
+  - {fileID: 354547556857757566, guid: 83e0cf4082042d9498f1f95abfc2f003, type: 3}
+  - {fileID: 354547556857757566, guid: 83e0cf4082042d9498f1f95abfc2f003, type: 3}
+  - {fileID: 354547556857757566, guid: 83e0cf4082042d9498f1f95abfc2f003, type: 3}
+  - {fileID: 354547556857757566, guid: 83e0cf4082042d9498f1f95abfc2f003, type: 3}
+  - {fileID: 3069505792593458651, guid: 3d130ede25fd12b469250b418765ee9c, type: 3}
+  - {fileID: 3069505792593458651, guid: 3d130ede25fd12b469250b418765ee9c, type: 3}
+  - {fileID: 666588485384422944, guid: 916d89d0c2fa0a14792c2cce6dda54ca, type: 3}
+  - {fileID: 666588485384422944, guid: 916d89d0c2fa0a14792c2cce6dda54ca, type: 3}
+  - {fileID: 2587555554550897904, guid: 66942117287d25246b3ff370e5ca59e9, type: 3}
   spawnInterval: 2
   maxCount: 8
 --- !u!4 &31291500
@@ -2769,7 +2769,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   effectPrefab: {fileID: 417761080263594737, guid: 7800b8f6b712bfe49bd663eeb3ebe1e4, type: 3}
   lifetime: 2
-  effectScale: 0.01
+  effectScale: 0.005
+  particleSpeedMultiplier: 5
+  particleLifetimeMultiplier: 0.5
 --- !u!114 &1323473305
 MonoBehaviour:
   m_ObjectHideFlags: 0
