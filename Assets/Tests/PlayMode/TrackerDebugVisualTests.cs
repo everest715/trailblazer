@@ -9,6 +9,8 @@ public class TrackerDebugVisualTests
 {
     private GameObject _car;
     private GameObject _rawModel;
+    private GameObject _externalTracker;
+    private GameObject _trackedTarget;
 
     private sealed class FakeTracker : MonoBehaviour, ITrackerDebugInfo
     {
@@ -29,6 +31,8 @@ public class TrackerDebugVisualTests
     {
         Object.DestroyImmediate(_car);
         if (_rawModel != null) Object.DestroyImmediate(_rawModel);
+        if (_externalTracker != null) Object.DestroyImmediate(_externalTracker);
+        if (_trackedTarget != null) Object.DestroyImmediate(_trackedTarget);
     }
 
     [UnityTest]
@@ -96,6 +100,30 @@ public class TrackerDebugVisualTests
         yield return null;
 
         Assert.IsNull(GameObject.Find("TrackerRawDebugModel"));
+    }
+
+    [UnityTest]
+    public IEnumerator Start_UsesExternalTrackerAndFollowsAssignedTarget()
+    {
+        _externalTracker = new GameObject("ExternalTracker");
+        var tracker = _externalTracker.AddComponent<FakeTracker>();
+        _trackedTarget = new GameObject("TrackedTarget");
+        var visual = _car.AddComponent<TrackerDebugVisual>();
+        visual.tracker = tracker;
+        visual.trackedTarget = _trackedTarget.transform;
+        visual.showRawDebugModel = true;
+
+        yield return null;
+
+        var model = _trackedTarget.transform.Find("TrackerDebugModel");
+        Assert.IsNotNull(model);
+        Assert.AreEqual(Vector3.zero, model.localPosition);
+        _rawModel = GameObject.Find("TrackerRawDebugModel");
+        Assert.IsNotNull(_rawModel);
+
+        _trackedTarget.transform.position = new Vector3(2f, 0.5f, -1f);
+        yield return null;
+        Assert.AreEqual(_trackedTarget.transform.position, model.position);
     }
 
     [UnityTest]

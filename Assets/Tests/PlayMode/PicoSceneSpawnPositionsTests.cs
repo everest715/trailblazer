@@ -11,6 +11,7 @@ public class PicoSceneSpawnPositionsTests
 {
     private GameObject _spawner;
     private GameObject _prefab;
+    private GameObject _providerObject;
 
     private sealed class FakeProvider : MonoBehaviour, IPicoFloorAreaProvider
     {
@@ -42,6 +43,7 @@ public class PicoSceneSpawnPositionsTests
             UnityEngine.Object.DestroyImmediate(instance);
         }
 
+        if (_providerObject != null) UnityEngine.Object.DestroyImmediate(_providerObject);
         UnityEngine.Object.DestroyImmediate(_spawner);
         UnityEngine.Object.DestroyImmediate(_prefab);
     }
@@ -203,6 +205,22 @@ public class PicoSceneSpawnPositionsTests
 
         var instances = UnityEngine.Object.FindObjectsOfType<GameObject>().Where(item => item.name.StartsWith("SpawnProbe(")).ToArray();
         Assert.AreEqual(2, instances.Length);
+    }
+
+    [Test]
+    public void StartSpawn_ReferencedProviderOnAnotherObjectIsUsed()
+    {
+        var spawn = CreateSceneSpawner();
+        _providerObject = new GameObject("ExternalProvider");
+        var provider = _providerObject.AddComponent<FakeProvider>();
+        provider.Areas = new[] { Rectangle() };
+        spawn.sceneCaptureProvider = provider;
+
+        spawn.StartSpawn();
+
+        var instance = UnityEngine.Object.FindObjectsOfType<GameObject>().Single(item => item.name.StartsWith("SpawnProbe("));
+        Assert.AreEqual(0.3f, instance.transform.position.y, 0.0001f);
+        Assert.AreEqual("SceneCapture", spawn.LastSpawnSource);
     }
 
     [Test]

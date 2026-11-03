@@ -7,6 +7,7 @@ public class PicoSceneSpawnPositions : MonoBehaviour
     public bool SpawnOnStart;
     public GameObject SpawnObject;
     public int SpawnAmount = 1;
+    public MonoBehaviour sceneCaptureProvider;
     public float surfaceClearance = 0.05f;
     public Bounds spawnBounds = new Bounds(Vector3.zero, new Vector3(4f, 1f, 4f));
 
@@ -36,7 +37,9 @@ public class PicoSceneSpawnPositions : MonoBehaviour
         _isSpawning = true;
         try
         {
-            var provider = GetComponent<IPicoFloorAreaProvider>();
+            var provider = sceneCaptureProvider == null
+                ? GetComponent<IPicoFloorAreaProvider>()
+                : sceneCaptureProvider as IPicoFloorAreaProvider;
             if (provider == null)
             {
                 SpawnInFixedBounds(_cachedSpawnHeight);

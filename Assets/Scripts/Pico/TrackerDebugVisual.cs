@@ -3,6 +3,8 @@ using UnityEngine;
 public class TrackerDebugVisual : MonoBehaviour
 {
     public bool showDebugVisual = true;
+    public MonoBehaviour tracker;
+    public Transform trackedTarget;
     public Transform trackingOrigin;
     public GameObject debugModelPrefab;
     public bool showRawDebugModel;
@@ -17,16 +19,19 @@ public class TrackerDebugVisual : MonoBehaviour
             return;
         }
 
-        _tracker = GetComponent<ITrackerDebugInfo>();
+        _tracker = tracker == null
+            ? GetComponent<ITrackerDebugInfo>()
+            : tracker as ITrackerDebugInfo;
 
         var model = debugModelPrefab == null
             ? GameObject.CreatePrimitive(PrimitiveType.Cube)
             : Instantiate(debugModelPrefab);
         model.name = "TrackerDebugModel";
-        model.transform.SetParent(transform, false);
+        var target = trackedTarget == null ? transform : trackedTarget;
+        model.transform.SetParent(target, false);
         model.transform.localPosition = Vector3.zero;
         model.transform.localRotation = Quaternion.identity;
-        var parentScale = transform.localScale;
+        var parentScale = target.localScale;
         model.transform.localScale = debugModelPrefab == null
             ? new Vector3(0.15f / parentScale.x, 0.05f / parentScale.y, 0.08f / parentScale.z)
             : new Vector3(1f / parentScale.x, 1f / parentScale.y, 1f / parentScale.z);
