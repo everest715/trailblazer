@@ -11,6 +11,8 @@ public class PicoSceneSpawnPositions : MonoBehaviour
     public float surfaceClearance = 0.05f;
     public Bounds spawnBounds = new Bounds(Vector3.zero, new Vector3(4f, 1f, 4f));
 
+    public event Action<GameObject> Spawned;
+
     private bool _isSpawning;
     private float? _cachedSpawnHeight;
 
@@ -78,7 +80,7 @@ public class PicoSceneSpawnPositions : MonoBehaviour
             LastSpawnPoint = spawnPoints[0];
             foreach (var point in spawnPoints)
             {
-                Instantiate(SpawnObject, point, SpawnObject.transform.rotation);
+                SpawnAt(point);
             }
         }
         catch (Exception)
@@ -92,6 +94,12 @@ public class PicoSceneSpawnPositions : MonoBehaviour
         }
     }
 
+    private void SpawnAt(Vector3 worldPosition)
+    {
+        var instance = Instantiate(SpawnObject, worldPosition, SpawnObject.transform.rotation);
+        Spawned?.Invoke(instance);
+    }
+
     private void SpawnInFixedBounds(float? fixedHeight)
     {
         Vector3? firstSpawnPoint = null;
@@ -102,7 +110,7 @@ public class PicoSceneSpawnPositions : MonoBehaviour
                 fixedHeight ?? UnityEngine.Random.Range(spawnBounds.min.y, spawnBounds.max.y),
                 UnityEngine.Random.Range(spawnBounds.min.z, spawnBounds.max.z));
             var worldPosition = transform.TransformPoint(localPosition);
-            Instantiate(SpawnObject, worldPosition, SpawnObject.transform.rotation);
+            SpawnAt(worldPosition);
             firstSpawnPoint ??= worldPosition;
         }
 

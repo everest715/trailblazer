@@ -164,6 +164,7 @@ MonoBehaviour:
   - {fileID: 666588485384422944, guid: 55c5f06b925bf4141b0fea9c4d2abc89, type: 3}
   - {fileID: 2587555554550897904, guid: 1cb3716c041294766a5c20ab55289f83, type: 3}
   spawnInterval: 2
+  maxCount: 8
 --- !u!4 &31291500
 Transform:
   m_ObjectHideFlags: 0
@@ -1541,6 +1542,7 @@ MonoBehaviour:
   SpawnOnStart: 1
   SpawnObject: {fileID: 354547556857757566, guid: eaf266e3024de4bd88298bb6cc1ead36, type: 3}
   SpawnAmount: 4
+  sceneCaptureProvider: {fileID: 0}
   surfaceClearance: 0.1
   spawnBounds:
     m_Center: {x: 0, y: 0.05, z: 1.5}
