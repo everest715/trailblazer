@@ -150,9 +150,6 @@ public class DebugInfoPanelTests
         var provider = root.AddComponent<FakeProvider>();
         spawner.SpawnObject = new GameObject("Probe");
         spawner.SpawnAmount = 1;
-        spawner.fallback = root.AddComponent<PicoSpawnPositions>();
-        spawner.fallback.SpawnObject = spawner.SpawnObject;
-        spawner.fallback.SpawnAmount = 1;
         panel.output = output;
         panel.tracker = tracker;
         panel.spawners = new[] { spawner };

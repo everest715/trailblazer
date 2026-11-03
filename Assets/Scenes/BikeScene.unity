@@ -132,7 +132,6 @@ GameObject:
   m_Component:
   - component: {fileID: 31291500}
   - component: {fileID: 31291498}
-  - component: {fileID: 31291501}
   - component: {fileID: 31291502}
   - component: {fileID: 31291503}
   m_Layer: 0
@@ -181,24 +180,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 599993780}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &31291501
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 31291497}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 63ce693c41f938a4895619152ba047b1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  SpawnOnStart: 0
-  SpawnObject: {fileID: 354547556857757566, guid: eaf266e3024de4bd88298bb6cc1ead36, type: 3}
-  SpawnAmount: 1
-  spawnBounds:
-    m_Center: {x: 0, y: 0.05, z: 1.5}
-    m_Extent: {x: 0.75, y: 0.05, z: 0.75}
 --- !u!114 &31291502
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -215,10 +196,9 @@ MonoBehaviour:
   SpawnObject: {fileID: 0}
   SpawnAmount: 1
   surfaceClearance: 0.1
-  playAreaBounds:
+  spawnBounds:
     m_Center: {x: 0, y: 0.05, z: 1.5}
     m_Extent: {x: 0.75, y: 0.05, z: 0.75}
-  fallback: {fileID: 31291501}
 --- !u!114 &31291503
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1473,7 +1453,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 589298191}
-  - component: {fileID: 589298192}
   - component: {fileID: 589298193}
   m_Layer: 0
   m_Name: SpawnCoinsAtStart
@@ -1497,24 +1476,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 599993780}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &589298192
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 589298189}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 63ce693c41f938a4895619152ba047b1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  SpawnOnStart: 0
-  SpawnObject: {fileID: 354547556857757566, guid: eaf266e3024de4bd88298bb6cc1ead36, type: 3}
-  SpawnAmount: 4
-  spawnBounds:
-    m_Center: {x: 0, y: 0.05, z: 1.5}
-    m_Extent: {x: 0.75, y: 0.05, z: 0.75}
 --- !u!114 &589298193
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1531,10 +1492,9 @@ MonoBehaviour:
   SpawnObject: {fileID: 354547556857757566, guid: eaf266e3024de4bd88298bb6cc1ead36, type: 3}
   SpawnAmount: 4
   surfaceClearance: 0.1
-  playAreaBounds:
+  spawnBounds:
     m_Center: {x: 0, y: 0.05, z: 1.5}
     m_Extent: {x: 0.75, y: 0.05, z: 0.75}
-  fallback: {fileID: 589298192}
 --- !u!1 &599993779
 GameObject:
   m_ObjectHideFlags: 0

@@ -8,8 +8,7 @@ public class PicoSceneSpawnPositions : MonoBehaviour
     public GameObject SpawnObject;
     public int SpawnAmount = 1;
     public float surfaceClearance = 0.05f;
-    public Bounds playAreaBounds = new Bounds(Vector3.zero, new Vector3(10f, 1f, 10f));
-    public PicoSpawnPositions fallback;
+    public Bounds spawnBounds = new Bounds(Vector3.zero, new Vector3(4f, 1f, 4f));
 
     private bool _isSpawning;
     private float? _cachedSpawnHeight;
@@ -40,10 +39,7 @@ public class PicoSceneSpawnPositions : MonoBehaviour
             var provider = GetComponent<IPicoFloorAreaProvider>();
             if (provider == null)
             {
-                // LastGroundHeight = fallback.spawnBounds.center.y;
-                // LastGroundHeightMethod = "Fixed bounds";
-                // LastSpawnSource = "固定区域";
-                // fallback.StartSpawn();
+                SpawnInFixedBounds(_cachedSpawnHeight);
                 return;
             }
 
@@ -68,10 +64,7 @@ public class PicoSceneSpawnPositions : MonoBehaviour
 
             if (spawnPoints.Count != SpawnAmount)
             {
-                // LastGroundHeight = fallback.spawnBounds.center.y;
-                // LastGroundHeightMethod = "Fixed bounds";
-                // LastSpawnSource = "固定区域";
-                // fallback.StartSpawn();
+                SpawnInFixedBounds(_cachedSpawnHeight);
                 return;
             }
 
@@ -87,15 +80,35 @@ public class PicoSceneSpawnPositions : MonoBehaviour
         }
         catch (Exception)
         {
-            LastGroundHeight = _cachedSpawnHeight ?? fallback.spawnBounds.center.y;
-            LastGroundHeightMethod = _cachedSpawnHeight.HasValue ? "Cached first spawn height" : "Fixed bounds";
-            LastSpawnSource = "固定区域";
             Debug.LogWarning("Scene capture spawn failed; using fallback");
-            fallback.StartSpawn(_cachedSpawnHeight);
+            SpawnInFixedBounds(_cachedSpawnHeight);
         }
         finally
         {
             _isSpawning = false;
+        }
+    }
+
+    private void SpawnInFixedBounds(float? fixedHeight)
+    {
+        Vector3? firstSpawnPoint = null;
+        for (var i = 0; i < SpawnAmount; i++)
+        {
+            var localPosition = new Vector3(
+                UnityEngine.Random.Range(spawnBounds.min.x, spawnBounds.max.x),
+                fixedHeight ?? UnityEngine.Random.Range(spawnBounds.min.y, spawnBounds.max.y),
+                UnityEngine.Random.Range(spawnBounds.min.z, spawnBounds.max.z));
+            var worldPosition = transform.TransformPoint(localPosition);
+            Instantiate(SpawnObject, worldPosition, SpawnObject.transform.rotation);
+            firstSpawnPoint ??= worldPosition;
+        }
+
+        LastSpawnSource = "固定区域";
+        LastGroundHeightMethod = fixedHeight.HasValue ? "Cached first spawn height" : "Fixed bounds";
+        LastGroundHeight = firstSpawnPoint?.y ?? fixedHeight ?? spawnBounds.center.y;
+        if (firstSpawnPoint.HasValue)
+        {
+            LastSpawnPoint = firstSpawnPoint.Value;
         }
     }
 }

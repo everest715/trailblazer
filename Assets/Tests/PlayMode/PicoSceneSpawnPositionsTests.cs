@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,7 +11,6 @@ public class PicoSceneSpawnPositionsTests
 {
     private GameObject _spawner;
     private GameObject _prefab;
-    private PicoSpawnPositions _fallback;
 
     private sealed class FakeProvider : MonoBehaviour, IPicoFloorAreaProvider
     {
@@ -32,11 +32,6 @@ public class PicoSceneSpawnPositionsTests
     {
         _spawner = new GameObject("SceneSpawner");
         _prefab = new GameObject("SpawnProbe");
-        _fallback = _spawner.AddComponent<PicoSpawnPositions>();
-        _fallback.SpawnOnStart = false;
-        _fallback.SpawnObject = _prefab;
-        _fallback.SpawnAmount = 1;
-        _fallback.spawnBounds = new Bounds(Vector3.zero, new Vector3(2f, 0f, 2f));
     }
 
     [TearDown]
@@ -81,7 +76,7 @@ public class PicoSceneSpawnPositionsTests
         var spawn = CreateSceneSpawner();
         var provider = _spawner.AddComponent<FakeProvider>();
         provider.Areas = new[] { Rectangle() };
-        spawn.playAreaBounds = new Bounds(Vector3.zero, new Vector3(4f, 1f, 4f));
+        spawn.spawnBounds = new Bounds(Vector3.zero, new Vector3(4f, 1f, 4f));
 
         spawn.StartSpawn();
 
@@ -99,7 +94,7 @@ public class PicoSceneSpawnPositionsTests
         var spawn = CreateSceneSpawner();
         var provider = _spawner.AddComponent<FakeProvider>();
         provider.Areas = new[] { Rectangle() };
-        spawn.playAreaBounds = new Bounds(new Vector3(10f, 0f, 10f), new Vector3(2f, 1f, 2f));
+        spawn.spawnBounds = new Bounds(new Vector3(10f, 0f, 10f), new Vector3(2f, 1f, 2f));
 
         spawn.StartSpawn();
 
@@ -122,7 +117,92 @@ public class PicoSceneSpawnPositionsTests
         spawn.StartSpawn();
 
         var instance = UnityEngine.Object.FindObjectsOfType<GameObject>().Single(item => item.name.StartsWith("SpawnProbe("));
-        Assert.IsTrue(_fallback.spawnBounds.Contains(instance.transform.position));
+        Assert.IsTrue(spawn.spawnBounds.Contains(instance.transform.position));
+    }
+
+    [Test]
+    public void StartSpawn_NoProviderUsesFixedBounds()
+    {
+        var spawn = CreateSceneSpawner();
+
+        spawn.StartSpawn();
+
+        var instance = UnityEngine.Object.FindObjectsOfType<GameObject>().Single(item => item.name.StartsWith("SpawnProbe("));
+        Assert.IsTrue(spawn.spawnBounds.Contains(spawn.transform.InverseTransformPoint(instance.transform.position)));
+    }
+
+    [Test]
+    public void StartSpawn_NoFloorAreasUsesFixedBounds()
+    {
+        var spawn = CreateSceneSpawner();
+        var provider = _spawner.AddComponent<FakeProvider>();
+        provider.Areas = Array.Empty<PicoFloorArea>();
+
+        spawn.StartSpawn();
+
+        var instance = UnityEngine.Object.FindObjectsOfType<GameObject>().Single(item => item.name.StartsWith("SpawnProbe("));
+        Assert.IsTrue(spawn.spawnBounds.Contains(spawn.transform.InverseTransformPoint(instance.transform.position)));
+    }
+
+    [Test]
+    public void StartSpawn_ProviderFailureWithCachedHeightReusesHeight()
+    {
+        var spawn = CreateSceneSpawner();
+        var provider = _spawner.AddComponent<FakeProvider>();
+        provider.Areas = new[] { Rectangle() };
+        spawn.StartSpawn();
+        var first = UnityEngine.Object.FindObjectsOfType<GameObject>().Single(item => item.name.StartsWith("SpawnProbe("));
+        Assert.AreEqual(0.3f, first.transform.position.y, 0.0001f);
+
+        provider.Throw = true;
+        LogAssert.Expect(LogType.Warning, "Scene capture spawn failed; using fallback");
+        spawn.StartSpawn();
+
+        var second = UnityEngine.Object.FindObjectsOfType<GameObject>().Single(item => item.name.StartsWith("SpawnProbe(") && item != first);
+        Assert.AreEqual(0.3f, second.transform.position.y, 0.0001f);
+    }
+
+    [Test]
+    public void StartSpawn_SpawnsRequestedAmountInsideFixedBounds()
+    {
+        var spawn = CreateSceneSpawner();
+        spawn.SpawnAmount = 3;
+        spawn.spawnBounds = new Bounds(Vector3.zero, new Vector3(2f, 1f, 4f));
+        _spawner.transform.position = new Vector3(5f, 0f, -2f);
+
+        spawn.StartSpawn();
+
+        var instances = UnityEngine.Object.FindObjectsOfType<GameObject>().Where(item => item.name.StartsWith("SpawnProbe(")).ToArray();
+        Assert.AreEqual(3, instances.Length);
+        foreach (var instance in instances)
+        {
+            var localPosition = _spawner.transform.InverseTransformPoint(instance.transform.position);
+            Assert.IsTrue(spawn.spawnBounds.Contains(localPosition));
+        }
+    }
+
+    [Test]
+    public void StartSpawn_NullPrefabDoesNotThrowOrSpawn()
+    {
+        var spawn = CreateSceneSpawner();
+        spawn.SpawnObject = null;
+
+        Assert.DoesNotThrow(spawn.StartSpawn);
+        Assert.IsFalse(UnityEngine.Object.FindObjectsOfType<GameObject>().Any(item => item.name.StartsWith("SpawnProbe(")));
+    }
+
+    [UnityTest]
+    public IEnumerator Start_SpawnOnStartSpawnsOnce()
+    {
+        var spawn = CreateSceneSpawner();
+        spawn.SpawnOnStart = true;
+        spawn.SpawnAmount = 2;
+
+        yield return null;
+        yield return null;
+
+        var instances = UnityEngine.Object.FindObjectsOfType<GameObject>().Where(item => item.name.StartsWith("SpawnProbe(")).ToArray();
+        Assert.AreEqual(2, instances.Length);
     }
 
     [Test]
@@ -148,7 +228,7 @@ public class PicoSceneSpawnPositionsTests
         spawn.SpawnObject = _prefab;
         spawn.SpawnAmount = 1;
         spawn.surfaceClearance = 0.1f;
-        spawn.fallback = _fallback;
+        spawn.spawnBounds = new Bounds(Vector3.zero, new Vector3(2f, 0f, 2f));
         return spawn;
     }
 
