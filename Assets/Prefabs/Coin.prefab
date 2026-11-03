@@ -128,7 +128,6 @@ GameObject:
   - component: {fileID: 710007059131642078}
   - component: {fileID: 3645015593774405237}
   - component: {fileID: 699105344765616179}
-  - component: {fileID: 8704518844941915607}
   m_Layer: 0
   m_Name: Outline
   m_TagString: Untagged
@@ -201,29 +200,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!136 &8704518844941915607
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3053857648884363457}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.50000006
-  m_Height: 2.0000002
-  m_Direction: 1
-  m_Center: {x: 0.000000059604645, y: -0.0000019073486, z: -0.00000008940695}
 --- !u!1 &4806031499337465071
 GameObject:
   m_ObjectHideFlags: 0
@@ -236,7 +212,6 @@ GameObject:
   - component: {fileID: 393792826110256056}
   - component: {fileID: 662101500207027965}
   - component: {fileID: 5196605048779414938}
-  - component: {fileID: 6470151121139736016}
   m_Layer: 0
   m_Name: Core
   m_TagString: Untagged
@@ -323,29 +298,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 200
---- !u!136 &6470151121139736016
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4806031499337465071}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.50000006
-  m_Height: 2.0000002
-  m_Direction: 1
-  m_Center: {x: 0.000000059604645, y: 4.1866357e-15, z: -0.00000008940696}
 --- !u!1 &7877954928391072638
 GameObject:
   m_ObjectHideFlags: 0
@@ -357,7 +309,6 @@ GameObject:
   - component: {fileID: 8667531476583719589}
   - component: {fileID: 6350542177329343063}
   - component: {fileID: 48795335047650979}
-  - component: {fileID: 1225379644828006254}
   m_Layer: 0
   m_Name: Core
   m_TagString: Untagged
@@ -430,29 +381,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!136 &1225379644828006254
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7877954928391072638}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.50000006
-  m_Height: 2
-  m_Direction: 1
-  m_Center: {x: 0.000000059604638, y: 0, z: -0.00000008940695}
 --- !u!1 &8320411216249958985
 GameObject:
   m_ObjectHideFlags: 0
@@ -464,7 +392,6 @@ GameObject:
   - component: {fileID: 7009171495923552443}
   - component: {fileID: 6040842238794023243}
   - component: {fileID: 7409713684943509503}
-  - component: {fileID: 8526775629829919450}
   m_Layer: 0
   m_Name: Base
   m_TagString: Untagged
@@ -538,26 +465,3 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!136 &8526775629829919450
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8320411216249958985}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.50000006
-  m_Height: 2
-  m_Direction: 1
-  m_Center: {x: 0.000000059604638, y: 0, z: -0.00000008940695}
