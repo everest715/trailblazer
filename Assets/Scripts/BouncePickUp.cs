@@ -9,12 +9,12 @@ public class BouncePickUp : MonoBehaviour
 
     private void Start()
     {
-        _startPosition = transform.position;
+        _startPosition = transform.localPosition;
     }
 
     private void Update()
     {
         var newY = _startPosition.y + (Mathf.Sin(Time.time * speed) + 1) * height;
-        transform.position = new Vector3(_startPosition.x, newY, _startPosition.z);
+        transform.localPosition = new Vector3(_startPosition.x, newY, _startPosition.z);
     }
 }
