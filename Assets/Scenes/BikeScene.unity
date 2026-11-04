@@ -2780,6 +2780,7 @@ MonoBehaviour:
   bombEffectPrefab: {fileID: 1298315647077242, guid: 72160083e1a24a94b88cb874c61f8d39, type: 3}
   lifetime: 2
   effectScale: 0.005
+  bombEffectScale: 0.1
   particleSpeedMultiplier: 5
   particleLifetimeMultiplier: 0.5
 --- !u!114 &1323473305

@@ -6,6 +6,7 @@ public class CarCollisionEffects : MonoBehaviour
     public GameObject bombEffectPrefab;
     public float lifetime = 2f;
     public float effectScale = 1f;
+    public float bombEffectScale = 1f;
     public float particleSpeedMultiplier = 3f;
     public float particleLifetimeMultiplier = 0.5f;
 
@@ -17,8 +18,10 @@ public class CarCollisionEffects : MonoBehaviour
         }
 
         var position = other.ClosestPoint(car.position);
-        var effect = Instantiate(other.CompareTag("Bomb") ? bombEffectPrefab : effectPrefab, position, effectPrefab.transform.rotation);
-        effect.transform.localScale = effect.transform.localScale * effectScale;
+        var isBomb = other.CompareTag("Bomb");
+        var selectedScale = isBomb ? bombEffectScale : effectScale;
+        var effect = Instantiate(isBomb ? bombEffectPrefab : effectPrefab, position, effectPrefab.transform.rotation);
+        effect.transform.localScale = effect.transform.localScale * selectedScale;
         foreach (var particleSystem in effect.GetComponentsInChildren<ParticleSystem>(true))
         {
             var main = particleSystem.main;
@@ -26,7 +29,7 @@ public class CarCollisionEffects : MonoBehaviour
             {
                 main.startSpeedMultiplier *= particleSpeedMultiplier;
                 main.startLifetimeMultiplier *= particleLifetimeMultiplier;
-                main.gravityModifierMultiplier *= effectScale;
+                main.gravityModifierMultiplier *= selectedScale;
             }
             particleSystem.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
             particleSystem.Play(true);
