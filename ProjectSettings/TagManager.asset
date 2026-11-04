@@ -39,6 +39,7 @@ TagManager:
   - DenyGate
   - StartingArea
   - Camera0
+  - Bomb
   layers:
   - Default
   - TransparentFX

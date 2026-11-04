@@ -3,6 +3,7 @@ using UnityEngine;
 public class CarCollisionEffects : MonoBehaviour
 {
     public GameObject effectPrefab;
+    public GameObject bombEffectPrefab;
     public float lifetime = 2f;
     public float effectScale = 1f;
     public float particleSpeedMultiplier = 3f;
@@ -16,7 +17,7 @@ public class CarCollisionEffects : MonoBehaviour
         }
 
         var position = other.ClosestPoint(car.position);
-        var effect = Instantiate(effectPrefab, position, effectPrefab.transform.rotation);
+        var effect = Instantiate(other.CompareTag("Bomb") ? bombEffectPrefab : effectPrefab, position, effectPrefab.transform.rotation);
         effect.transform.localScale = effect.transform.localScale * effectScale;
         foreach (var particleSystem in effect.GetComponentsInChildren<ParticleSystem>(true))
         {

@@ -12,8 +12,8 @@ GameObject:
   - component: {fileID: 3793896579770092539}
   - component: {fileID: 5617361161693355102}
   m_Layer: 0
-  m_Name: Coin 1
-  m_TagString: Coin
+  m_Name: Bomb
+  m_TagString: Bomb
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -96,7 +96,7 @@ Transform:
   m_GameObject: {fileID: 1394422306636805902}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.4, z: 0}
+  m_LocalPosition: {x: 0, y: 0.2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -340,9 +340,29 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 8198538246239724014}
     m_Modifications:
+    - target: {fileID: 1170204688564018, guid: 2efd61b9ccf276c48af088089fcea0eb, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1240875055126586, guid: 2efd61b9ccf276c48af088089fcea0eb, type: 3}
       propertyPath: m_Name
       value: PowerupIconLightning
+      objectReference: {fileID: 0}
+    - target: {fileID: 1761421213241658, guid: 2efd61b9ccf276c48af088089fcea0eb, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4153299494021196, guid: 2efd61b9ccf276c48af088089fcea0eb, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4153299494021196, guid: 2efd61b9ccf276c48af088089fcea0eb, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4153299494021196, guid: 2efd61b9ccf276c48af088089fcea0eb, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.3
       objectReference: {fileID: 0}
     - target: {fileID: 4153299494021196, guid: 2efd61b9ccf276c48af088089fcea0eb, type: 3}
       propertyPath: m_LocalPosition.x
@@ -384,10 +404,22 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4153299494021196, guid: 2efd61b9ccf276c48af088089fcea0eb, type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 199268104160342410, guid: 2efd61b9ccf276c48af088089fcea0eb, type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: 3199620151876962272, guid: c095112f0dd46a948bfc66dba5b0c983, type: 3}
     - target: {fileID: 199268104160342410, guid: 2efd61b9ccf276c48af088089fcea0eb, type: 3}
       propertyPath: m_Materials.Array.size
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 199268104160342410, guid: 2efd61b9ccf276c48af088089fcea0eb, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: fc983ad336b49904e9a6d06737e96f10, type: 2}
     - target: {fileID: 199357175498570392, guid: 2efd61b9ccf276c48af088089fcea0eb, type: 3}
       propertyPath: m_Materials.Array.size
       value: 1

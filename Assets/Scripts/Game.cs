@@ -40,6 +40,7 @@ public class Game : MonoBehaviour
     public AudioClip multEndSound;
     public AudioClip timeBonusSound;
     public AudioClip errorSound;
+    public AudioClip bombSound;
     // public AudioClip boostSound;
 
     public GameObject gate1;
@@ -71,6 +72,7 @@ public class Game : MonoBehaviour
     private readonly Color _3CoinColor = new Color(0.9f, 0.6f, 0.3f);
     private readonly Color _timeBonusColor = new Color(0.2f, 0.4f, 0.9f);
     private readonly Color _multiplierColor = new Color(0.4f, 0.9f, 0.4f);
+    private readonly Color _bombColor = new Color(0.9f, 0.1f, 0.1f);
     private const float VignetteIntensity = 0.4f;
 
     private async void Start()
@@ -309,6 +311,14 @@ public class Game : MonoBehaviour
             Destroy(other.gameObject);
             StartCoroutine(Multiplier());
         }
+        else if (other.CompareTag("Bomb"))
+        {
+            StartCoroutine(SetVignette(_bombColor));
+            
+            _audioSource.PlayOneShot(bombSound);
+            Destroy(other.gameObject);
+            UpdateScore(-1*_mult);
+        } 
     }
     private void UpdateScore(int change)
     {
