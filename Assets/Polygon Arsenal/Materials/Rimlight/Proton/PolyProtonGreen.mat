@@ -57,14 +57,14 @@ Material:
     m_Colors:
     - Color_1A0BCCE7: {r: 0.19158328, g: 7.1843157, b: 0, a: 0}
     - Color_8EE4FC62: {r: 0.01707165, g: 0.16078432, b: 0, a: 0}
-    - Color_AD8B744C: {r: 0, g: 0.9372549, b: 0.053806465, a: 0}
-    - Color_B70EC491: {r: 0.4941176, g: 1.4980391, b: 0.85680926, a: 0}
+    - Color_AD8B744C: {r: 0, g: 0.6396674, b: 0.9369776, a: 0}
+    - Color_B70EC491: {r: 0.4941176, g: 1.498039, b: 1.427451, a: 0}
     - _InnerColor: {r: 0.035142735, g: 0.18382353, b: 0.03616811, a: 1}
     - _RimColor: {r: 0.41774848, g: 0.75, b: 0.2867647, a: 1}
     - _SpecColor: {r: 1, g: 1, b: 1, a: 1}
     - _TintColor: {r: 0.5, g: 0.5, b: 0.5, a: 0.5}
   m_BuildTextureStacks: []
---- !u!114 &584977163507328684
+--- !u!114 &9150085843374772428
 MonoBehaviour:
   m_ObjectHideFlags: 11
   m_CorrespondingSourceObject: {fileID: 0}
