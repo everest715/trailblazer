@@ -408,6 +408,30 @@ PrefabInstance:
       propertyPath: m_ConstrainProportionsScale
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 198437534905964972, guid: 2efd61b9ccf276c48af088089fcea0eb, type: 3}
+      propertyPath: ColorModule.gradient.maxGradient.key1.b
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 198437534905964972, guid: 2efd61b9ccf276c48af088089fcea0eb, type: 3}
+      propertyPath: ColorModule.gradient.maxGradient.key1.g
+      value: 0.2926092
+      objectReference: {fileID: 0}
+    - target: {fileID: 198437534905964972, guid: 2efd61b9ccf276c48af088089fcea0eb, type: 3}
+      propertyPath: ColorModule.gradient.maxGradient.key2.b
+      value: 0.23529413
+      objectReference: {fileID: 0}
+    - target: {fileID: 198437534905964972, guid: 2efd61b9ccf276c48af088089fcea0eb, type: 3}
+      propertyPath: ColorModule.gradient.maxGradient.key2.g
+      value: 0.23529413
+      objectReference: {fileID: 0}
+    - target: {fileID: 198437534905964972, guid: 2efd61b9ccf276c48af088089fcea0eb, type: 3}
+      propertyPath: ColorModule.gradient.maxGradient.key2.r
+      value: 0.23529413
+      objectReference: {fileID: 0}
+    - target: {fileID: 198437534905964972, guid: 2efd61b9ccf276c48af088089fcea0eb, type: 3}
+      propertyPath: ColorModule.gradient.maxGradient.m_ColorSpace
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 199268104160342410, guid: 2efd61b9ccf276c48af088089fcea0eb, type: 3}
       propertyPath: m_Mesh
       value: 
@@ -424,6 +448,10 @@ PrefabInstance:
       propertyPath: m_Materials.Array.size
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 199357175498570392, guid: 2efd61b9ccf276c48af088089fcea0eb, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 980e52e87906ca0489ff5804907558b4, type: 2}
     - target: {fileID: 199622663510832552, guid: 2efd61b9ccf276c48af088089fcea0eb, type: 3}
       propertyPath: m_Materials.Array.size
       value: 1
