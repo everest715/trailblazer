@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 using System.Collections;
 
 namespace PolygonArsenal
@@ -23,31 +24,42 @@ namespace PolygonArsenal
 
         void Update()
         {
-            if (Input.GetKeyDown(KeyCode.RightArrow))
+            Keyboard keyboard = Keyboard.current;
+            if (keyboard != null)
             {
-                nextEffect();
+                if (keyboard.rightArrowKey.wasPressedThisFrame)
+                {
+                    nextEffect();
+                }
+
+                if (keyboard.dKey.wasPressedThisFrame)
+                {
+                    nextEffect();
+                }
+
+                if (keyboard.aKey.wasPressedThisFrame)
+                {
+                    previousEffect();
+                }
+                else if (keyboard.leftArrowKey.wasPressedThisFrame)
+                {
+                    previousEffect();
+                }
             }
 
-            if (Input.GetKeyDown(KeyCode.D))
+            Mouse mouse = Mouse.current;
+            if (mouse == null)
             {
-                nextEffect();
+                return;
             }
 
-            if (Input.GetKeyDown(KeyCode.A))
-            {
-                previousEffect();
-            }
-            else if (Input.GetKeyDown(KeyCode.LeftArrow))
-            {
-                previousEffect();
-            }
-
-            if (Input.GetKeyDown(KeyCode.Mouse0))
+            Vector2 mousePosition = mouse.position.ReadValue();
+            if (mouse.leftButton.wasPressedThisFrame)
             {
 
                 if (!EventSystem.current.IsPointerOverGameObject())
                 {
-                    if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit, 100f))
+                    if (Physics.Raycast(Camera.main.ScreenPointToRay(mousePosition), out hit, 100f))
                     {
                         GameObject projectile = Instantiate(projectiles[currentProjectile], spawnPosition.position, Quaternion.identity) as GameObject;
                         projectile.transform.LookAt(hit.point);
@@ -56,7 +68,7 @@ namespace PolygonArsenal
                 }
 
             }
-            Debug.DrawRay(Camera.main.ScreenPointToRay(Input.mousePosition).origin, Camera.main.ScreenPointToRay(Input.mousePosition).direction * 100, Color.yellow);
+            Debug.DrawRay(Camera.main.ScreenPointToRay(mousePosition).origin, Camera.main.ScreenPointToRay(mousePosition).direction * 100, Color.yellow);
         }
 
         public void nextEffect()

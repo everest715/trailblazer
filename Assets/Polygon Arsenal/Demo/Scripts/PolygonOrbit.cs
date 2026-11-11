@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.InputSystem;
 using System.Collections;
 [AddComponentMenu("Camera-Control/Mouse drag Orbit with zoom")]
 public class PolygonOrbit : MonoBehaviour
@@ -32,10 +33,12 @@ public class PolygonOrbit : MonoBehaviour
     {
         if (target)
         {
-            if (Input.GetMouseButton(1))
+            Mouse mouse = Mouse.current;
+            if (mouse != null && mouse.rightButton.isPressed)
             {
-                velocityX += xSpeed * Input.GetAxis("Mouse X") * distance * 0.02f;
-                velocityY += ySpeed * Input.GetAxis("Mouse Y") * 0.02f;
+                Vector2 mouseDelta = mouse.delta.ReadValue() * 0.1f;
+                velocityX += xSpeed * mouseDelta.x * distance * 0.02f;
+                velocityY += ySpeed * mouseDelta.y * 0.02f;
             }
             rotationYAxis += velocityX;
             rotationXAxis -= velocityY;
@@ -44,7 +47,8 @@ public class PolygonOrbit : MonoBehaviour
             Quaternion toRotation = Quaternion.Euler(rotationXAxis, rotationYAxis, 0);
             Quaternion rotation = toRotation;
 
-            distance = Mathf.Clamp(distance - Input.GetAxis("Mouse ScrollWheel") * 5, distanceMin, distanceMax);
+            float scrollDelta = mouse != null ? mouse.scroll.ReadValue().y / 120f * 0.1f : 0f;
+            distance = Mathf.Clamp(distance - scrollDelta * 5, distanceMin, distanceMax);
             RaycastHit hit;
             if (Physics.Linecast(target.position, transform.position, out hit))
             {

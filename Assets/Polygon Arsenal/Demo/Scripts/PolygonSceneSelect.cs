@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.Events;
+using UnityEngine.InputSystem;
 
 namespace PolygonArsenal
 {
@@ -119,8 +120,13 @@ public class PolygonSceneSelect : MonoBehaviour
 	
 	 void Update ()
 	 {
+     Keyboard keyboard = Keyboard.current;
+     if (keyboard == null)
+     {
+         return;
+     }
  
-     if(Input.GetKeyDown(KeyCode.L))
+     if(keyboard.lKey.wasPressedThisFrame)
 	 {
          GUIHide = !GUIHide;
      
@@ -133,7 +139,7 @@ public class PolygonSceneSelect : MonoBehaviour
              GameObject.Find("CanvasSceneSelect").GetComponent<Canvas> ().enabled = true;
          }
      }
-	      if(Input.GetKeyDown(KeyCode.J))
+	      if(keyboard.jKey.wasPressedThisFrame)
 	 {
          GUIHide2 = !GUIHide2;
      
@@ -146,7 +152,7 @@ public class PolygonSceneSelect : MonoBehaviour
              GameObject.Find("CanvasMissiles").GetComponent<Canvas> ().enabled = true;
          }
      }
-		if(Input.GetKeyDown(KeyCode.H))
+		if(keyboard.hKey.wasPressedThisFrame)
 	 {
          GUIHide3 = !GUIHide3;
      
