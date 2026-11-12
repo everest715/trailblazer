@@ -812,7 +812,6 @@ GameObject:
   - component: {fileID: 1323473303}
   - component: {fileID: 1323473306}
   - component: {fileID: 1323473305}
-  - component: {fileID: 1323473304}
   m_Layer: 0
   m_Name: TrackedCar
   m_TagString: Player
@@ -3067,7 +3066,6 @@ MonoBehaviour:
   blockedGate: {fileID: 2076354572317973458, guid: 3483ff7233488164eab58e2525174e4a, type: 3}
   finalGate: {fileID: 3872552109673360492, guid: 795507ba75f12de4e89d38eb4d6c9f00, type: 3}
   vignette: {fileID: 887983040}
-  collisionEffects: {fileID: 1323473304}
   tryAgainText: {fileID: 1339786242}
   playAgainText: {fileID: 1724582890}
   startingArea: {fileID: 201118414}
@@ -3167,25 +3165,6 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!114 &1323473304
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 272445418}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d55bc3635af013944b33e7b5edbc6e06, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  effectPrefab: {fileID: 417761080263594737, guid: 7800b8f6b712bfe49bd663eeb3ebe1e4, type: 3}
-  bombEffectPrefab: {fileID: 1822773341328252, guid: 8aea2a892ad46aa439b8be49adccdcad, type: 3}
-  lifetime: 2
-  effectScale: 0.005
-  bombEffectScale: 0.08
-  particleSpeedMultiplier: 5
-  particleLifetimeMultiplier: 0.5
 --- !u!114 &1323473305
 MonoBehaviour:
   m_ObjectHideFlags: 0

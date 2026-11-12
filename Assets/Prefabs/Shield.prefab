@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 3832236277856177401}
   - component: {fileID: 7236591778835299912}
   - component: {fileID: -4678610080513275086}
+  - component: {fileID: 6731046395214992665}
   m_Layer: 0
   m_Name: Shield
   m_TagString: TimeBonus
@@ -358,3 +359,20 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4209707071704364, guid: 30f9b24fda1c6854da58f6ea1bc3cae6, type: 3}
   m_PrefabInstance: {fileID: 7853293186233814921}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &6731046395214992665
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 666588485384422944}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 82b21fe9c59343af9952995609172958, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  effectPrefab: {fileID: 417761080263594737, guid: 7800b8f6b712bfe49bd663eeb3ebe1e4, type: 3}
+  lifetime: 2
+  effectScale: 0.005
+  particleSpeedMultiplier: 5
+  particleLifetimeMultiplier: 0.5

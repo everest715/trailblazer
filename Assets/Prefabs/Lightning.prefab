@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 1227519472815565127}
   - component: {fileID: 3793896579770092539}
   - component: {fileID: 5617361161693355102}
+  - component: {fileID: 5035686189304384686}
   m_Layer: 0
   m_Name: Lightning
   m_TagString: Coin
@@ -422,3 +423,20 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4153299494021196, guid: 2efd61b9ccf276c48af088089fcea0eb, type: 3}
   m_PrefabInstance: {fileID: 7074075884539624136}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &5035686189304384686
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 354547556857757566}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 82b21fe9c59343af9952995609172958, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  effectPrefab: {fileID: 417761080263594737, guid: 7800b8f6b712bfe49bd663eeb3ebe1e4, type: 3}
+  lifetime: 2
+  effectScale: 0.005
+  particleSpeedMultiplier: 5
+  particleLifetimeMultiplier: 0.5

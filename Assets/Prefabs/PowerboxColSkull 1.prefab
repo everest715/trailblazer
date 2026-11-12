@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 2167769386731258848}
   - component: {fileID: 2166529144099945836}
   - component: {fileID: 4209730145955517081}
+  - component: {fileID: 7261387009227579730}
   m_Layer: 0
   m_Name: PowerboxColSkull 1
   m_TagString: DenyGate
@@ -14706,3 +14707,20 @@ ParticleSystemRenderer:
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
   m_MaskInteraction: 0
+--- !u!114 &7261387009227579730
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2076354572317973458}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 82b21fe9c59343af9952995609172958, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  effectPrefab: {fileID: 417761080263594737, guid: 7800b8f6b712bfe49bd663eeb3ebe1e4, type: 3}
+  lifetime: 2
+  effectScale: 0.005
+  particleSpeedMultiplier: 5
+  particleLifetimeMultiplier: 0.5

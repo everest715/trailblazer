@@ -9758,6 +9758,7 @@ GameObject:
   - component: {fileID: 8915052685114227606}
   - component: {fileID: 8918408281909245948}
   - component: {fileID: 6580353150630340412}
+  - component: {fileID: 4329187526571555798}
   m_Layer: 0
   m_Name: PowerboxColSpeed 1
   m_TagString: Gate
@@ -14706,3 +14707,20 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &4329187526571555798
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8720259077876665506}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 82b21fe9c59343af9952995609172958, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  effectPrefab: {fileID: 417761080263594737, guid: 7800b8f6b712bfe49bd663eeb3ebe1e4, type: 3}
+  lifetime: 2
+  effectScale: 0.005
+  particleSpeedMultiplier: 5
+  particleLifetimeMultiplier: 0.5

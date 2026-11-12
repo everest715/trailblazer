@@ -53,7 +53,6 @@ public class Game : MonoBehaviour
     public GameObject finalGate;
     
     public VignetteController vignette;
-    public CarCollisionEffects collisionEffects;
 
     public GameObject tryAgainText;
     public GameObject playAgainText;
@@ -256,11 +255,6 @@ public class Game : MonoBehaviour
     
     private void OnTriggerEnter(Collider other)
     {
-        if (!other.CompareTag("StartingArea") && collisionEffects != null)
-        {
-            collisionEffects.Play(other, transform);
-        }
-
         if (other.CompareTag("Gate"))
         {
             StartCoroutine(SetVignette(_defaultColor));
