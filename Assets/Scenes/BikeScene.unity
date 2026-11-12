@@ -588,11 +588,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8725459858920189510, guid: 519d0db196b0d7c42a82b74fb3f922b6, type: 3}
   m_PrefabInstance: {fileID: 214726572}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &214726574 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 8720259077876665506, guid: 519d0db196b0d7c42a82b74fb3f922b6, type: 3}
-  m_PrefabInstance: {fileID: 214726572}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &235456320
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1561,11 +1556,6 @@ PrefabInstance:
 Transform:
   m_CorrespondingSourceObject: {fileID: 7361326246097402861, guid: 2ca30d5112f71574188c5fba27bbabfb, type: 3}
   m_PrefabInstance: {fileID: 476516086}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &483970073 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 8146015705493227717, guid: 3cf6e89c5d9bd4440a05df261a9e8480, type: 3}
-  m_PrefabInstance: {fileID: 132944127}
   m_PrefabAsset: {fileID: 0}
 --- !u!4 &483970074 stripped
 Transform:
@@ -3023,11 +3013,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7072457803760952743, guid: ecd3be46bf50a4baf93476aa1dd24073, type: 3}
   m_PrefabInstance: {fileID: 235456320}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1310468460 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 4016608922871684807, guid: 4c77c4d2d38f7b543b1029f89fb4d326, type: 3}
-  m_PrefabInstance: {fileID: 1020979985}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &1310468461 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3676788133211860578, guid: 4c77c4d2d38f7b543b1029f89fb4d326, type: 3}
@@ -3150,13 +3135,13 @@ MonoBehaviour:
   timeBonusSound: {fileID: 8300000, guid: b388d32b5aebe4e29a2d93c13d2c5946, type: 3}
   errorSound: {fileID: 8300000, guid: b318195f1a92345cfabbc265a76932d4, type: 3}
   bombSound: {fileID: 8300000, guid: c63c97718a9532c45903f33e38d138ce, type: 3}
-  gate1: {fileID: 214726574}
-  gate2: {fileID: 1310468460}
-  gate3: {fileID: 1410623457}
-  gate4: {fileID: 483970073}
-  activeGate: {fileID: 8720259077876665506, guid: 519d0db196b0d7c42a82b74fb3f922b6, type: 3}
-  blockedGate: {fileID: 2076354572317973458, guid: 3483ff7233488164eab58e2525174e4a, type: 3}
-  finalGate: {fileID: 3872552109673360492, guid: 795507ba75f12de4e89d38eb4d6c9f00, type: 3}
+  gate1: {fileID: 242874622}
+  gate2: {fileID: 2117279737}
+  gate3: {fileID: 1454126421}
+  gate4: {fileID: 1679194717}
+  activeGate: {fileID: 1048125852660918350, guid: ea79605428657aa4c93a5d04eacc844c, type: 3}
+  blockedGate: {fileID: 1048125852660918350, guid: ea79605428657aa4c93a5d04eacc844c, type: 3}
+  finalGate: {fileID: 1048125852660918350, guid: ea79605428657aa4c93a5d04eacc844c, type: 3}
   vignette: {fileID: 887983040}
   tryAgainText: {fileID: 1339786242}
   playAgainText: {fileID: 1724582890}
@@ -3490,11 +3475,6 @@ PrefabInstance:
 Transform:
   m_CorrespondingSourceObject: {fileID: 7072457803760952743, guid: ecd3be46bf50a4baf93476aa1dd24073, type: 3}
   m_PrefabInstance: {fileID: 973998713}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &1410623457 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 2368296917001246434, guid: bfbe0651622f79641ad5a275df9eada6, type: 3}
-  m_PrefabInstance: {fileID: 970625915}
   m_PrefabAsset: {fileID: 0}
 --- !u!4 &1410623458 stripped
 Transform:
