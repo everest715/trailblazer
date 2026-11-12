@@ -175,6 +175,32 @@ public class GateGroundAlignmentTests
     }
 
     [Test]
+    public void HandleCheckpoint_GateWithoutParticles_DoesNotThrow()
+    {
+        var gameType = AppDomain.CurrentDomain.GetAssemblies()
+            .SelectMany(assembly => assembly.GetTypes())
+            .First(type => type.Name == "Game");
+        var car = new GameObject("Car");
+        car.AddComponent<AudioSource>();
+        var game = car.AddComponent(gameType);
+        var gate = new GameObject("BrickGate");
+        var gateCollider = gate.AddComponent<BoxCollider>();
+        var serialized = new SerializedObject(game);
+        serialized.FindProperty("gate1").objectReferenceValue = gate;
+        serialized.ApplyModifiedProperties();
+        gameType.GetField("_audioSource", BindingFlags.Instance | BindingFlags.NonPublic)
+            .SetValue(game, car.GetComponent<AudioSource>());
+        var method = gameType.GetMethod("HandleCheckpoint", BindingFlags.Instance | BindingFlags.NonPublic);
+        var routine = (System.Collections.IEnumerator)method.Invoke(game, new object[] { gateCollider });
+
+        Assert.DoesNotThrow(() => routine.MoveNext());
+        Assert.IsFalse(gate.activeSelf);
+
+        UnityEngine.Object.DestroyImmediate(gate);
+        UnityEngine.Object.DestroyImmediate(car);
+    }
+
+    [Test]
     public void EnableGate_PreservesWorldScaleWithoutChangingParent()
     {
         var gameType = AppDomain.CurrentDomain.GetAssemblies()

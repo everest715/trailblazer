@@ -361,21 +361,21 @@ public class Game : MonoBehaviour
         {
             case 0:
                 _startTime = Time.time;
-                gate1.GetComponentInChildren<ParticleSystem>().Play();
+                gate1.GetComponentInChildren<ParticleSystem>()?.Play();
                 gate.gameObject.SetActive(false);
                 yield return new WaitForSeconds(0.01f);
                 gate2 = EnableGate(gate2);
                 break;
 
             case 1:
-                gate2.GetComponentInChildren<ParticleSystem>().Play();
+                gate2.GetComponentInChildren<ParticleSystem>()?.Play();
                 gate.gameObject.SetActive(false);
                 yield return new WaitForSeconds(0.01f);
                 gate3 = EnableGate(gate3);
                 break;
 
             case 2:
-                gate3.GetComponentInChildren<ParticleSystem>().Play();
+                gate3.GetComponentInChildren<ParticleSystem>()?.Play();
                 gate.gameObject.SetActive(false);
                 yield return new WaitForSeconds(0.01f);
 
@@ -393,7 +393,7 @@ public class Game : MonoBehaviour
                 break;
 
             case 3:
-                gate4.GetComponentInChildren<ParticleSystem>().Play();
+                gate4.GetComponentInChildren<ParticleSystem>()?.Play();
                 _audioSource.PlayOneShot(startSound2);
                 gate.gameObject.SetActive(false);
                 yield return new WaitForSeconds(0.01f);
