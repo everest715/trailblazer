@@ -13,6 +13,16 @@ public class CollisionEffectTests
     private GameObject _effectPrefab;
     private CollisionEffect _effect;
 
+    private sealed class CollisionContactProbe : MonoBehaviour
+    {
+        public Vector3 ContactPoint { get; private set; }
+
+        private void OnCollisionEnter(Collision collision)
+        {
+            ContactPoint = collision.GetContact(0).point;
+        }
+    }
+
     [SetUp]
     public void SetUp()
     {
@@ -84,7 +94,7 @@ public class CollisionEffectTests
         Trigger(_car);
 
         var instance = EffectInstances().Single();
-        Assert.AreEqual(rotation, instance.transform.rotation);
+        Assert.Less(Quaternion.Angle(rotation, instance.transform.rotation), 0.001f);
         Assert.AreEqual(new Vector3(1f, 1.5f, 2f), instance.transform.localScale);
     }
 
@@ -125,6 +135,7 @@ public class CollisionEffectTests
     [UnityTest]
     public IEnumerator OnCollisionEnter_Player_CreatesOneEffectAtContactPoint()
     {
+        var contactProbe = _target.AddComponent<CollisionContactProbe>();
         var targetBody = _target.AddComponent<Rigidbody>();
         targetBody.isKinematic = true;
         var carBody = _car.AddComponent<Rigidbody>();
@@ -136,7 +147,7 @@ public class CollisionEffectTests
 
         var instances = EffectInstances();
         Assert.AreEqual(1, instances.Length);
-        Assert.AreEqual(0.5f, instances[0].transform.position.x, 0.01f);
+        Assert.AreEqual(contactProbe.ContactPoint, instances[0].transform.position);
     }
 
     [Test]

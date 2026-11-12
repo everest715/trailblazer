@@ -186,7 +186,7 @@ public class GateGroundAlignmentTests
         var parent = new GameObject("Gates");
         parent.transform.localScale = Vector3.one * 0.25f;
         var original = new GameObject("OldGate");
-        original.transform.SetParent(parent.transform);
+        original.transform.SetParent(parent.transform, false);
         var prefab = new GameObject("GatePrefab");
         prefab.transform.localScale = Vector3.one * 2f;
         var serialized = new SerializedObject(game);
