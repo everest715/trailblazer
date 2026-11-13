@@ -35,12 +35,8 @@ public class Game : MonoBehaviour
     public AudioClip startSound2;
     
     
-    public AudioClip coinSound;
-    public AudioClip multSound;
     public AudioClip multEndSound;
-    public AudioClip timeBonusSound;
     public AudioClip errorSound;
-    public AudioClip bombSound;
     // public AudioClip boostSound;
 
     public GameObject gate1;
@@ -273,7 +269,6 @@ public class Game : MonoBehaviour
         {
             StartCoroutine(SetVignette(_coinColor));
             
-            _audioSource.PlayOneShot(coinSound);
             Destroy(other.gameObject);
             UpdateScore(1*_mult);
         } 
@@ -281,7 +276,6 @@ public class Game : MonoBehaviour
         {
             StartCoroutine(SetVignette(_3CoinColor));
             
-            StartCoroutine(Handle3CoinSound());
             UpdateScore(3*_mult);
             Destroy(other.gameObject);
         } 
@@ -291,7 +285,6 @@ public class Game : MonoBehaviour
             
             Destroy(other.gameObject);
             timer += timeDelta;
-            _audioSource.PlayOneShot(timeBonusSound);
         } 
         // todo make boost work for multiplayer
         // else if (other.CompareTag("Boost"))
@@ -309,7 +302,6 @@ public class Game : MonoBehaviour
         {
             StartCoroutine(SetVignette(_bombColor));
             
-            _audioSource.PlayOneShot(bombSound);
             Destroy(other.gameObject);
             UpdateScore(-1*_mult);
         } 
@@ -341,7 +333,6 @@ public class Game : MonoBehaviour
 
     private IEnumerator Multiplier()
     {
-        _audioSource.PlayOneShot(multSound);
         _mult = 2;
         showMultiplier.SetActive(true);
         for (int i = 1; i < multTimer; i++)
@@ -416,15 +407,6 @@ public class Game : MonoBehaviour
         var gate = Instantiate(final ? finalGate : speedFault ? blockedGate : activeGate, position, rotation);
         gate.transform.localScale = scale;
         return gate;
-    }
-
-    private IEnumerator Handle3CoinSound()
-    {
-        _audioSource.PlayOneShot(coinSound);
-        yield return new WaitForSeconds(0.1f);
-        _audioSource.PlayOneShot(coinSound);
-        yield return new WaitForSeconds(0.1f);
-        _audioSource.PlayOneShot(coinSound);
     }
 
     public IEnumerator SetVignette(Color color, float intensity = VignetteIntensity)
