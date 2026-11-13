@@ -10,6 +10,8 @@ public class CollisionEffect : MonoBehaviour
     public float particleSpeedMultiplier = 3f;
     public float particleLifetimeMultiplier = 0.5f;
 
+    public AudioClip effectSound;
+
     private Collider _collider;
 
     private void Awake()
@@ -45,6 +47,11 @@ public class CollisionEffect : MonoBehaviour
 
     private void Play(Vector3 position)
     {
+        if (effectSound)
+        {
+            AudioSource.PlayClipAtPoint(effectSound, position);
+        }
+
         if (effectPrefab == null)
         {
             return;

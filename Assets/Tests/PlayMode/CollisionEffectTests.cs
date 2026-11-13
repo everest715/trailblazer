@@ -12,6 +12,7 @@ public class CollisionEffectTests
     private GameObject _car;
     private GameObject _effectPrefab;
     private CollisionEffect _effect;
+    private AudioClip _effectSound;
 
     private sealed class CollisionContactProbe : MonoBehaviour
     {
@@ -48,9 +49,16 @@ public class CollisionEffectTests
             UnityEngine.Object.DestroyImmediate(instance);
         }
 
+        foreach (var audioSource in UnityEngine.Object.FindObjectsOfType<AudioSource>()
+                     .Where(item => item.name == "One shot audio"))
+        {
+            UnityEngine.Object.DestroyImmediate(audioSource.gameObject);
+        }
+
         UnityEngine.Object.DestroyImmediate(_target);
         UnityEngine.Object.DestroyImmediate(_car);
         UnityEngine.Object.DestroyImmediate(_effectPrefab);
+        UnityEngine.Object.DestroyImmediate(_effectSound);
     }
 
     [Test]
@@ -151,6 +159,30 @@ public class CollisionEffectTests
     }
 
     [Test]
+    public void OnTriggerEnter_NullPrefab_PlaysEffectSoundAtClosestPoint()
+    {
+        _effect.effectPrefab = null;
+        CreateEffectSound();
+
+        Trigger(_car);
+
+        var audioSource = EffectSoundInstances().Single();
+        Assert.AreSame(_effectSound, audioSource.clip);
+        Assert.AreEqual(new Vector3(0.5f, 0f, 0f), audioSource.transform.position);
+    }
+
+    [Test]
+    public void OnTriggerEnter_NonPlayer_DoesNotPlayEffectSound()
+    {
+        _car.tag = "Untagged";
+        CreateEffectSound();
+
+        Trigger(_car);
+
+        Assert.IsEmpty(EffectSoundInstances());
+    }
+
+    [Test]
     public void CollisionEffect_HasEarlierExecutionOrderThanGame()
     {
         var attribute = typeof(CollisionEffect).GetCustomAttribute<DefaultExecutionOrder>();
@@ -162,6 +194,19 @@ public class CollisionEffectTests
     private void Trigger(GameObject other)
     {
         _target.SendMessage("OnTriggerEnter", other.GetComponent<Collider>());
+    }
+
+    private void CreateEffectSound()
+    {
+        _effectSound = AudioClip.Create("CollisionEffectSoundProbe", 441, 1, 44100, false);
+        _effect.effectSound = _effectSound;
+    }
+
+    private static AudioSource[] EffectSoundInstances()
+    {
+        return UnityEngine.Object.FindObjectsOfType<AudioSource>()
+            .Where(item => item.name == "One shot audio")
+            .ToArray();
     }
 
     private static GameObject[] EffectInstances()
