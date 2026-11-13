@@ -484,3 +484,4 @@ MonoBehaviour:
   effectScale: 0.08
   particleSpeedMultiplier: 5
   particleLifetimeMultiplier: 0.5
+  effectSound: {fileID: 8300000, guid: c63c97718a9532c45903f33e38d138ce, type: 3}
