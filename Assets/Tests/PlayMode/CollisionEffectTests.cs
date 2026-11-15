@@ -202,7 +202,7 @@ public class CollisionEffectTests
         Assert.AreEqual(scale, coin.transform.localScale);
         yield return new WaitForSeconds(0.7f);
 
-        Assert.Less(Vector3.Distance(targetPosition + Vector3.back * 0.6f,
+        Assert.Less(Vector3.Distance(targetPosition + Vector3.back * 0.4f,
             coin.transform.position), 0.0001f);
         Assert.IsTrue(coin.GetComponent<SphereCollider>().enabled);
     }
@@ -222,8 +222,82 @@ public class CollisionEffectTests
         yield return new WaitForSeconds(0.7f);
 
         var coin = CoinInstances().Single();
-        Assert.Less(Vector3.Distance(targetPosition + Vector3.right * 0.6f,
+        Assert.Less(Vector3.Distance(targetPosition + Vector3.right * 0.4f,
             coin.transform.position), 0.0001f);
+        Assert.IsTrue(coin.GetComponent<SphereCollider>().enabled);
+    }
+
+    [UnityTest]
+    public IEnumerator OnTriggerEnter_AutoDuration_UsesHeightAndGravity()
+    {
+        var targetPosition = new Vector3(2f, 3f, 4f);
+        _target.transform.position = targetPosition;
+        _car.transform.position = targetPosition + Vector3.forward * 2f;
+        _coinPrefab.AddComponent<SphereCollider>();
+        _effect.coinPrefab = _coinPrefab;
+        _effect.dropChance = 100f;
+        _effect.coinDropDistance = 0.4f;
+        _effect.coinDropHeight = 0.3f;
+        _effect.autoCoinDropDuration = true;
+        _effect.coinDropGravity = 9.81f;
+        _effect.coinDropDuration = 0.65f;
+
+        Trigger(_car);
+
+        var collider = CoinInstances().Single().GetComponent<SphereCollider>();
+        yield return new WaitForSeconds(0.4f);
+        Assert.IsFalse(collider.enabled);
+        yield return new WaitForSeconds(0.15f);
+        Assert.IsTrue(collider.enabled);
+    }
+
+    [UnityTest]
+    public IEnumerator OnTriggerEnter_ManualDuration_OverridesAutoDuration()
+    {
+        var targetPosition = new Vector3(2f, 3f, 4f);
+        _target.transform.position = targetPosition;
+        _car.transform.position = targetPosition + Vector3.forward * 2f;
+        _coinPrefab.AddComponent<SphereCollider>();
+        _effect.coinPrefab = _coinPrefab;
+        _effect.dropChance = 100f;
+        _effect.coinDropDistance = 0.4f;
+        _effect.coinDropHeight = 0.3f;
+        _effect.autoCoinDropDuration = false;
+        _effect.coinDropDuration = 0.2f;
+
+        Trigger(_car);
+        yield return new WaitForSeconds(0.25f);
+
+        var coin = CoinInstances().Single();
+        Assert.Less(Vector3.Distance(targetPosition + Vector3.back * 0.4f,
+            coin.transform.position), 0.0001f);
+        Assert.IsTrue(coin.GetComponent<SphereCollider>().enabled);
+    }
+
+    [UnityTest]
+    public IEnumerator OnTriggerEnter_ZeroGravity_DoesNotProduceNaNAndLands()
+    {
+        var targetPosition = new Vector3(2f, 3f, 4f);
+        _target.transform.position = targetPosition;
+        _car.transform.position = targetPosition + Vector3.forward * 2f;
+        _coinPrefab.AddComponent<SphereCollider>();
+        _effect.coinPrefab = _coinPrefab;
+        _effect.dropChance = 100f;
+        _effect.coinDropDistance = 0.4f;
+        _effect.coinDropHeight = 0.0001f;
+        _effect.autoCoinDropDuration = true;
+        _effect.coinDropGravity = 0f;
+
+        Trigger(_car);
+        yield return new WaitForSeconds(0.35f);
+
+        var coin = CoinInstances().Single();
+        var position = coin.transform.position;
+        Assert.IsFalse(float.IsNaN(position.x) || float.IsInfinity(position.x));
+        Assert.IsFalse(float.IsNaN(position.y) || float.IsInfinity(position.y));
+        Assert.IsFalse(float.IsNaN(position.z) || float.IsInfinity(position.z));
+        Assert.Less(Vector3.Distance(targetPosition + Vector3.back * 0.4f,
+            position), 0.0001f);
         Assert.IsTrue(coin.GetComponent<SphereCollider>().enabled);
     }
 

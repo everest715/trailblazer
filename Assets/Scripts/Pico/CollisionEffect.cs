@@ -16,9 +16,11 @@ public class CollisionEffect : MonoBehaviour
     public GameObject coinPrefab;
     [Range(0f, 100f)]
     public float dropChance;
-    public float coinDropDistance = 0.6f;
-    public float coinDropHeight = 0.6f;
-    public float coinDropDuration = 0.65f;
+    public float coinDropDistance = 0.4f;
+    public float coinDropHeight = 0.3f;
+    public float coinDropDuration = 0.5f;
+    public bool autoCoinDropDuration = true;
+    public float coinDropGravity = 9.81f;
 
     private Collider _collider;
 
@@ -77,8 +79,11 @@ public class CollisionEffect : MonoBehaviour
             (dropChance >= 100f || Random.value < dropChance / 100f))
         {
             var coin = Instantiate(coinPrefab, transform.position, coinPrefab.transform.rotation);
+            var duration = autoCoinDropDuration
+                ? Mathf.Sqrt(8f * Mathf.Max(0f, coinDropHeight) / Mathf.Max(0.01f, coinDropGravity))
+                : coinDropDuration;
             coin.AddComponent<CoinArcFlight>().Launch(coinDropDirection,
-                coinDropDistance, coinDropHeight, coinDropDuration);
+                coinDropDistance, coinDropHeight, duration);
         }
 
         if (effectPrefab == null)

@@ -188,6 +188,11 @@ MonoBehaviour:
   effectSound: {fileID: 8300000, guid: f02fedbcd78734041b3768d005bdc3d1, type: 3}
   coinPrefab: {fileID: 354547556857757566, guid: eaf266e3024de4bd88298bb6cc1ead36, type: 3}
   dropChance: 30
+  coinDropDistance: 0.4
+  coinDropHeight: 0.3
+  coinDropDuration: 0.5
+  autoCoinDropDuration: 1
+  coinDropGravity: 9.81
 --- !u!1 &5294095042706409652
 GameObject:
   m_ObjectHideFlags: 0

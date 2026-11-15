@@ -19,6 +19,11 @@ public class BrickCoinDropTests
         Assert.IsNotNull(effect);
         Assert.AreSame(coin, effect.coinPrefab);
         Assert.AreEqual(30f, effect.dropChance);
+        Assert.AreEqual(0.4f, effect.coinDropDistance);
+        Assert.AreEqual(0.3f, effect.coinDropHeight);
+        Assert.AreEqual(0.5f, effect.coinDropDuration);
+        Assert.IsTrue(effect.autoCoinDropDuration);
+        Assert.AreEqual(9.81f, effect.coinDropGravity);
     }
 }
 #endif
