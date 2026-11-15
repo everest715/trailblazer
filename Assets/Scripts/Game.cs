@@ -43,6 +43,7 @@ public class Game : MonoBehaviour
     public GameObject gate2;
     public GameObject gate3;
     public GameObject gate4;
+    public GameObject flag;
 
     public GameObject activeGate;
     public GameObject blockedGate;
@@ -133,6 +134,11 @@ public class Game : MonoBehaviour
                 gate.transform.position = new Vector3(gate.transform.position.x, groundHeight, gate.transform.position.z);
             }
         }
+
+        if (flag != null)
+        {
+            flag.transform.position = new Vector3(flag.transform.position.x, groundHeight, flag.transform.position.z);
+        }
     }
     
     private void AlignGatesToArea(PicoFloorArea area)
@@ -204,6 +210,11 @@ public class Game : MonoBehaviour
         for (var i = 0; i < gates.Length; i++)
         {
             gates[i].transform.position = fitted[i];
+        }
+
+        if (flag != null)
+        {
+            flag.transform.position = new Vector3(flag.transform.position.x, fitted[3].y, flag.transform.position.z);
         }
     }
 
