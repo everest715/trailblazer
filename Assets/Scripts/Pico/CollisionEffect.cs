@@ -12,6 +12,11 @@ public class CollisionEffect : MonoBehaviour
 
     public AudioClip effectSound;
 
+    [Header("Coin Drop")]
+    public GameObject coinPrefab;
+    [Range(0f, 100f)]
+    public float dropChance;
+
     private Collider _collider;
 
     private void Awake()
@@ -50,6 +55,12 @@ public class CollisionEffect : MonoBehaviour
         if (effectSound)
         {
             AudioSource.PlayClipAtPoint(effectSound, position);
+        }
+
+        if (coinPrefab != null && dropChance > 0f &&
+            (dropChance >= 100f || Random.value < dropChance / 100f))
+        {
+            Instantiate(coinPrefab, transform.position, coinPrefab.transform.rotation);
         }
 
         if (effectPrefab == null)

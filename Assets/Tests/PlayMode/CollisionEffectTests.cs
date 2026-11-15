@@ -11,6 +11,7 @@ public class CollisionEffectTests
     private GameObject _target;
     private GameObject _car;
     private GameObject _effectPrefab;
+    private GameObject _coinPrefab;
     private CollisionEffect _effect;
     private AudioClip _effectSound;
 
@@ -38,6 +39,7 @@ public class CollisionEffectTests
 
         _effectPrefab = new GameObject("CollisionEffectProbe");
         _effect.effectPrefab = _effectPrefab;
+        _coinPrefab = new GameObject("CoinDropProbe");
     }
 
     [TearDown]
@@ -55,9 +57,16 @@ public class CollisionEffectTests
             UnityEngine.Object.DestroyImmediate(audioSource.gameObject);
         }
 
+        foreach (var instance in UnityEngine.Object.FindObjectsOfType<GameObject>()
+                     .Where(item => item.name.StartsWith("CoinDropProbe(")))
+        {
+            UnityEngine.Object.DestroyImmediate(instance);
+        }
+
         UnityEngine.Object.DestroyImmediate(_target);
         UnityEngine.Object.DestroyImmediate(_car);
         UnityEngine.Object.DestroyImmediate(_effectPrefab);
+        UnityEngine.Object.DestroyImmediate(_coinPrefab);
         UnityEngine.Object.DestroyImmediate(_effectSound);
     }
 
@@ -159,6 +168,60 @@ public class CollisionEffectTests
     }
 
     [Test]
+    public void OnTriggerEnter_ZeroDropChance_DoesNotCreateCoin()
+    {
+        _effect.coinPrefab = _coinPrefab;
+        _effect.dropChance = 0f;
+
+        Trigger(_car);
+
+        Assert.IsEmpty(CoinInstances());
+    }
+
+    [Test]
+    public void OnTriggerEnter_FullDropChance_CreatesOneCoinAtTargetPosition()
+    {
+        var targetPosition = new Vector3(2f, 3f, 4f);
+        var rotation = Quaternion.Euler(10f, 20f, 30f);
+        var scale = new Vector3(2f, 3f, 4f);
+        _target.transform.position = targetPosition;
+        _coinPrefab.transform.rotation = rotation;
+        _coinPrefab.transform.localScale = scale;
+        _effect.coinPrefab = _coinPrefab;
+        _effect.dropChance = 100f;
+
+        Trigger(_car);
+
+        var coin = CoinInstances().Single();
+        Assert.AreEqual(targetPosition, coin.transform.position);
+        Assert.Less(Quaternion.Angle(rotation, coin.transform.rotation), 0.001f);
+        Assert.AreEqual(scale, coin.transform.localScale);
+    }
+
+    [Test]
+    public void OnTriggerEnter_NullCoinPrefab_DoesNotCreateCoin()
+    {
+        _effect.coinPrefab = null;
+        _effect.dropChance = 100f;
+
+        Trigger(_car);
+
+        Assert.IsEmpty(CoinInstances());
+    }
+
+    [Test]
+    public void OnTriggerEnter_NonPlayer_DoesNotCreateCoin()
+    {
+        _car.tag = "Untagged";
+        _effect.coinPrefab = _coinPrefab;
+        _effect.dropChance = 100f;
+
+        Trigger(_car);
+
+        Assert.IsEmpty(CoinInstances());
+    }
+
+    [Test]
     public void OnTriggerEnter_NullPrefab_PlaysEffectSoundAtClosestPoint()
     {
         _effect.effectPrefab = null;
@@ -213,6 +276,13 @@ public class CollisionEffectTests
     {
         return UnityEngine.Object.FindObjectsOfType<GameObject>()
             .Where(item => item.name.StartsWith("CollisionEffectProbe("))
+            .ToArray();
+    }
+
+    private static GameObject[] CoinInstances()
+    {
+        return UnityEngine.Object.FindObjectsOfType<GameObject>()
+            .Where(item => item.name.StartsWith("CoinDropProbe("))
             .ToArray();
     }
 }
