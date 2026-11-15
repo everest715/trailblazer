@@ -4943,7 +4943,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1007769842999995988, guid: 337ef3907e8c21848ac89257530498cf, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 68.29
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 1007769842999995988, guid: 337ef3907e8c21848ac89257530498cf, type: 3}
       propertyPath: m_LocalRotation.w
@@ -7615,9 +7615,25 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6979100997218778775, guid: 7f05eed49ca2e8644b40491f15c417f0, type: 3}
+      propertyPath: coinPrefab
+      value: 
+      objectReference: {fileID: 2630111903718000425, guid: a1226a30ae236b14b9e9ca149a3009d3, type: 3}
+    - target: {fileID: 6979100997218778775, guid: 7f05eed49ca2e8644b40491f15c417f0, type: 3}
+      propertyPath: dropChance
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 6979100997218778775, guid: 7f05eed49ca2e8644b40491f15c417f0, type: 3}
       propertyPath: effectSound
       value: 
       objectReference: {fileID: 8300000, guid: f02fedbcd78734041b3768d005bdc3d1, type: 3}
+    - target: {fileID: 6979100997218778775, guid: 7f05eed49ca2e8644b40491f15c417f0, type: 3}
+      propertyPath: coinDropHeight
+      value: 0.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 6979100997218778775, guid: 7f05eed49ca2e8644b40491f15c417f0, type: 3}
+      propertyPath: coinDropDistance
+      value: 0.4
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
