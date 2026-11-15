@@ -5,10 +5,13 @@ import { type Message, uuidv7 } from "@earendil-works/pi-ai";
 import type { ExtensionAPI, ExtensionContext, SessionEntry } from "@earendil-works/pi-coding-agent";
 import { convertToLlm, serializeConversation } from "@earendil-works/pi-coding-agent";
 import {
+	HandoffScheduler,
 	hasMeaningfulConversation,
 	type SessionStartReason,
+	shouldAttemptTimedSave,
 	shouldInjectHandoff,
 	shouldSaveOnShutdown,
+	TIMED_HANDOFF_INTERVAL_MS,
 	writeHandoffAtomically,
 } from "./core.ts";
 
@@ -73,10 +76,18 @@ export default function (pi: ExtensionAPI) {
 	let alreadyInjected = false;
 	let handoffContent = "";
 	let saveAttempted = false;
+	let scheduler: HandoffScheduler | undefined;
+	let lastSavedLeafId: string | null | undefined;
+	let hasSavedInSession = false;
 
-	async function saveHandoff(ctx: ExtensionContext): Promise<void> {
+	function getConversationMarker(ctx: ExtensionContext): string | null | undefined {
+		return ctx.sessionManager.getLeafId() ?? ctx.sessionManager.getBranch().at(-1)?.id;
+	}
+
+	async function saveHandoff(ctx: ExtensionContext): Promise<string | null | undefined> {
 		const branch = ctx.sessionManager.getBranch();
-		if (!hasMeaningfulConversation(branch)) return;
+		const leafId = getConversationMarker(ctx);
+		if (!hasMeaningfulConversation(branch)) return undefined;
 		if (!ctx.model) throw new Error("No model selected; handoff was not saved");
 
 		const conversationText = serializeConversation(convertToLlm(getHandoffMessages(branch)));
@@ -108,28 +119,60 @@ export default function (pi: ExtensionAPI) {
 			.trim();
 		const path = await writeHandoffAtomically(ctx.cwd, summary);
 		if (ctx.hasUI) ctx.ui.notify(`Handoff saved: ${path}`, "info");
+		return leafId;
 	}
 
-	async function trySaveHandoff(ctx: ExtensionContext): Promise<void> {
+	async function trySaveHandoff(ctx: ExtensionContext): Promise<string | null | undefined> {
 		try {
-			await saveHandoff(ctx);
+			return await saveHandoff(ctx);
 		} catch (error) {
 			if (ctx.hasUI) ctx.ui.notify(`Auto-handoff: ${errorMessage(error)}`, "error");
+			return undefined;
+		}
+	}
+
+	async function saveAndTrack(ctx: ExtensionContext): Promise<void> {
+		const savedLeafId = await trySaveHandoff(ctx);
+		if (savedLeafId !== undefined) {
+			lastSavedLeafId = savedLeafId;
+			hasSavedInSession = true;
+		}
+	}
+
+	async function saveWithScheduler(ctx: ExtensionContext): Promise<void> {
+		if (hasSavedInSession && getConversationMarker(ctx) === lastSavedLeafId) return;
+		if (scheduler) {
+			await scheduler.saveNow();
+		} else {
+			await saveAndTrack(ctx);
 		}
 	}
 
 	pi.on("session_start", async (event, ctx) => {
+		await scheduler?.stop();
 		sessionReason = event.reason;
 		hadUserMessages = ctx.sessionManager
 			.getBranch()
 			.some((entry) => entry.type === "message" && entry.message.role === "user");
 		alreadyInjected = false;
 		saveAttempted = false;
+		hasSavedInSession = false;
 		try {
 			handoffContent = await readFile(resolve(ctx.cwd, "HANDOFF.md"), "utf8");
 		} catch {
 			handoffContent = "";
 		}
+		lastSavedLeafId = getConversationMarker(ctx);
+		scheduler = new HandoffScheduler({
+			intervalMs: TIMED_HANDOFF_INTERVAL_MS,
+			shouldSave: () =>
+				shouldAttemptTimedSave({
+					tokens: ctx.getContextUsage()?.tokens,
+					hasNewContent: getConversationMarker(ctx) !== lastSavedLeafId,
+				}),
+			save: () => saveAndTrack(ctx),
+		});
+		scheduler.start();
 	});
 
 	pi.on("before_agent_start", async (event, _ctx) => {
@@ -158,12 +201,17 @@ export default function (pi: ExtensionAPI) {
 	pi.on("session_before_switch", async (event, ctx) => {
 		if (event.reason !== "new" && event.reason !== "resume") return;
 		saveAttempted = true;
-		await trySaveHandoff(ctx);
+		await saveWithScheduler(ctx);
 	});
 
 	pi.on("session_shutdown", async (event, ctx) => {
-		if (!shouldSaveOnShutdown(event.reason, saveAttempted)) return;
-		saveAttempted = true;
-		await trySaveHandoff(ctx);
+		try {
+			if (shouldSaveOnShutdown(event.reason, saveAttempted)) {
+				saveAttempted = true;
+				await saveWithScheduler(ctx);
+			}
+		} finally {
+			await scheduler?.stop();
+		}
 	});
 }
