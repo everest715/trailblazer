@@ -24,6 +24,14 @@ public class PhysicApplier : MonoBehaviour
             e.AddForce((e.transform.position - transform.position) * directionalForce + extraForce, ForceMode.Impulse);
             Vector3 randomRotation = Random.insideUnitSphere;
             e.AddTorque(randomRotation * torque, ForceMode.Impulse);
+
+            if (GameManager.instance)
+            {
+                if (e.GetComponent<Collider>())
+                {
+                    GameManager.instance.IgnorePlayerCollision(e.GetComponent<Collider>());
+                }
+            }
         }
         
         StartCoroutine(DestroyElements());
