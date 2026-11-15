@@ -284,12 +284,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 82b21fe9c59343af9952995609172958, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  effectPrefab: {fileID: 292892848416973804, guid: 5f849121f091c6d4c8846f5a701053b3, type: 3}
+  effectPrefab: {fileID: 292892848416973804, guid: 1301cc6345a854449b46746e2f813b50, type: 3}
   lifetime: 2
   effectScale: 0.1
   particleSpeedMultiplier: 3
   particleLifetimeMultiplier: 0.5
   effectSound: {fileID: 8300000, guid: 64c6a2d9472b8374c915ab7ae979f5c4, type: 3}
+  coinPrefab: {fileID: 0}
+  dropChance: 0
+  coinDropDistance: 0.4
+  coinDropHeight: 0.3
+  coinDropDuration: 0.5
+  autoCoinDropDuration: 1
+  coinDropGravity: 9.81
 --- !u!1 &6614979570975273240
 GameObject:
   m_ObjectHideFlags: 0

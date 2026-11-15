@@ -190,6 +190,14 @@ MonoBehaviour:
   effectScale: 0.06
   particleSpeedMultiplier: 3
   particleLifetimeMultiplier: 0.5
+  effectSound: {fileID: 0}
+  coinPrefab: {fileID: 0}
+  dropChance: 0
+  coinDropDistance: 0.4
+  coinDropHeight: 0.3
+  coinDropDuration: 0.5
+  autoCoinDropDuration: 1
+  coinDropGravity: 9.81
 --- !u!1 &2028376950438501173
 GameObject:
   m_ObjectHideFlags: 0

@@ -8,18 +8,18 @@ using UnityEditor;
 public class BrickCoinDropTests
 {
     [Test]
-    public void MBrickGate_HasThirtyPercentCoinDrop()
+    public void MBrickGate_HasConfiguredCoinDrop()
     {
         var brick = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/MBrick Gate.prefab");
-        var coin = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Coin.prefab");
+        var coin = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/MCoin 1.prefab");
 
         Assert.IsNotNull(brick);
         Assert.IsNotNull(coin);
         var effect = brick.GetComponent<CollisionEffect>();
         Assert.IsNotNull(effect);
         Assert.AreSame(coin, effect.coinPrefab);
-        Assert.AreEqual(30f, effect.dropChance);
-        Assert.AreEqual(0.4f, effect.coinDropDistance);
+        Assert.AreEqual(20f, effect.dropChance);
+        Assert.AreEqual(0.5f, effect.coinDropDistance);
         Assert.AreEqual(0.3f, effect.coinDropHeight);
         Assert.AreEqual(0.5f, effect.coinDropDuration);
         Assert.IsTrue(effect.autoCoinDropDuration);
