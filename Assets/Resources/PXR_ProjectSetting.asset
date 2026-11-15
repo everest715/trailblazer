@@ -44,8 +44,8 @@ MonoBehaviour:
   selfAdaptiveSharpening: 0
   handTrackingSupportType: 1
   environmentDepth: 0
-  lightEstimation: 0
-  lightEstimationTextureResolution: 0
+  lightEstimation: 1
+  lightEstimationTextureResolution: 4
   objectTracking: 0
   keyboardPassthrough: 0
   arFoundation: 0
