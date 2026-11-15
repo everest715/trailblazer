@@ -178,24 +178,53 @@ public class CollisionEffectTests
         Assert.IsEmpty(CoinInstances());
     }
 
-    [Test]
-    public void OnTriggerEnter_FullDropChance_CreatesOneCoinAtTargetPosition()
+    [UnityTest]
+    public IEnumerator OnTriggerEnter_FullDropChance_LaunchesCoinAlongTrackerCollisionDirection()
     {
         var targetPosition = new Vector3(2f, 3f, 4f);
         var rotation = Quaternion.Euler(10f, 20f, 30f);
         var scale = new Vector3(2f, 3f, 4f);
         _target.transform.position = targetPosition;
+        _car.transform.position = targetPosition + Vector3.forward * 2f + Vector3.up * 3f;
         _coinPrefab.transform.rotation = rotation;
         _coinPrefab.transform.localScale = scale;
+        _coinPrefab.AddComponent<SphereCollider>();
         _effect.coinPrefab = _coinPrefab;
         _effect.dropChance = 100f;
 
         Trigger(_car);
 
         var coin = CoinInstances().Single();
+        Assert.IsNotNull(coin.GetComponent<CoinArcFlight>());
+        Assert.IsFalse(coin.GetComponent<SphereCollider>().enabled);
         Assert.AreEqual(targetPosition, coin.transform.position);
         Assert.Less(Quaternion.Angle(rotation, coin.transform.rotation), 0.001f);
         Assert.AreEqual(scale, coin.transform.localScale);
+        yield return new WaitForSeconds(0.7f);
+
+        Assert.Less(Vector3.Distance(targetPosition + Vector3.back * 0.6f,
+            coin.transform.position), 0.0001f);
+        Assert.IsTrue(coin.GetComponent<SphereCollider>().enabled);
+    }
+
+    [UnityTest]
+    public IEnumerator OnTriggerEnter_CoincidentTracker_UsesTrackerForwardForCoinDrop()
+    {
+        var targetPosition = new Vector3(2f, 3f, 4f);
+        _target.transform.position = targetPosition;
+        _car.transform.position = targetPosition + Vector3.up * 2f;
+        _car.transform.rotation = Quaternion.LookRotation(Vector3.right);
+        _coinPrefab.AddComponent<SphereCollider>();
+        _effect.coinPrefab = _coinPrefab;
+        _effect.dropChance = 100f;
+
+        Trigger(_car);
+        yield return new WaitForSeconds(0.7f);
+
+        var coin = CoinInstances().Single();
+        Assert.Less(Vector3.Distance(targetPosition + Vector3.right * 0.6f,
+            coin.transform.position), 0.0001f);
+        Assert.IsTrue(coin.GetComponent<SphereCollider>().enabled);
     }
 
     [Test]

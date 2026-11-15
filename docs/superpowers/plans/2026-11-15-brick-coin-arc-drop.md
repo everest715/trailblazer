@@ -65,7 +65,7 @@ Expected: 因 `CoinArcFlight` 不存在而编译失败；实现后必须执行�
 
 Expected: `CoinArcFlightTests` 全部通过，无编译错误。
 
-- [ ] **Step 5: 提交运动组件**
+- [x] **Step 5: 提交运动组件**
 
 ```bash
 git add -- Assets/Scripts/Pico/CoinArcFlight.cs Assets/Scripts/Pico/CoinArcFlight.cs.meta Assets/Tests/PlayMode/CoinArcFlightTests.cs Assets/Tests/PlayMode/CoinArcFlightTests.cs.meta docs/superpowers/specs/2026-11-15-brick-coin-arc-drop-design.md docs/superpowers/plans/2026-11-15-brick-coin-arc-drop.md
@@ -82,23 +82,23 @@ git commit -m "feat(金币): 添加抛物线飞行动作"
 - Consumes: `CoinArcFlight.Launch(Vector3 direction, float distance, float height, float duration)`。
 - Produces: `CollisionEffect.coinDropDistance = 0.6f`、`coinDropHeight = 0.6f`、`coinDropDuration = 0.65f`；生成金币立即启动运动。
 
-- [ ] **Step 1: 改写集成测试并确认 RED**
+- [x] **Step 1: 改写集成测试并确认 RED**
 
 将原地生成断言改为抛物线生成：100% 概率下，金币带 `CoinArcFlight`，Collider 立即禁用；Tracker 位于砖块水平正前方时，落地位置等于砖块位置加 `Vector3.back * 0.6f`，Y 不变，落地后 Collider 恢复。另加 Tracker 与砖块水平位置重合时使用 Tracker 水平 forward 的测试。运行 `CollisionEffectTests`，输出 `brick-coin-arc-integration-red.xml`。
 
 Expected: 因运动组件未接入或方向未传递而失败。
 
-- [ ] **Step 2: 接入方向和运动参数**
+- [x] **Step 2: 接入方向和运动参数**
 
 在 `CollisionEffect` 增加三个运动参数。Trigger 和 Collision 入口均用 `transform.position - tracker.transform.position` 计算去 Y 方向；零向量时回退到 Tracker 水平 forward，仍为零则传 `Vector3.zero`。把原 `Play(Vector3)` 扩展为接收方向，在实例化金币后添加 `CoinArcFlight` 并调用 Task 1 的 `Launch`。
 
-- [ ] **Step 3: 重跑集成测试并确认 GREEN**
+- [x] **Step 3: 重跑集成测试并确认 GREEN**
 
 运行 `CollisionEffectTests;BrickCoinDropTests;CoinArcFlightTests`，输出 `brick-coin-arc-integration-green.xml`。
 
 Expected: 全部通过，30% 配置不变，既有特效与音效测试通过。
 
-- [ ] **Step 4: 完整回归并提交接入**
+- [x] **Step 4: 完整回归并提交接入**
 
 在同步副本运行完整 PlayMode，输出 `brick-coin-arc-full.xml`。预期无失败；检查 C# / Markdown `git diff --check`，只提交本任务代码与测试。
 

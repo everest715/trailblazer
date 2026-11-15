@@ -16,6 +16,9 @@ public class CollisionEffect : MonoBehaviour
     public GameObject coinPrefab;
     [Range(0f, 100f)]
     public float dropChance;
+    public float coinDropDistance = 0.6f;
+    public float coinDropHeight = 0.6f;
+    public float coinDropDuration = 0.65f;
 
     private Collider _collider;
 
@@ -36,7 +39,7 @@ public class CollisionEffect : MonoBehaviour
             _collider = GetComponent<Collider>();
         }
 
-        Play(_collider.ClosestPoint(other.transform.position));
+        Play(_collider.ClosestPoint(other.transform.position), GetCoinDropDirection(other.transform));
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -47,10 +50,23 @@ public class CollisionEffect : MonoBehaviour
             return;
         }
 
-        Play(collision.GetContact(0).point);
+        Play(collision.GetContact(0).point, GetCoinDropDirection(collision.collider.transform));
     }
 
-    private void Play(Vector3 position)
+    private Vector3 GetCoinDropDirection(Transform tracker)
+    {
+        var direction = transform.position - tracker.position;
+        direction.y = 0f;
+        if (direction.sqrMagnitude <= 0.0001f)
+        {
+            direction = tracker.forward;
+            direction.y = 0f;
+        }
+
+        return direction.sqrMagnitude > 0.0001f ? direction.normalized : Vector3.zero;
+    }
+
+    private void Play(Vector3 position, Vector3 coinDropDirection)
     {
         if (effectSound)
         {
@@ -60,7 +76,9 @@ public class CollisionEffect : MonoBehaviour
         if (coinPrefab != null && dropChance > 0f &&
             (dropChance >= 100f || Random.value < dropChance / 100f))
         {
-            Instantiate(coinPrefab, transform.position, coinPrefab.transform.rotation);
+            var coin = Instantiate(coinPrefab, transform.position, coinPrefab.transform.rotation);
+            coin.AddComponent<CoinArcFlight>().Launch(coinDropDirection,
+                coinDropDistance, coinDropHeight, coinDropDuration);
         }
 
         if (effectPrefab == null)
