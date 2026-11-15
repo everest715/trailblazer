@@ -6,6 +6,7 @@ public class CoinEffectParticleTextureTests
 {
     [TestCase("ParticleShiny")]
     [TestCase("ParticleFlash")]
+    [TestCase("ParticleCircle")]
     public void EffectTexture_HasAlphaForPicoPassthrough(string textureName)
     {
         var material = AssetDatabase.LoadAssetAtPath<Material>(
