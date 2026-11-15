@@ -2,9 +2,11 @@ import assert from "node:assert/strict";
 import { mkdtemp, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { resolve } from "node:path";
-import test from "node:test";
+import test, { mock } from "node:test";
 import {
+	HandoffScheduler,
 	hasMeaningfulConversation,
+	shouldAttemptTimedSave,
 	shouldInjectHandoff,
 	shouldSaveOnShutdown,
 	writeHandoffAtomically,
@@ -87,4 +89,90 @@ test("blank summaries preserve an existing handoff", async (t) => {
 
 	await assert.rejects(writeHandoffAtomically(directory, "  \n"), /blank/i);
 	assert.equal(await readFile(handoffPath, "utf8"), "# Keep me");
+});
+
+test("timed save requires new content and more than 100k tokens", () => {
+	for (const tokens of [null, undefined, 99999, 100000]) {
+		assert.equal(shouldAttemptTimedSave({ tokens, hasNewContent: true }), false);
+	}
+	assert.equal(shouldAttemptTimedSave({ tokens: 100001, hasNewContent: true }), true);
+	assert.equal(shouldAttemptTimedSave({ tokens: 200000, hasNewContent: false }), false);
+});
+
+test("scheduler ticks every five minutes and stops", async (t) => {
+	const timers = mock.timers;
+	timers.enable({ apis: ["setInterval"] });
+	t.after(() => timers.reset());
+	let allowed = true;
+	let calls = 0;
+	const scheduler = new HandoffScheduler({
+		intervalMs: 300000,
+		shouldSave: () => allowed,
+		save: async () => {
+			calls++;
+		},
+	});
+	scheduler.start();
+
+	await timers.tick(299999);
+	assert.equal(calls, 0);
+	await timers.tick(1);
+	assert.equal(calls, 1);
+
+	allowed = false;
+	await timers.tick(300000);
+	assert.equal(calls, 1);
+	await scheduler.stop();
+	allowed = true;
+	await timers.tick(300000);
+	assert.equal(calls, 1);
+});
+
+test("repeated start creates only one timer", async (t) => {
+	const timers = mock.timers;
+	timers.enable({ apis: ["setInterval"] });
+	t.after(() => timers.reset());
+	let calls = 0;
+	const scheduler = new HandoffScheduler({
+		intervalMs: 1000,
+		shouldSave: () => true,
+		save: async () => {
+			calls++;
+		},
+	});
+	scheduler.start();
+	scheduler.start();
+
+	await timers.tick(1000);
+	assert.equal(calls, 1);
+	await scheduler.stop();
+});
+
+test("saveNow coalesces concurrent saves and stop awaits completion", async () => {
+	let calls = 0;
+	let resolveSave!: () => void;
+	const scheduler = new HandoffScheduler({
+		intervalMs: 1000,
+		shouldSave: () => true,
+		save: () => {
+			calls++;
+			return new Promise<void>((resolve) => {
+				resolveSave = resolve;
+			});
+		},
+	});
+
+	const first = scheduler.saveNow();
+	const second = scheduler.saveNow();
+	assert.equal(calls, 1);
+	let stopped = false;
+	const stopping = scheduler.stop().then(() => {
+		stopped = true;
+	});
+	await Promise.resolve();
+	assert.equal(stopped, false);
+
+	resolveSave();
+	await Promise.all([first, second, stopping]);
+	assert.equal(stopped, true);
 });

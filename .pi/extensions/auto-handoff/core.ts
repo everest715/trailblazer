@@ -3,6 +3,21 @@ import { resolve } from "node:path";
 
 export type SessionStartReason = "startup" | "reload" | "new" | "resume" | "fork";
 
+export const TIMED_HANDOFF_INTERVAL_MS = 300000;
+export const TIMED_HANDOFF_TOKEN_THRESHOLD = 100000;
+
+export function shouldAttemptTimedSave(options: {
+	tokens: number | null | undefined;
+	hasNewContent: boolean;
+}): boolean {
+	return (
+		options.hasNewContent &&
+		typeof options.tokens === "number" &&
+		Number.isFinite(options.tokens) &&
+		options.tokens > TIMED_HANDOFF_TOKEN_THRESHOLD
+	);
+}
+
 export function shouldInjectHandoff(options: {
 	reason: SessionStartReason;
 	hasUserMessages: boolean;
@@ -37,5 +52,50 @@ export async function writeHandoffAtomically(cwd: string, summary: string): Prom
 		return handoffPath;
 	} finally {
 		await rm(temporaryPath, { force: true });
+	}
+}
+
+export class HandoffScheduler {
+	private timer: ReturnType<typeof setInterval> | undefined;
+	private pending: Promise<void> | undefined;
+	private readonly options: {
+		intervalMs: number;
+		shouldSave: () => boolean;
+		save: () => Promise<void>;
+	};
+
+	constructor(options: {
+		intervalMs: number;
+		shouldSave: () => boolean;
+		save: () => Promise<void>;
+	}) {
+		this.options = options;
+	}
+
+	start(): void {
+		if (this.timer) return;
+		this.timer = setInterval(() => {
+			if (this.options.shouldSave()) void this.saveNow();
+		}, this.options.intervalMs);
+		this.timer.unref();
+	}
+
+	async saveNow(): Promise<void> {
+		if (this.pending) return this.pending;
+		const pending = this.options.save();
+		this.pending = pending;
+		try {
+			await pending;
+		} finally {
+			if (this.pending === pending) this.pending = undefined;
+		}
+	}
+
+	async stop(): Promise<void> {
+		if (this.timer) {
+			clearInterval(this.timer);
+			this.timer = undefined;
+		}
+		await this.pending;
 	}
 }
