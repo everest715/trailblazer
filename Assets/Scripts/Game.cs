@@ -214,7 +214,7 @@ public class Game : MonoBehaviour
 
         if (flag != null)
         {
-            flag.transform.position = new Vector3(flag.transform.position.x, fitted[3].y, flag.transform.position.z);
+            flag.transform.position = new Vector3(flag.transform.position.x, groundHeight, flag.transform.position.z);
         }
     }
 
