@@ -10,9 +10,12 @@ public class PicoSceneSpawnPositions : MonoBehaviour
     public MonoBehaviour sceneCaptureProvider;
     public float surfaceClearance = 0.05f;
     public Bounds spawnBounds = new Bounds(Vector3.zero, new Vector3(4f, 1f, 4f));
+    public Transform tracker;
+    public float trackerExclusionRadius = 0.05f;
 
     public event Action<GameObject> Spawned;
 
+    private const int TrackerAvoidanceAttempts = 20;
     private bool _isSpawning;
     private float? _cachedSpawnHeight;
 
@@ -20,6 +23,18 @@ public class PicoSceneSpawnPositions : MonoBehaviour
     public Vector3 LastSpawnPoint { get; private set; }
     public float LastGroundHeight { get; private set; }
     public string LastGroundHeightMethod { get; private set; } = "Not detected";
+
+    private void Awake()
+    {
+        if (tracker == null)
+        {
+            var driver = FindAnyObjectByType<MotionTrackerDriver>();
+            if (driver != null)
+            {
+                tracker = driver.transform;
+            }
+        }
+    }
 
     private void Start()
     {
@@ -56,7 +71,7 @@ public class PicoSceneSpawnPositions : MonoBehaviour
                 for (var i = 0; i < SpawnAmount && areas.Count > 0; i++)
                 {
                     var area = areas[UnityEngine.Random.Range(0, areas.Count)];
-                    if (area.TryGetRandomPoint(out var point))
+                    if (TryGetAreaPointAwayFromTracker(area, out var point))
                     {
                         if (!batchHeight.HasValue)
                         {
@@ -94,6 +109,32 @@ public class PicoSceneSpawnPositions : MonoBehaviour
         }
     }
 
+    private bool TryGetAreaPointAwayFromTracker(PicoFloorArea area, out Vector3 point)
+    {
+        for (var attempt = 0; attempt < TrackerAvoidanceAttempts; attempt++)
+        {
+            if (area.TryGetRandomPoint(out point) && !IsNearTracker(point))
+            {
+                return true;
+            }
+        }
+
+        point = default;
+        return false;
+    }
+
+    private bool IsNearTracker(Vector3 worldPosition)
+    {
+        if (tracker == null || trackerExclusionRadius <= 0f)
+        {
+            return false;
+        }
+
+        var delta = worldPosition - tracker.position;
+        delta.y = 0f;
+        return delta.sqrMagnitude < trackerExclusionRadius * trackerExclusionRadius;
+    }
+
     private void SpawnAt(Vector3 worldPosition)
     {
         var instance = Instantiate(SpawnObject, worldPosition, SpawnObject.transform.rotation);
@@ -105,11 +146,19 @@ public class PicoSceneSpawnPositions : MonoBehaviour
         Vector3? firstSpawnPoint = null;
         for (var i = 0; i < SpawnAmount; i++)
         {
-            var localPosition = new Vector3(
-                UnityEngine.Random.Range(spawnBounds.min.x, spawnBounds.max.x),
-                fixedHeight ?? UnityEngine.Random.Range(spawnBounds.min.y, spawnBounds.max.y),
-                UnityEngine.Random.Range(spawnBounds.min.z, spawnBounds.max.z));
-            var worldPosition = transform.TransformPoint(localPosition);
+            var worldPosition = Vector3.zero;
+            for (var attempt = 0; attempt < TrackerAvoidanceAttempts; attempt++)
+            {
+                var localPosition = new Vector3(
+                    UnityEngine.Random.Range(spawnBounds.min.x, spawnBounds.max.x),
+                    fixedHeight ?? UnityEngine.Random.Range(spawnBounds.min.y, spawnBounds.max.y),
+                    UnityEngine.Random.Range(spawnBounds.min.z, spawnBounds.max.z));
+                worldPosition = transform.TransformPoint(localPosition);
+                if (!IsNearTracker(worldPosition))
+                {
+                    break;
+                }
+            }
             SpawnAt(worldPosition);
             firstSpawnPoint ??= worldPosition;
         }
