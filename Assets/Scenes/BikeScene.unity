@@ -2556,15 +2556,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 6866837349743045141, guid: 25639d6604a7bd9439937484b92d0788, type: 3}
       propertyPath: m_LocalScale.x
-      value: 10
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 6866837349743045141, guid: 25639d6604a7bd9439937484b92d0788, type: 3}
       propertyPath: m_LocalScale.y
-      value: 10
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 6866837349743045141, guid: 25639d6604a7bd9439937484b92d0788, type: 3}
       propertyPath: m_LocalScale.z
-      value: 10
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 6866837349743045141, guid: 25639d6604a7bd9439937484b92d0788, type: 3}
       propertyPath: m_LocalPosition.x
@@ -2986,7 +2986,7 @@ PrefabInstance:
       objectReference: {fileID: 8300000, guid: f02fedbcd78734041b3768d005bdc3d1, type: 3}
     - target: {fileID: 6979100997218778775, guid: 7f05eed49ca2e8644b40491f15c417f0, type: 3}
       propertyPath: coinDropDistance
-      value: 0.4
+      value: 0.3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -3233,7 +3233,7 @@ PrefabInstance:
       objectReference: {fileID: 8300000, guid: f02fedbcd78734041b3768d005bdc3d1, type: 3}
     - target: {fileID: 6979100997218778775, guid: 7f05eed49ca2e8644b40491f15c417f0, type: 3}
       propertyPath: coinDropDistance
-      value: 0.4
+      value: 0.3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -7815,7 +7815,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6979100997218778775, guid: 7f05eed49ca2e8644b40491f15c417f0, type: 3}
       propertyPath: coinDropDistance
-      value: 0.4
+      value: 0.3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
