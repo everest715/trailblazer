@@ -197,6 +197,8 @@ MonoBehaviour:
   spawnBounds:
     m_Center: {x: 0, y: 0.05, z: 1.5}
     m_Extent: {x: 0.75, y: 0.05, z: 0.75}
+  tracker: {fileID: 0}
+  trackerExclusionRadius: 0.05
 --- !u!1 &41985312
 GameObject:
   m_ObjectHideFlags: 0
@@ -1913,6 +1915,8 @@ MonoBehaviour:
   spawnBounds:
     m_Center: {x: 0, y: 0.05, z: 1.5}
     m_Extent: {x: 0.75, y: 0.05, z: 0.75}
+  tracker: {fileID: 0}
+  trackerExclusionRadius: 0.05
 --- !u!1 &599993779
 GameObject:
   m_ObjectHideFlags: 0
@@ -3364,6 +3368,9 @@ MonoBehaviour:
   gate3: {fileID: 1902750343}
   gate4: {fileID: 1400652915}
   flag: {fileID: 151091883}
+  cap: {fileID: 2005921845}
+  capGoldMaterial: {fileID: 0}
+  goldCapScoreThreshold: 10
   activeGate: {fileID: 2672608010270623628, guid: 7f05eed49ca2e8644b40491f15c417f0, type: 3}
   blockedGate: {fileID: 2672608010270623628, guid: 7f05eed49ca2e8644b40491f15c417f0, type: 3}
   finalGate: {fileID: 687826816407221881, guid: f0aecbbdc82c25942b81ceefee8c4804, type: 3}
@@ -4777,6 +4784,11 @@ GameObject:
 Transform:
   m_CorrespondingSourceObject: {fileID: 3340776470241549622, guid: 7f05eed49ca2e8644b40491f15c417f0, type: 3}
   m_PrefabInstance: {fileID: 1052180052}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &2005921845 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8981124955743495258, guid: 25639d6604a7bd9439937484b92d0788, type: 3}
+  m_PrefabInstance: {fileID: 893140025}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &2026941909
 GameObject:

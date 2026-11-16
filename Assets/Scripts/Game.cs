@@ -45,6 +45,10 @@ public class Game : MonoBehaviour
     public GameObject gate4;
     public GameObject flag;
 
+    public GameObject cap;
+    public Material capGoldMaterial;
+    public int goldCapScoreThreshold = 10;
+
     public GameObject activeGate;
     public GameObject blockedGate;
     public GameObject finalGate;
@@ -58,6 +62,7 @@ public class Game : MonoBehaviour
     private int _mult = 1;
     private bool _gameStarted = false;
     private int _checkpoints = 0;
+    private bool _capTurnedGold;
 
     private float _startTime;
     private AudioSource _audioSource;
@@ -325,6 +330,44 @@ public class Game : MonoBehaviour
         {
             drawTrail.segmentTotal += trailDelta;
         }
+
+        if (!_capTurnedGold && score >= goldCapScoreThreshold)
+        {
+            TurnCapGold();
+        }
+    }
+
+    private void TurnCapGold()
+    {
+        if (cap == null)
+        {
+            cap = GameObject.Find("Cap");
+        }
+        if (cap == null)
+        {
+            return;
+        }
+
+        _capTurnedGold = true;
+        var goldMaterial = capGoldMaterial != null ? capGoldMaterial : CreateGoldMaterial();
+        foreach (var childRenderer in cap.GetComponentsInChildren<Renderer>(true))
+        {
+            var materials = childRenderer.sharedMaterials;
+            for (var i = 0; i < materials.Length; i++)
+            {
+                materials[i] = goldMaterial;
+            }
+            childRenderer.sharedMaterials = materials;
+        }
+    }
+
+    private static Material CreateGoldMaterial()
+    {
+        var material = new Material(Shader.Find("Universal Render Pipeline/Lit"));
+        material.SetColor("_BaseColor", new Color(1f, 0.78f, 0.2f));
+        material.SetFloat("_Metallic", 1f);
+        material.SetFloat("_Smoothness", 0.85f);
+        return material;
     }
 
     private IEnumerator Timer()
