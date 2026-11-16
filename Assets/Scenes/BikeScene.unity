@@ -164,6 +164,8 @@ MonoBehaviour:
   - {fileID: 2672608010270623628, guid: 08caf95093d3bac408130bbaf2b0f619, type: 3}
   - {fileID: 2672608010270623628, guid: 08caf95093d3bac408130bbaf2b0f619, type: 3}
   - {fileID: 2672608010270623628, guid: 08caf95093d3bac408130bbaf2b0f619, type: 3}
+  - {fileID: 687826816407221881, guid: 41355da933f9f6849b822fa71cdd2734, type: 3}
+  - {fileID: 687826816407221881, guid: 41355da933f9f6849b822fa71cdd2734, type: 3}
   spawnInterval: 2
   maxCount: 8
 --- !u!4 &31291500
@@ -2988,6 +2990,10 @@ PrefabInstance:
       propertyPath: effectSound
       value: 
       objectReference: {fileID: 8300000, guid: f02fedbcd78734041b3768d005bdc3d1, type: 3}
+    - target: {fileID: 6979100997218778775, guid: 7f05eed49ca2e8644b40491f15c417f0, type: 3}
+      propertyPath: coinDropDistance
+      value: 0.4
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -3231,6 +3237,10 @@ PrefabInstance:
       propertyPath: effectSound
       value: 
       objectReference: {fileID: 8300000, guid: f02fedbcd78734041b3768d005bdc3d1, type: 3}
+    - target: {fileID: 6979100997218778775, guid: 7f05eed49ca2e8644b40491f15c417f0, type: 3}
+      propertyPath: coinDropDistance
+      value: 0.4
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -3752,6 +3762,10 @@ PrefabInstance:
     - target: {fileID: 687826816407221881, guid: f0aecbbdc82c25942b81ceefee8c4804, type: 3}
       propertyPath: m_TagString
       value: Gate4
+      objectReference: {fileID: 0}
+    - target: {fileID: 4616311422551530464, guid: f0aecbbdc82c25942b81ceefee8c4804, type: 3}
+      propertyPath: coinDropDistance
+      value: 0.2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
