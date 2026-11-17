@@ -1,0 +1,152 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &7792660063528153110
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1725569, guid: 2cdf449d3829a6e469e142ec959e7e00, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1725572, guid: 2cdf449d3829a6e469e142ec959e7e00, type: 3}
+      propertyPath: m_UseGravity
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1725572, guid: 2cdf449d3829a6e469e142ec959e7e00, type: 3}
+      propertyPath: m_IsKinematic
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1542552166, guid: 2cdf449d3829a6e469e142ec959e7e00, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1542552166, guid: 2cdf449d3829a6e469e142ec959e7e00, type: 3}
+      propertyPath: m_PlayOnAwake
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2580298442665617851, guid: 2cdf449d3829a6e469e142ec959e7e00, type: 3}
+      propertyPath: m_Name
+      value: BobouncingEnemy
+      objectReference: {fileID: 0}
+    - target: {fileID: 2919704129014313729, guid: 2cdf449d3829a6e469e142ec959e7e00, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2919704129014313729, guid: 2cdf449d3829a6e469e142ec959e7e00, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2919704129014313729, guid: 2cdf449d3829a6e469e142ec959e7e00, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2919704129014313729, guid: 2cdf449d3829a6e469e142ec959e7e00, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2919704129014313729, guid: 2cdf449d3829a6e469e142ec959e7e00, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2919704129014313729, guid: 2cdf449d3829a6e469e142ec959e7e00, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2919704129014313729, guid: 2cdf449d3829a6e469e142ec959e7e00, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2919704129014313729, guid: 2cdf449d3829a6e469e142ec959e7e00, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2919704129014313729, guid: 2cdf449d3829a6e469e142ec959e7e00, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2919704129014313729, guid: 2cdf449d3829a6e469e142ec959e7e00, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2919704129014313729, guid: 2cdf449d3829a6e469e142ec959e7e00, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2919704129014313729, guid: 2cdf449d3829a6e469e142ec959e7e00, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2919704129014313729, guid: 2cdf449d3829a6e469e142ec959e7e00, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2580298442665617851, guid: 2cdf449d3829a6e469e142ec959e7e00, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 751194766864530114}
+    - targetCorrespondingSourceObject: {fileID: 2580298442665617851, guid: 2cdf449d3829a6e469e142ec959e7e00, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7043009936352144790}
+  m_SourcePrefab: {fileID: 100100000, guid: 2cdf449d3829a6e469e142ec959e7e00, type: 3}
+--- !u!1 &5758442326798375341 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2580298442665617851, guid: 2cdf449d3829a6e469e142ec959e7e00, type: 3}
+  m_PrefabInstance: {fileID: 7792660063528153110}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &751194766864530114
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5758442326798375341}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fdaf46541daa22542a0436d65148127c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tracker: {fileID: 0}
+  wanderSpeed: 0.08
+  fleeSpeed: 0.14
+  rotationSpeed: 360
+  detectionRadius: 0.3
+  exitDetectionRadius: 0.4
+  waypointMinDist: 0.02
+  waypointTimeout: 3
+  edgeMargin: 0.1
+  fleeTargetDistance: 0.25
+  fleeRepathInterval: 0.25
+--- !u!114 &7043009936352144790
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5758442326798375341}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 82b21fe9c59343af9952995609172958, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  effectPrefab: {fileID: 2186909620543394829, guid: fabdcee7d4ce352469cdb68cf69037ec, type: 3}
+  lifetime: 2
+  effectScale: 0.25
+  particleSpeedMultiplier: 3
+  particleLifetimeMultiplier: 0.5
+  triggerOnce: 1
+  destroyOnHit: 1
+  effectSound: {fileID: 0}
+  coinPrefab: {fileID: 0}
+  dropChance: 0
+  coinDropDistance: 0.4
+  coinDropHeight: 0.3
+  coinDropDuration: 0.5
+  autoCoinDropDuration: 1
+  coinDropGravity: 9.81

@@ -262,6 +262,12 @@ public class Game : MonoBehaviour
             powerUpSpawner.gameObject.SetActive(true);
             powerUpSpawner.SpawnNow();
         }
+        var enemySpawner = gameScripts.GetComponentInChildren<SpawnEnemies>(true);
+        if (enemySpawner != null)
+        {
+            enemySpawner.gameObject.SetActive(true);
+            enemySpawner.SpawnNow();
+        }
         StartCoroutine(Timer());
     }
     

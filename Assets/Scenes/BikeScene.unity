@@ -194,6 +194,7 @@ MonoBehaviour:
   SpawnAmount: 1
   sceneCaptureProvider: {fileID: 242273341}
   surfaceClearance: 0.05
+  surfaceEdgeMargin: 0
   spawnBounds:
     m_Center: {x: 0, y: 0.05, z: 1.5}
     m_Extent: {x: 0.75, y: 0.05, z: 0.75}
@@ -376,6 +377,78 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3cf6e89c5d9bd4440a05df261a9e8480, type: 3}
+--- !u!1 &133873018
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 133873019}
+  - component: {fileID: 133873021}
+  - component: {fileID: 133873020}
+  m_Layer: 0
+  m_Name: SpawnEnemies
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &133873019
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 133873018}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 599993780}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &133873020
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 133873018}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff23fc8a25fe67441bd39a8b7b16a7af, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  enemyPrefab: {fileID: 5758442326798375341, guid: edb832bf3760fe64c87c25e1d9b8efdd, type: 3}
+  spawnInterval: 8
+  maxCount: 3
+  tracker: {fileID: 1323473305}
+--- !u!114 &133873021
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 133873018}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b6611a25f96d1524da3beb956936983e, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  SpawnOnStart: 0
+  SpawnObject: {fileID: 0}
+  SpawnAmount: 1
+  sceneCaptureProvider: {fileID: 242273341}
+  surfaceClearance: 0.01
+  surfaceEdgeMargin: 0.1
+  spawnBounds:
+    m_Center: {x: 0, y: 0.05, z: 1.5}
+    m_Extent: {x: 0.75, y: 0.05, z: 0.75}
+  tracker: {fileID: 1323473299}
+  trackerExclusionRadius: 0.2
 --- !u!1 &151091883 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 483998394263401710, guid: 337ef3907e8c21848ac89257530498cf, type: 3}
@@ -1912,6 +1985,7 @@ MonoBehaviour:
   SpawnAmount: 4
   sceneCaptureProvider: {fileID: 0}
   surfaceClearance: 0.1
+  surfaceEdgeMargin: 0
   spawnBounds:
     m_Center: {x: 0, y: 0.05, z: 1.5}
     m_Extent: {x: 0.75, y: 0.05, z: 0.75}
@@ -1951,6 +2025,7 @@ Transform:
   - {fileID: 445761738}
   - {fileID: 589298191}
   - {fileID: 31291500}
+  - {fileID: 133873019}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &616985418
