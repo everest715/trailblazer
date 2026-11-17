@@ -239,6 +239,91 @@ public class PicoSceneSpawnPositionsTests
         Assert.AreEqual(1, UnityEngine.Object.FindObjectsOfType<GameObject>().Count(item => item.name.StartsWith("SpawnProbe(")));
     }
 
+    [Test]
+    public void StartSpawn_SceneCapture_RaisesBothEventsWithSameInstanceAndSourceArea()
+    {
+        var spawn = CreateSceneSpawner();
+        var provider = _spawner.AddComponent<FakeProvider>();
+        var area = Rectangle();
+        provider.Areas = new[] { area };
+        GameObject originalEventInstance = null;
+        GameObject areaEventInstance = null;
+        PicoFloorArea? eventArea = null;
+        var originalEventCalls = 0;
+        spawn.Spawned += instance =>
+        {
+            originalEventCalls++;
+            originalEventInstance = instance;
+        };
+        spawn.SpawnedInArea += (instance, spawnedArea) =>
+        {
+            areaEventInstance = instance;
+            eventArea = spawnedArea;
+        };
+
+        spawn.StartSpawn();
+
+        Assert.AreEqual(1, originalEventCalls);
+        Assert.NotNull(originalEventInstance);
+        Assert.AreSame(originalEventInstance, areaEventInstance);
+        Assert.IsTrue(eventArea.HasValue);
+        Assert.AreEqual(area.SurfaceHeight, eventArea.Value.SurfaceHeight);
+        CollectionAssert.AreEqual(area.Vertices, eventArea.Value.Vertices);
+    }
+
+    [Test]
+    public void StartSpawn_Fallback_RaisesWorldSpaceAreaAtActualSpawnHeight()
+    {
+        var spawn = CreateSceneSpawner();
+        _spawner.transform.SetPositionAndRotation(new Vector3(5f, 2f, -1f), Quaternion.Euler(0f, 90f, 0f));
+        spawn.spawnBounds = new Bounds(new Vector3(0f, 0.3f, 1.5f), new Vector3(2f, 0f, 2f));
+        GameObject instance = null;
+        PicoFloorArea? eventArea = null;
+        spawn.SpawnedInArea += (spawnedInstance, area) =>
+        {
+            instance = spawnedInstance;
+            eventArea = area;
+        };
+
+        spawn.StartSpawn();
+
+        Assert.NotNull(instance);
+        Assert.IsTrue(eventArea.HasValue);
+        Assert.AreEqual(4, eventArea.Value.Vertices.Length);
+        Assert.IsTrue(eventArea.Value.ContainsXZ(instance.transform.position));
+        foreach (var vertex in eventArea.Value.Vertices)
+        {
+            Assert.AreEqual(instance.transform.position.y, vertex.y, 0.0001f);
+        }
+        var expectedCenter = _spawner.transform.TransformPoint(spawn.spawnBounds.center);
+        Assert.AreEqual(expectedCenter.x, eventArea.Value.PlanarBounds.center.x, 0.0001f);
+        Assert.AreEqual(expectedCenter.z, eventArea.Value.PlanarBounds.center.z, 0.0001f);
+    }
+
+    [Test]
+    public void StartSpawn_PositiveEdgeMargin_KeepsSpawnAwayFromEdges()
+    {
+        var spawn = CreateSceneSpawner();
+        spawn.surfaceEdgeMargin = 0.2f;
+        var area = Rectangle();
+        var provider = _spawner.AddComponent<FakeProvider>();
+        provider.Areas = new[] { area };
+        var events = new List<KeyValuePair<GameObject, PicoFloorArea>>();
+        spawn.SpawnedInArea += (instance, spawnedArea) =>
+            events.Add(new KeyValuePair<GameObject, PicoFloorArea>(instance, spawnedArea));
+
+        spawn.StartSpawn();
+        UnityEngine.Object.DestroyImmediate(provider);
+        spawn.sceneCaptureProvider = null;
+        spawn.StartSpawn();
+
+        Assert.AreEqual(2, events.Count);
+        foreach (var item in events)
+        {
+            Assert.IsTrue(item.Value.ContainsXZ(item.Key.transform.position, 0.2f));
+        }
+    }
+
     private PicoSceneSpawnPositions CreateSceneSpawner()
     {
         var spawn = _spawner.AddComponent<PicoSceneSpawnPositions>();

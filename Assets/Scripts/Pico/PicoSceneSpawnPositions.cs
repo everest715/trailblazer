@@ -9,11 +9,13 @@ public class PicoSceneSpawnPositions : MonoBehaviour
     public int SpawnAmount = 1;
     public MonoBehaviour sceneCaptureProvider;
     public float surfaceClearance = 0.05f;
+    public float surfaceEdgeMargin;
     public Bounds spawnBounds = new Bounds(Vector3.zero, new Vector3(4f, 1f, 4f));
     public Transform tracker;
     public float trackerExclusionRadius = 0.05f;
 
     public event Action<GameObject> Spawned;
+    public event Action<GameObject, PicoFloorArea> SpawnedInArea;
 
     private const int TrackerAvoidanceAttempts = 20;
     private bool _isSpawning;
@@ -65,6 +67,7 @@ public class PicoSceneSpawnPositions : MonoBehaviour
 
             var areas = await provider.GetFloorAreasAsync();
             var spawnPoints = new List<Vector3>();
+            var spawnAreas = new List<PicoFloorArea>();
             var batchHeight = _cachedSpawnHeight;
             if (areas != null)
             {
@@ -78,6 +81,7 @@ public class PicoSceneSpawnPositions : MonoBehaviour
                             batchHeight = point.y + surfaceClearance;
                         }
                         spawnPoints.Add(new Vector3(point.x, batchHeight.Value, point.z));
+                        spawnAreas.Add(area);
                     }
                 }
             }
@@ -93,9 +97,9 @@ public class PicoSceneSpawnPositions : MonoBehaviour
             LastGroundHeight = spawnPoints[0].y;
             LastGroundHeightMethod = "SceneCapture floor anchors";
             LastSpawnPoint = spawnPoints[0];
-            foreach (var point in spawnPoints)
+            for (var i = 0; i < spawnPoints.Count; i++)
             {
-                SpawnAt(point);
+                SpawnAt(spawnPoints[i], spawnAreas[i]);
             }
         }
         catch (Exception)
@@ -113,7 +117,7 @@ public class PicoSceneSpawnPositions : MonoBehaviour
     {
         for (var attempt = 0; attempt < TrackerAvoidanceAttempts; attempt++)
         {
-            if (area.TryGetRandomPoint(out point) && !IsNearTracker(point))
+            if (area.TryGetRandomPoint(surfaceEdgeMargin, out point) && !IsNearTracker(point))
             {
                 return true;
             }
@@ -135,31 +139,36 @@ public class PicoSceneSpawnPositions : MonoBehaviour
         return delta.sqrMagnitude < trackerExclusionRadius * trackerExclusionRadius;
     }
 
-    private void SpawnAt(Vector3 worldPosition)
+    private void SpawnAt(Vector3 worldPosition, PicoFloorArea area)
     {
         var instance = Instantiate(SpawnObject, worldPosition, SpawnObject.transform.rotation);
         Spawned?.Invoke(instance);
+        SpawnedInArea?.Invoke(instance, area);
     }
 
     private void SpawnInFixedBounds(float? fixedHeight)
     {
         Vector3? firstSpawnPoint = null;
-        for (var i = 0; i < SpawnAmount; i++)
+        var minX = spawnBounds.min.x + surfaceEdgeMargin;
+        var maxX = spawnBounds.max.x - surfaceEdgeMargin;
+        var minZ = spawnBounds.min.z + surfaceEdgeMargin;
+        var maxZ = spawnBounds.max.z - surfaceEdgeMargin;
+        for (var i = 0; i < SpawnAmount && minX <= maxX && minZ <= maxZ; i++)
         {
             var worldPosition = Vector3.zero;
             for (var attempt = 0; attempt < TrackerAvoidanceAttempts; attempt++)
             {
                 var localPosition = new Vector3(
-                    UnityEngine.Random.Range(spawnBounds.min.x, spawnBounds.max.x),
+                    UnityEngine.Random.Range(minX, maxX),
                     fixedHeight ?? UnityEngine.Random.Range(spawnBounds.min.y, spawnBounds.max.y),
-                    UnityEngine.Random.Range(spawnBounds.min.z, spawnBounds.max.z));
+                    UnityEngine.Random.Range(minZ, maxZ));
                 worldPosition = transform.TransformPoint(localPosition);
                 if (!IsNearTracker(worldPosition))
                 {
                     break;
                 }
             }
-            SpawnAt(worldPosition);
+            SpawnAt(worldPosition, CreateFallbackArea(worldPosition.y));
             firstSpawnPoint ??= worldPosition;
         }
 
@@ -170,5 +179,23 @@ public class PicoSceneSpawnPositions : MonoBehaviour
         {
             LastSpawnPoint = firstSpawnPoint.Value;
         }
+    }
+
+    private PicoFloorArea CreateFallbackArea(float height)
+    {
+        var localVertices = new[]
+        {
+            new Vector3(spawnBounds.min.x, 0f, spawnBounds.min.z),
+            new Vector3(spawnBounds.max.x, 0f, spawnBounds.min.z),
+            new Vector3(spawnBounds.max.x, 0f, spawnBounds.max.z),
+            new Vector3(spawnBounds.min.x, 0f, spawnBounds.max.z)
+        };
+        var worldVertices = new Vector3[localVertices.Length];
+        for (var i = 0; i < localVertices.Length; i++)
+        {
+            worldVertices[i] = transform.TransformPoint(localVertices[i]);
+            worldVertices[i].y = height;
+        }
+        return new PicoFloorArea(worldVertices, useHighestVertexHeight: true, surfaceRotation: transform.rotation);
     }
 }
