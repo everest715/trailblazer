@@ -107,6 +107,27 @@ public class MotionTrackerDriverTests
         yield break;
     }
 
+    [Test]
+    public void Update_PoseValidityChanges_ExposesCurrentState()
+    {
+        _source.HasPose = true;
+        _source.Position = new Vector3(1f, 2f, 3f);
+        _source.Rotation = Quaternion.identity;
+        var driver = _car.AddComponent<MotionTrackerDriver>();
+
+        driver.Update();
+
+        Assert.IsTrue(driver.DebugPoseValid);
+        Assert.AreEqual(new Vector3(1f, 2f, 3f), _car.transform.position);
+
+        _source.HasPose = false;
+        _source.Position = new Vector3(9f, 9f, 9f);
+        driver.Update();
+
+        Assert.IsFalse(driver.DebugPoseValid);
+        Assert.AreEqual(new Vector3(1f, 2f, 3f), _car.transform.position);
+    }
+
     [UnityTest]
     public IEnumerator FixedUpdate_InvalidPoseKeepsRigidbodyStill()
     {

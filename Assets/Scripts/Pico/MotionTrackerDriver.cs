@@ -7,6 +7,7 @@ public class MotionTrackerDriver : MonoBehaviour
     public Quaternion rotationOffset = Quaternion.identity;
     public Transform trackingOrigin;
     public Vector3 DebugWorldPosition { get; private set; }
+    public bool DebugPoseValid { get; private set; }
 
     private Rigidbody _body;
     private IPicoTrackerPoseSource _poseSource;
@@ -19,7 +20,9 @@ public class MotionTrackerDriver : MonoBehaviour
 
     public void Update()
     {
-        if (!_poseSource.TryGetPose(out var position, out var rotation))
+        var hasPose = _poseSource.TryGetPose(out var position, out var rotation);
+        DebugPoseValid = hasPose;
+        if (!hasPose)
         {
             return;
         }
@@ -36,7 +39,9 @@ public class MotionTrackerDriver : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (!_poseSource.TryGetPose(out var position, out var rotation))
+        var hasPose = _poseSource.TryGetPose(out var position, out var rotation);
+        DebugPoseValid = hasPose;
+        if (!hasPose)
         {
             return;
         }
