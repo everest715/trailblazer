@@ -109,6 +109,11 @@ public readonly struct PicoFloorArea
 
     public bool TryGetRandomPoint(out Vector3 point)
     {
+        return TryGetRandomPoint(0f, out point);
+    }
+
+    public bool TryGetRandomPoint(float edgeMargin, out Vector3 point)
+    {
         point = Vector3.zero;
         if (_vertices == null || _vertices.Length < 3)
         {
@@ -119,7 +124,7 @@ public readonly struct PicoFloorArea
         {
             var x = Random.Range(PlanarBounds.min.x, PlanarBounds.max.x);
             var z = Random.Range(PlanarBounds.min.z, PlanarBounds.max.z);
-            if (!ContainsXZ(x, z))
+            if (!ContainsXZ(new Vector3(x, 0f, z), edgeMargin))
             {
                 continue;
             }
@@ -133,10 +138,15 @@ public readonly struct PicoFloorArea
 
     public bool ContainsXZ(Vector3 point)
     {
-        return ContainsXZ(point.x, point.z);
+        return ContainsXZ(point, 0f);
     }
 
-    private bool ContainsXZ(float x, float z)
+    public bool ContainsXZ(Vector3 point, float edgeMargin)
+    {
+        return ContainsXZ(point.x, point.z, edgeMargin);
+    }
+
+    private bool ContainsXZ(float x, float z, float edgeMargin)
     {
         if (_vertices == null || _vertices.Length < 3)
         {
@@ -156,6 +166,34 @@ public readonly struct PicoFloorArea
             }
         }
 
-        return inside;
+        if (!inside || edgeMargin <= 0f)
+        {
+            return inside;
+        }
+
+        var point = new Vector2(x, z);
+        for (int i = 0, j = _vertices.Length - 1; i < _vertices.Length; j = i++)
+        {
+            var a = new Vector2(_vertices[j].x, _vertices[j].z);
+            var b = new Vector2(_vertices[i].x, _vertices[i].z);
+            if (DistanceToSegment(point, a, b) < edgeMargin)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private static float DistanceToSegment(Vector2 point, Vector2 a, Vector2 b)
+    {
+        var segment = b - a;
+        if (segment.sqrMagnitude <= 0.000001f)
+        {
+            return Vector2.Distance(point, a);
+        }
+
+        var t = Mathf.Clamp01(Vector2.Dot(point - a, segment) / segment.sqrMagnitude);
+        return Vector2.Distance(point, a + segment * t);
     }
 }

@@ -78,6 +78,48 @@ public class PicoFloorAreaTests
     }
 
     [Test]
+    public void ContainsXZ_PositiveMargin_RejectsNearEdgeButKeepsCenter()
+    {
+        var area = Rectangle(1f, 0.2f);
+
+        Assert.IsTrue(area.ContainsXZ(Vector3.zero, 0.2f));
+        Assert.IsFalse(area.ContainsXZ(new Vector3(0.9f, 0.2f, 0f), 0.2f));
+    }
+
+    [Test]
+    public void TryGetRandomPoint_PositiveMargin_ReturnsOnlySafePoints()
+    {
+        var area = Rectangle(1f, 0.2f);
+
+        for (var i = 0; i < 20; i++)
+        {
+            Assert.IsTrue(area.TryGetRandomPoint(0.2f, out var point));
+            Assert.IsTrue(area.ContainsXZ(point, 0.2f));
+            Assert.AreEqual(0.2f, point.y, 0.0001f);
+        }
+    }
+
+    [Test]
+    public void TryGetRandomPoint_MarginExceedsTable_ReturnsFalse()
+    {
+        var area = Rectangle(0.1f, 0.2f);
+
+        Assert.IsFalse(area.TryGetRandomPoint(0.2f, out var point));
+        Assert.AreEqual(Vector3.zero, point);
+    }
+
+    [Test]
+    public void ContainsXZ_DegenerateEdgeAndZeroMargin_DoesNotReturnNaN()
+    {
+        var area = new PicoFloorArea(new[] { Vector3.zero, Vector3.zero, Vector3.right });
+
+        Assert.DoesNotThrow(() => area.ContainsXZ(Vector3.zero, 0f));
+        Assert.IsFalse(area.TryGetRandomPoint(0.1f, out var point));
+        Assert.IsFalse(float.IsNaN(point.x) || float.IsNaN(point.y) || float.IsNaN(point.z));
+        Assert.IsFalse(float.IsInfinity(point.x) || float.IsInfinity(point.y) || float.IsInfinity(point.z));
+    }
+
+    [Test]
     public void TryGetRandomPoint_UsesSurfaceHeight()
     {
         var area = new PicoFloorArea(new[]
@@ -94,5 +136,16 @@ public class PicoFloorAreaTests
             Assert.AreEqual(0.8f, point.y, 1e-5f);
             Assert.IsTrue(area.ContainsXZ(point));
         }
+    }
+
+    private static PicoFloorArea Rectangle(float halfSize, float height)
+    {
+        return new PicoFloorArea(new[]
+        {
+            new Vector3(-halfSize, height, -halfSize),
+            new Vector3(halfSize, height, -halfSize),
+            new Vector3(halfSize, height, halfSize),
+            new Vector3(-halfSize, height, halfSize)
+        });
     }
 }
