@@ -38,6 +38,7 @@ public class DebugInfoPanelTests
         public Vector3 DebugAnchorEuler => Vector3.zero;
         public Vector3 DebugBoxLocalEuler => Vector3.zero;
         public Vector3 DebugBoxCenter => Vector3.zero;
+        public string DebugCaptureDetails => "Snapshot frame=42\nAnchor[0] handle=123 locate=SUCCESS";
 
         public Task<IReadOnlyList<PicoFloorArea>> GetFloorAreasAsync()
         {
@@ -136,6 +137,25 @@ public class DebugInfoPanelTests
         StringAssert.Contains("Ground query: Floor anchors: 1", output.text);
         StringAssert.Contains("Ground anchor: (0.00, -1.59, 2.00)", output.text);
         StringAssert.DoesNotContain("Not detected", output.text);
+    }
+
+    [Test]
+    public void Refresh_ShowsSceneCaptureDiagnosticSnapshot()
+    {
+        var root = new GameObject("DebugRoot");
+        _roots.Add(root);
+        var output = root.AddComponent<TextMeshProUGUI>();
+        var panel = root.AddComponent<DebugInfoPanel>();
+        var tracker = root.AddComponent<FakeTracker>();
+        root.AddComponent<FakeProvider>();
+        panel.output = output;
+        panel.tracker = tracker;
+        panel.spawners = new PicoSceneSpawnPositions[0];
+
+        panel.SendMessage("Start");
+
+        StringAssert.Contains("Snapshot frame=42", output.text);
+        StringAssert.Contains("Anchor[0] handle=123 locate=SUCCESS", output.text);
     }
 
     [Test]

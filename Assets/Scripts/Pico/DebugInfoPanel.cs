@@ -27,6 +27,12 @@ public class DebugInfoPanel : MonoBehaviour
         if (trackerDriver == null) trackerDriver = FindAnyObjectByType<MotionTrackerDriver>();
         if (spawners == null || spawners.Length == 0) spawners = Resources.FindObjectsOfTypeAll<PicoSceneSpawnPositions>();
         if (_sceneCapture == null) _sceneCapture = Resources.FindObjectsOfTypeAll<MonoBehaviour>().OfType<ISceneCaptureDebugInfo>().FirstOrDefault();
+        if (output != null)
+        {
+            output.enableAutoSizing = true;
+            output.fontSizeMin = 6;
+            output.fontSizeMax = 18;
+        }
         Refresh();
     }
 
@@ -49,8 +55,16 @@ public class DebugInfoPanel : MonoBehaviour
         else
         {
             text.AppendLine($"Tracker: {tracker.DebugRequestStatus} | id={tracker.DebugTrackerId} | valid={tracker.DebugPoseValid}");
-            var position = trackerDriver == null ? tracker.DebugPosition : trackerDriver.DebugWorldPosition;
-            text.AppendLine($"Position: {position:F2}");
+            text.AppendLine($"Tracker raw: {tracker.DebugPosition:F4}");
+            if (trackerDriver == null)
+            {
+                text.AppendLine("Tracker world: no driver");
+            }
+            else
+            {
+                text.AppendLine($"Tracker world: {trackerDriver.DebugWorldPosition:F4} | driverValid={trackerDriver.DebugPoseValid}");
+                text.AppendLine($"Tracker transform: scale={trackerDriver.positionScale:F4} offset={trackerDriver.positionOffset:F4} origin={(trackerDriver.trackingOrigin == null ? "null" : trackerDriver.trackingOrigin.name)}");
+            }
         }
 
         if (_sceneCapture != null)
@@ -65,9 +79,10 @@ public class DebugInfoPanel : MonoBehaviour
             text.AppendLine($"Box center: {_sceneCapture.DebugBoxCenter:F2}");
             text.AppendLine($"Anchor rot: {_sceneCapture.DebugAnchorEuler:F1}");
             text.AppendLine($"Box local rot: {_sceneCapture.DebugBoxLocalEuler:F1}");
+            text.AppendLine(_sceneCapture.DebugCaptureDetails);
             if (Camera.main != null)
             {
-                text.AppendLine($"Headset: {Camera.main.transform.position:F2}");
+                text.AppendLine($"Headset: {Camera.main.transform.position:F4}");
             }
         }
         else

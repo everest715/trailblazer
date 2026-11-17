@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
 using ByteDance.PICO.XR;
 using UnityEngine;
@@ -49,6 +50,7 @@ public class PicoSceneCaptureFloorAreaProvider : MonoBehaviour, IPicoFloorAreaPr
     public Vector3 DebugAnchorEuler { get; private set; }
     public Vector3 DebugBoxLocalEuler { get; private set; }
     public Vector3 DebugBoxCenter { get; private set; }
+    public string DebugCaptureDetails { get; private set; } = "Not queried";
 
     public async Task<IReadOnlyList<PicoFloorArea>> GetFloorAreasAsync()
     {
@@ -166,18 +168,35 @@ public class PicoSceneCaptureFloorAreaProvider : MonoBehaviour, IPicoFloorAreaPr
 
     private async Task<List<PicoFloorArea>> QueryFloorAreasAsync()
     {
+        var details = new StringBuilder();
+        details.AppendLine($"Snapshot frame={Time.frameCount} time={Time.unscaledTime:F3}");
+        details.AppendLine($"Config label={surfaceLabel} trackerOverride={useTrackerForTableHeight} trackerOffset={trackerTableHeightOffset:F4} debugMeshes={showDebugMeshes}");
         var query = await PXR_MixedReality.QuerySceneAnchorAsync(new[] { surfaceLabel });
+        details.AppendLine($"Query result={query.result} returnedAnchors={query.anchorHandleList?.Count ?? 0}");
         if (query.result != PxrResult.SUCCESS)
         {
             DebugQueryStatus = $"Query failed: {query.result}";
+            DebugCaptureDetails = details.ToString();
             throw new InvalidOperationException($"QuerySceneAnchor failed: {query.result}");
         }
 
         var areas = new List<PicoFloorArea>();
+        var rawAreas = new List<PicoFloorArea>();
         _debugBoxes.Clear();
-        foreach (var anchorHandle in query.anchorHandleList)
+        for (var anchorIndex = 0; anchorIndex < query.anchorHandleList.Count; anchorIndex++)
         {
-            if (PXR_MixedReality.LocateAnchor(anchorHandle, out var position, out var rotation) != PxrResult.SUCCESS)
+            var anchorHandle = query.anchorHandleList[anchorIndex];
+            var locateResult = PXR_MixedReality.LocateAnchor(anchorHandle, out var position, out var rotation);
+            var rawLocateResult = PXR_MixedReality.LocateAnchorRaw(anchorHandle, out var rawPosition, out var rawRotation);
+            var alignedLocateResult = PXR_MixedReality.LocateAnchorAligned(anchorHandle, out var alignedPosition, out var alignedRotation, out var alignedScale);
+            var semanticResult = PXR_MixedReality.GetSceneSemanticLabel(anchorHandle, out var semanticLabel);
+            var componentResult = PXR_MixedReality.GetSceneAnchorComponentTypes(anchorHandle, out var componentTypes);
+            details.AppendLine($"Anchor[{anchorIndex}] handle={anchorHandle} locate={locateResult}");
+            details.AppendLine($"  Locate pos={position:F4} rotQ={rotation.ToString("F4")} rotE={rotation.eulerAngles:F2}");
+            details.AppendLine($"  Raw result={rawLocateResult} pos={rawPosition:F4} rotQ={rawRotation.ToString("F4")}");
+            details.AppendLine($"  Aligned result={alignedLocateResult} pos={alignedPosition:F4} rotQ={alignedRotation.ToString("F4")} scale={alignedScale:F4}");
+            details.AppendLine($"  Semantic result={semanticResult} label={semanticLabel} componentsResult={componentResult} types={string.Join(",", componentTypes)}");
+            if (locateResult != PxrResult.SUCCESS)
             {
                 continue;
             }
@@ -190,25 +209,39 @@ public class PicoSceneCaptureFloorAreaProvider : MonoBehaviour, IPicoFloorAreaPr
 
             if (surfaceLabel == PxrSemanticLabel.Table)
             {
-                if (PXR_MixedReality.GetSceneBox3DData(anchorHandle, out var localPosition, out var localRotation, out var extent) == PxrResult.SUCCESS)
+                var boxResult = PXR_MixedReality.GetSceneBox3DData(anchorHandle, out var localPosition, out var localRotation, out var extent);
+                details.AppendLine($"  Box3D result={boxResult} localPos={localPosition:F4} extent={extent:F4}");
+                details.AppendLine($"  Box3D localRotQ={localRotation.ToString("F4")} localRotE={localRotation.eulerAngles:F2}");
+                if (boxResult == PxrResult.SUCCESS)
                 {
                     DebugBoxLocalPosition = localPosition;
                     DebugBoxExtent = extent;
                     DebugBoxLocalEuler = localRotation.eulerAngles;
                     DebugBoxCenter = position + rotation * localPosition;
+                    var sdkTopCenter = DebugBoxCenter + rotation * (Vector3.up * extent.y * 0.5f);
+                    details.AppendLine($"  Box3D worldCenter={DebugBoxCenter:F4} usedWorldRotQ={rotation.ToString("F4")}");
+                    details.AppendLine($"  SDK topCenter(no localRot)={sdkTopCenter:F4} topY={sdkTopCenter.y:F4}");
                     _debugBoxes.Add(new DebugBox
                     {
                         Center = position + rotation * localPosition,
                         Rotation = rotation,
                         Extent = extent
                     });
-                    areas.Add(PicoFloorArea.FromSceneCaptureBox3D(position, rotation, localPosition, extent));
+                    var tableArea = PicoFloorArea.FromSceneCaptureBox3D(position, rotation, localPosition, extent);
+                    areas.Add(tableArea);
+                    rawAreas.Add(tableArea);
                 }
                 continue;
             }
 
-            if (surfaceLabel != PxrSemanticLabel.Floor ||
-                PXR_MixedReality.GetScenePolygonData(anchorHandle, out var vertices) != PxrResult.SUCCESS || vertices.Length < 3)
+            Vector2[] vertices = null;
+            var polygonResult = PxrResult.ERROR_HANDLE_INVALID;
+            if (surfaceLabel == PxrSemanticLabel.Floor)
+            {
+                polygonResult = PXR_MixedReality.GetScenePolygonData(anchorHandle, out vertices);
+            }
+            details.AppendLine($"  Polygon result={polygonResult} localVertices={(vertices?.Length ?? 0)}");
+            if (surfaceLabel != PxrSemanticLabel.Floor || polygonResult != PxrResult.SUCCESS || vertices == null || vertices.Length < 3)
             {
                 continue;
             }
@@ -219,7 +252,9 @@ public class PicoSceneCaptureFloorAreaProvider : MonoBehaviour, IPicoFloorAreaPr
                 worldVertices[i] = position + rotation * new Vector3(vertices[i].x, vertices[i].y, 0f);
             }
 
-            areas.Add(new PicoFloorArea(worldVertices, surfaceRotation: rotation));
+            var floorArea = new PicoFloorArea(worldVertices, surfaceRotation: rotation);
+            areas.Add(floorArea);
+            rawAreas.Add(floorArea);
         }
 
         DebugQueryStatus = $"{surfaceLabel} anchors: {areas.Count}";
@@ -232,7 +267,28 @@ public class PicoSceneCaptureFloorAreaProvider : MonoBehaviour, IPicoFloorAreaPr
                 : "SceneCapture floor anchors";
             ApplyTrackerTableHeight(areas);
         }
-        Debug.Log($"Scene capture query: {DebugQueryStatus}");
+        details.AppendLine($"Final height={DebugGroundHeight:F4} method={DebugGroundHeightMethod}");
+        for (var areaIndex = 0; areaIndex < areas.Count; areaIndex++)
+        {
+            var rawArea = rawAreas[areaIndex];
+            var finalArea = areas[areaIndex];
+            details.AppendLine($"Area[{areaIndex}] rawHeight={rawArea.SurfaceHeight:F4} finalHeight={finalArea.SurfaceHeight:F4} delta={finalArea.SurfaceHeight - rawArea.SurfaceHeight:F4}");
+            details.AppendLine($"  Raw avgHeight={rawArea.AverageHeight:F4} boundsCenter={rawArea.PlanarBounds.center:F4} boundsSize={rawArea.PlanarBounds.size:F4}");
+            details.Append("  Raw worldVertices:");
+            for (var vertexIndex = 0; vertexIndex < rawArea.Vertices.Length; vertexIndex++)
+            {
+                details.Append($" {rawArea.Vertices[vertexIndex]:F4}");
+            }
+            details.AppendLine();
+            details.Append("  Final worldVertices:");
+            for (var vertexIndex = 0; vertexIndex < finalArea.Vertices.Length; vertexIndex++)
+            {
+                details.Append($" {finalArea.Vertices[vertexIndex]:F4}");
+            }
+            details.AppendLine();
+        }
+        DebugCaptureDetails = details.ToString();
+        Debug.Log($"Scene capture query: {DebugQueryStatus}\n{DebugCaptureDetails}");
         RebuildDebugMeshes(areas);
         return areas;
     }

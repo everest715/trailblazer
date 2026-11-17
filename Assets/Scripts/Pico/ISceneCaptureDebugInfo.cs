@@ -12,4 +12,5 @@ public interface ISceneCaptureDebugInfo
     Vector3 DebugAnchorEuler { get; }
     Vector3 DebugBoxLocalEuler { get; }
     Vector3 DebugBoxCenter { get; }
+    string DebugCaptureDetails { get; }
 }
