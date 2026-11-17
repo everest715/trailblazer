@@ -753,6 +753,7 @@ GameObject:
   - component: {fileID: 242273342}
   - component: {fileID: 242273341}
   - component: {fileID: 242273340}
+  - component: {fileID: 242273343}
   m_Layer: 0
   m_Name: PICO
   m_TagString: Untagged
@@ -796,6 +797,30 @@ MonoBehaviour:
   showDebugMeshes: 1
   averageHeightColor: {r: 0.1, g: 1, b: 0.3, a: 0.35}
   verticesColor: {r: 1, g: 0.25, b: 0.2, a: 0.35}
+--- !u!114 &242273343
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 242273339}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 646145a1516e4044d84528ecf27a3ff9, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  sceneCaptureProvider: {fileID: 242273341}
+  fencePrefab: {fileID: 5782639497385002916, guid: 90638a590311a104b94a39177afb78a3, type: 3}
+  treePrefab: {fileID: 4417786085886321137, guid: 8bd4db4730a85174cbf65a95c99f0b79, type: 3}
+  tree2Prefab: {fileID: 309707002457103136, guid: 927d2bb5075ea8941af7255c8d96e391, type: 3}
+  fenceLength: 0.24
+  treeHeight: 0.28
+  fenceMaxYaw: 8
+  edgeSafetyMargin: 0.005
+  spacingRange: {x: 0.01, y: 0.04}
+  inwardOffsetRange: {x: 0, y: 0.02}
+  scaleRange: {x: 0.9, y: 1.1}
+  randomSeed: 20261118
 --- !u!4 &242273342
 Transform:
   m_ObjectHideFlags: 0
