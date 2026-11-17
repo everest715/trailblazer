@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.TestTools;
 
@@ -175,6 +176,27 @@ public class PicoTableBoundaryObstaclesTests
 
         provider.Publish(Array.Empty<PicoFloorArea>());
         Assert.AreEqual(0, _generator.GeneratedCount);
+    }
+
+    [Test]
+    public void Rebuild_RealAssetPrefabs_GeneratesAllAndKeepsCapturedFootprintsInside()
+    {
+        _generator.fencePrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Super Mario Style/Prefabs/MFence.prefab");
+        _generator.treePrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Super Mario Style/Prefabs/MTree.prefab");
+        _generator.tree2Prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Super Mario Style/Prefabs/MTree2.prefab");
+        var area = Rectangle(Quaternion.Euler(0f, 37f, 0f), new Vector3(3f, 0.75f, -2f));
+
+        _generator.Rebuild(area);
+
+        var instances = Children().ToArray();
+        Assert.IsTrue(instances.Any(item => item.name.StartsWith("MFence")));
+        Assert.IsTrue(instances.Any(item => item.name.StartsWith("MTree")));
+        Assert.IsTrue(instances.Any(item => item.name.StartsWith("MTree2")));
+        foreach (var instance in instances)
+        {
+            Assert.IsTrue(PicoObstacleGeometry.TryCapture(instance.gameObject, out var bounds));
+            Assert.IsTrue(PicoObstacleGeometry.FitsInside(area, bounds, instance.position, instance.rotation, instance.localScale.x, _generator.edgeSafetyMargin), instance.name);
+        }
     }
 
     private GameObject CreateModel(string name, Vector3 dimensions)

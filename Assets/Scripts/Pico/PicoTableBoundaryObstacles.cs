@@ -153,7 +153,9 @@ public class PicoTableBoundaryObstacles : MonoBehaviour
                     : Quaternion.Euler(0f, yaw, 0f);
                 var projectedLength = ProjectedLength(localBounds, rotation, tangent, scale);
                 var inset = NextFloat(random, inwardOffsetRange);
-                var samplePosition = edgeStart + tangent * Mathf.Clamp(cursor + projectedLength * 0.5f, 0f, edgeLength);
+                var inwardHalfExtent = ProjectedLength(localBounds, rotation, inward, scale) * 0.5f;
+                var samplePosition = edgeStart + tangent * Mathf.Clamp(cursor + projectedLength * 0.5f, 0f, edgeLength)
+                    + inward * inwardHalfExtent;
 
                 if (TryPlace(area, prefab, localBounds, samplePosition, inward, inset, rotation, scale, out var instance))
                 {

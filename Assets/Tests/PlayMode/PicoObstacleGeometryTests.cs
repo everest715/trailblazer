@@ -92,6 +92,27 @@ public class PicoObstacleGeometryTests
     }
 
     [Test]
+    public void TryCapture_LodGroupWithAdditionalActiveVisual_IncludesNonLodRenderer()
+    {
+        var root = new GameObject("ModelWithDecal");
+        _roots.Add(root);
+        var lod0 = CreateCube("LOD0", root.transform, Vector3.zero, new Vector3(2f, 2f, 2f));
+        var lod1 = CreateCube("LOD1", root.transform, new Vector3(20f, 0f, 0f), Vector3.one * 30f);
+        CreateCube("ActiveDecal", root.transform, new Vector3(5f, 0f, 0f), Vector3.one);
+        var lodGroup = root.AddComponent<LODGroup>();
+        lodGroup.SetLODs(new[]
+        {
+            new LOD(0.6f, new[] { lod0.GetComponent<Renderer>() }),
+            new LOD(0.3f, new[] { lod1.GetComponent<Renderer>() })
+        });
+
+        var captured = PicoObstacleGeometry.TryCapture(root, out var bounds);
+
+        Assert.IsTrue(captured);
+        Assert.AreEqual(5.5f, bounds.max.x, 0.0001f);
+    }
+
+    [Test]
     public void TryCapture_NoMesh_ReturnsFalse()
     {
         var root = new GameObject("Empty");

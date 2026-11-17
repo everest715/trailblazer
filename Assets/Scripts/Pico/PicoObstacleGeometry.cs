@@ -94,27 +94,33 @@ public static class PicoObstacleGeometry
 
     private static IEnumerable<MeshFilter> GetLodZeroMeshFilters(GameObject root)
     {
+        var meshFilters = root.GetComponentsInChildren<MeshFilter>(false);
         var lodGroup = root.GetComponent<LODGroup>();
         if (lodGroup == null)
         {
-            return root.GetComponentsInChildren<MeshFilter>(false);
+            return meshFilters;
         }
 
+        var higherLodRenderers = new HashSet<Renderer>();
         var lods = lodGroup.GetLODs();
-        if (lods.Length == 0)
+        for (var i = 1; i < lods.Length; i++)
         {
-            return new MeshFilter[0];
-        }
-
-        var filters = new List<MeshFilter>();
-        foreach (var renderer in lods[0].renderers)
-        {
-            if (renderer != null && renderer.TryGetComponent<MeshFilter>(out var meshFilter))
+            foreach (var renderer in lods[i].renderers)
             {
-                filters.Add(meshFilter);
+                if (renderer != null) higherLodRenderers.Add(renderer);
             }
         }
-        return filters;
+
+        var visibleFilters = new List<MeshFilter>();
+        foreach (var meshFilter in meshFilters)
+        {
+            var renderer = meshFilter.GetComponent<Renderer>();
+            if (renderer != null && !higherLodRenderers.Contains(renderer))
+            {
+                visibleFilters.Add(meshFilter);
+            }
+        }
+        return visibleFilters;
     }
 
     private static bool IsFinite(Vector3 value)
