@@ -791,9 +791,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   surfaceLabel: 7
-  useTrackerForTableHeight: 1
+  useTrackerForTableHeight: 0
   trackerTableHeightOffset: 0.1
-  showDebugMeshes: 0
+  showDebugMeshes: 1
   averageHeightColor: {r: 0.1, g: 1, b: 0.3, a: 0.35}
   verticesColor: {r: 1, g: 0.25, b: 0.2, a: 0.35}
 --- !u!4 &242273342
