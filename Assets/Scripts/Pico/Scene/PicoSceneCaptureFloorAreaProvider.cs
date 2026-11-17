@@ -192,9 +192,6 @@ public class PicoSceneCaptureFloorAreaProvider : MonoBehaviour, IPicoFloorAreaPr
             {
                 if (PXR_MixedReality.GetSceneBox3DData(anchorHandle, out var localPosition, out var localRotation, out var extent) == PxrResult.SUCCESS)
                 {
-                    // LocateAnchor converts its pose to Unity's left-handed space, but Box3D's
-                    // local center is returned unchanged. Apply the same Z conversion here.
-                    localPosition.z = -localPosition.z;
                     DebugBoxLocalPosition = localPosition;
                     DebugBoxExtent = extent;
                     DebugBoxLocalEuler = localRotation.eulerAngles;
@@ -205,7 +202,7 @@ public class PicoSceneCaptureFloorAreaProvider : MonoBehaviour, IPicoFloorAreaPr
                         Rotation = rotation,
                         Extent = extent
                     });
-                    areas.Add(PicoFloorArea.FromBox3D(position, rotation, localPosition, extent));
+                    areas.Add(PicoFloorArea.FromSceneCaptureBox3D(position, rotation, localPosition, extent));
                 }
                 continue;
             }

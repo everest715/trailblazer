@@ -78,6 +78,18 @@ public class PicoFloorAreaTests
     }
 
     [Test]
+    public void FromSceneCaptureBox3D_OfficialTableSample_KeepsTableTopCenterAtAnchorHeight()
+    {
+        var area = PicoFloorArea.FromSceneCaptureBox3D(
+            new Vector3(-0.68f, 0.86f, 2.44f),
+            new Quaternion(0.10730f, -0.69975f, -0.69748f, -0.11112f),
+            new Vector3(0f, 0f, -0.37f),
+            new Vector3(1.47f, 4.56f, 0.74f));
+
+        Assert.AreEqual(0.86f, area.AverageHeight, 0.0001f);
+    }
+
+    [Test]
     public void ContainsXZ_PositiveMargin_RejectsNearEdgeButKeepsCenter()
     {
         var area = Rectangle(1f, 0.2f);

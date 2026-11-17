@@ -41,6 +41,12 @@ public readonly struct PicoFloorArea
         SurfaceHeight = useHighestVertexHeight ? highest : AverageHeight;
     }
 
+    public static PicoFloorArea FromSceneCaptureBox3D(Vector3 anchorPosition, Quaternion anchorRotation, Vector3 localPosition, Vector3 extent)
+    {
+        // PXR_SceneCaptureManager uses the Box3D center directly in anchor-local space.
+        return FromBox3D(anchorPosition, anchorRotation, localPosition, extent);
+    }
+
     public static PicoFloorArea FromBox3D(Vector3 anchorPosition, Quaternion anchorRotation, Vector3 localPosition, Vector3 extent)
     {
         var half = extent * 0.5f;
