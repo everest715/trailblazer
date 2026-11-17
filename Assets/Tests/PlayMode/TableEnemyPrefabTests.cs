@@ -28,6 +28,8 @@ public class TableEnemyPrefabTests
             Assert.NotNull(body);
             Assert.IsTrue(body.isKinematic);
             Assert.IsFalse(body.useGravity);
+            Assert.AreEqual(RigidbodyConstraints.FreezePositionY |
+                RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ, body.constraints);
             var enemyCollider = instance.GetComponent<Collider>();
             Assert.NotNull(enemyCollider);
             Assert.IsFalse(enemyCollider.isTrigger);

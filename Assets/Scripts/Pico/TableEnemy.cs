@@ -43,6 +43,8 @@ public class TableEnemy : MonoBehaviour
         _body = GetComponent<Rigidbody>();
         _body.isKinematic = true;
         _body.useGravity = false;
+        _body.constraints = RigidbodyConstraints.FreezePositionY |
+            RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
         _animator = GetComponent<Animator>();
         CacheAnimatorParameters();
         if (tracker == null)
