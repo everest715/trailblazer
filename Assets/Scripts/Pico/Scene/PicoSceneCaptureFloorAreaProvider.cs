@@ -18,6 +18,12 @@ public class PicoSceneCaptureFloorAreaProvider : MonoBehaviour, IPicoFloorAreaPr
     [Header("Scene Capture")]
     public PxrSemanticLabel surfaceLabel = PxrSemanticLabel.Floor;
 
+    [Header("Virtual Table Fallback")]
+    public bool useVirtualTableFallback = true;
+    public Vector3 virtualTableCenter = new Vector3(0f, 0f, 1.5f);
+    public Vector2 virtualTableSize = new Vector2(1.5f, 1.5f);
+    public float virtualTableYaw;
+
     [Header("Temporary Table Height")]
     public bool useTrackerForTableHeight = true;
     public float trackerTableHeightOffset = 0.05f;
@@ -54,36 +60,53 @@ public class PicoSceneCaptureFloorAreaProvider : MonoBehaviour, IPicoFloorAreaPr
 
     public async Task<IReadOnlyList<PicoFloorArea>> GetFloorAreasAsync()
     {
-        if (!_providerStarted)
+        try
         {
-            var startResult = await PXR_MixedReality.StartSenseDataProvider(PxrSenseDataProviderType.SceneCapture);
-            if (startResult != PxrResult.SUCCESS)
+            if (!_providerStarted)
             {
-                DebugQueryStatus = $"Provider failed: {startResult}";
-                throw new InvalidOperationException($"StartSenseDataProvider failed: {startResult}");
+                var startResult = await PXR_MixedReality.StartSenseDataProvider(PxrSenseDataProviderType.SceneCapture);
+                if (startResult != PxrResult.SUCCESS)
+                {
+                    DebugQueryStatus = $"Provider failed: {startResult}";
+                    throw new InvalidOperationException($"StartSenseDataProvider failed: {startResult}");
+                }
+
+                _providerStarted = true;
+                DebugQueryStatus = "Provider started";
+                SubscribeToAnchorUpdates();
             }
 
-            _providerStarted = true;
-            DebugQueryStatus = "Provider started";
-            SubscribeToAnchorUpdates();
-        }
-
-        var areas = await QueryFloorAreasAsync();
-        if (areas.Count == 0 && !_captureRequested)
-        {
-            _captureRequested = true;
-            var captureResult = await PXR_MixedReality.StartSceneCaptureAsync();
-            if (captureResult != PxrResult.SUCCESS)
+            var areas = await QueryFloorAreasAsync();
+            if (ShouldStartSceneCapture(areas.Count, _captureRequested))
             {
-                DebugQueryStatus = $"Capture failed: {captureResult}";
-                throw new InvalidOperationException($"StartSceneCapture failed: {captureResult}");
+                _captureRequested = true;
+                var captureResult = await PXR_MixedReality.StartSceneCaptureAsync();
+                if (captureResult != PxrResult.SUCCESS)
+                {
+                    DebugQueryStatus = $"Capture failed: {captureResult}";
+                    throw new InvalidOperationException($"StartSceneCapture failed: {captureResult}");
+                }
+
+                DebugQueryStatus = "Capture completed";
+                areas = await QueryFloorAreasAsync();
             }
 
-            DebugQueryStatus = "Capture completed";
-            areas = await QueryFloorAreasAsync();
+            return ApplyVirtualTableFallback(areas, "No table anchors after scene capture");
         }
+        catch (Exception exception)
+        {
+            if (surfaceLabel != PxrSemanticLabel.Table || !useVirtualTableFallback)
+            {
+                throw;
+            }
+            Debug.LogWarning($"Scene capture unavailable; using virtual table: {exception.Message}");
+            return ApplyVirtualTableFallback(new List<PicoFloorArea>(), exception.Message);
+        }
+    }
 
-        return areas;
+    private static bool ShouldStartSceneCapture(int areaCount, bool captureRequested)
+    {
+        return areaCount == 0 && !captureRequested;
     }
 
     private void SubscribeToAnchorUpdates()
@@ -122,10 +145,19 @@ public class PicoSceneCaptureFloorAreaProvider : MonoBehaviour, IPicoFloorAreaPr
         try
         {
             var areas = await QueryFloorAreasAsync();
+            areas = ApplyVirtualTableFallback(areas, "Scene anchor update contains no table");
             AreasUpdated?.Invoke(areas);
         }
         catch (Exception exception)
         {
+            if (surfaceLabel == PxrSemanticLabel.Table && useVirtualTableFallback)
+            {
+                var fallback = ApplyVirtualTableFallback(new List<PicoFloorArea>(), exception.Message);
+                if (fallback.Count > 0)
+                {
+                    AreasUpdated?.Invoke(fallback);
+                }
+            }
             Debug.LogWarning($"Scene anchor update failed: {exception.Message}");
         }
         finally
@@ -291,6 +323,47 @@ public class PicoSceneCaptureFloorAreaProvider : MonoBehaviour, IPicoFloorAreaPr
         Debug.Log($"Scene capture query: {DebugQueryStatus}\n{DebugCaptureDetails}");
         RebuildDebugMeshes(areas);
         return areas;
+    }
+
+    private List<PicoFloorArea> ApplyVirtualTableFallback(List<PicoFloorArea> areas, string reason)
+    {
+        if (areas != null && areas.Count > 0)
+        {
+            return areas;
+        }
+        if (surfaceLabel != PxrSemanticLabel.Table || !useVirtualTableFallback)
+        {
+            return areas;
+        }
+
+        areas ??= new List<PicoFloorArea>();
+        if (!PicoFloorArea.TryCreateRectangle(virtualTableCenter, virtualTableSize, virtualTableYaw, out var virtualArea))
+        {
+            Debug.LogWarning("Virtual table fallback config invalid", this);
+            DebugFloorAreaCount = 0;
+            DebugQueryStatus = $"Virtual table config invalid: {reason}";
+            DebugGroundHeightMethod = "Virtual table config invalid";
+            DebugCaptureDetails = $"Virtual table config invalid\nReason: {reason}";
+            RebuildDebugMeshes(areas);
+            return areas;
+        }
+
+        var fallback = new List<PicoFloorArea> { virtualArea };
+        DebugFloorAreaCount = 1;
+        DebugGroundHeight = virtualArea.SurfaceHeight;
+        DebugGroundHeightMethod = "Virtual table fallback";
+        DebugQueryStatus = $"Virtual table fallback: {reason}";
+        var details = new StringBuilder();
+        details.AppendLine($"Virtual table fallback reason={reason}");
+        details.AppendLine($"Virtual center={virtualTableCenter:F4} size={virtualTableSize:F4} yaw={virtualTableYaw:F2}");
+        details.AppendLine($"Final height={DebugGroundHeight:F4} method={DebugGroundHeightMethod}");
+        for (var i = 0; i < virtualArea.Vertices.Length; i++)
+        {
+            details.AppendLine($"  Virtual worldVertex[{i}]={virtualArea.Vertices[i]:F4}");
+        }
+        DebugCaptureDetails = details.ToString();
+        RebuildDebugMeshes(fallback);
+        return fallback;
     }
 
     private void ApplyTrackerTableHeight(List<PicoFloorArea> areas)

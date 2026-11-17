@@ -113,6 +113,43 @@ public readonly struct PicoFloorArea
         }
     }
 
+    public static bool TryCreateRectangle(Vector3 center, Vector2 size, float yawDegrees, out PicoFloorArea area)
+    {
+        area = default;
+        if (!IsFinite(center) || !IsFinite(size) || !IsFinite(yawDegrees) || size.x <= 0f || size.y <= 0f)
+        {
+            return false;
+        }
+
+        var rotation = Quaternion.Euler(0f, yawDegrees, 0f);
+        var halfX = size.x * 0.5f;
+        var halfZ = size.y * 0.5f;
+        var vertices = new[]
+        {
+            center + rotation * new Vector3(-halfX, 0f, -halfZ),
+            center + rotation * new Vector3(halfX, 0f, -halfZ),
+            center + rotation * new Vector3(halfX, 0f, halfZ),
+            center + rotation * new Vector3(-halfX, 0f, halfZ)
+        };
+        area = new PicoFloorArea(vertices, useHighestVertexHeight: true, surfaceRotation: rotation);
+        return true;
+    }
+
+    private static bool IsFinite(Vector3 value)
+    {
+        return IsFinite(value.x) && IsFinite(value.y) && IsFinite(value.z);
+    }
+
+    private static bool IsFinite(Vector2 value)
+    {
+        return IsFinite(value.x) && IsFinite(value.y);
+    }
+
+    private static bool IsFinite(float value)
+    {
+        return !float.IsNaN(value) && !float.IsInfinity(value);
+    }
+
     public bool TryGetRandomPoint(out Vector3 point)
     {
         return TryGetRandomPoint(0f, out point);

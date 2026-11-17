@@ -150,6 +150,54 @@ public class PicoFloorAreaTests
         }
     }
 
+    [Test]
+    public void TryCreateRectangle_RotatedSizeAndHeight_ReturnsExpectedWorldVertices()
+    {
+        var created = PicoFloorArea.TryCreateRectangle(new Vector3(1f, 0.4f, 2f), new Vector2(2f, 1f), 90f, out var area);
+
+        Assert.IsTrue(created);
+        var expected = new[]
+        {
+            new Vector3(0.5f, 0.4f, 3f),
+            new Vector3(0.5f, 0.4f, 1f),
+            new Vector3(1.5f, 0.4f, 1f),
+            new Vector3(1.5f, 0.4f, 3f)
+        };
+        Assert.AreEqual(4, area.Vertices.Length);
+        for (var i = 0; i < expected.Length; i++)
+        {
+            Assert.Less(Vector3.Distance(expected[i], area.Vertices[i]), 0.0001f);
+        }
+        Assert.AreEqual(0.4f, area.SurfaceHeight, 0.0001f);
+        Assert.Less(Quaternion.Angle(Quaternion.Euler(0f, 90f, 0f), area.SurfaceRotation), 0.001f);
+        Assert.Less(Vector3.Distance(new Vector3(1f, 0.4f, 2f), area.PlanarBounds.center), 0.0001f);
+        Assert.Less(Vector3.Distance(new Vector3(1f, 0f, 2f), area.PlanarBounds.size), 0.0001f);
+    }
+
+    [Test]
+    public void TryCreateRectangle_RandomPointsStayInside()
+    {
+        Assert.IsTrue(PicoFloorArea.TryCreateRectangle(new Vector3(1f, 0.4f, 2f), new Vector2(2f, 1f), 37f, out var area));
+
+        for (var i = 0; i < 20; i++)
+        {
+            Assert.IsTrue(area.TryGetRandomPoint(out var point));
+            Assert.IsTrue(area.ContainsXZ(point));
+            Assert.AreEqual(0.4f, point.y, 0.0001f);
+        }
+    }
+
+    [Test]
+    public void TryCreateRectangle_ZeroNegativeOrNonFiniteInput_ReturnsFalse()
+    {
+        Assert.IsFalse(PicoFloorArea.TryCreateRectangle(Vector3.zero, Vector2.zero, 0f, out var area));
+        Assert.IsNull(area.Vertices);
+        Assert.IsFalse(PicoFloorArea.TryCreateRectangle(Vector3.zero, new Vector2(-1f, 1f), 0f, out _));
+        Assert.IsFalse(PicoFloorArea.TryCreateRectangle(new Vector3(float.NaN, 0f, 0f), Vector2.one, 0f, out _));
+        Assert.IsFalse(PicoFloorArea.TryCreateRectangle(Vector3.zero, new Vector2(float.PositiveInfinity, 1f), 0f, out _));
+        Assert.IsFalse(PicoFloorArea.TryCreateRectangle(Vector3.zero, Vector2.one, float.NaN, out _));
+    }
+
     private static PicoFloorArea Rectangle(float halfSize, float height)
     {
         return new PicoFloorArea(new[]
