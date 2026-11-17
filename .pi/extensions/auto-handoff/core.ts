@@ -59,6 +59,27 @@ export async function writeHandoffAtomically(cwd: string, summary: string): Prom
 	}
 }
 
+export function compactAndWriteHandoff(options: {
+	cwd: string;
+	compact: (callbacks: {
+		onComplete: (result: { summary: string }) => void;
+		onError: (error: Error) => void;
+	}) => void;
+}): Promise<string> {
+	return new Promise<string>((resolve, reject) => {
+		try {
+			options.compact({
+				onComplete: (result) => {
+					void writeHandoffAtomically(options.cwd, result.summary).then(resolve, reject);
+				},
+				onError: reject,
+			});
+		} catch (error) {
+			reject(error);
+		}
+	});
+}
+
 export class HandoffScheduler {
 	private timer: ReturnType<typeof setTimeout> | undefined;
 	private pending: Promise<void> | undefined;

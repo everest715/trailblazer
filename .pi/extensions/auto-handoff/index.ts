@@ -5,10 +5,11 @@ import { type Message, uuidv7 } from "@earendil-works/pi-ai";
 import type { ExtensionAPI, ExtensionContext, SessionEntry } from "@earendil-works/pi-coding-agent";
 import { convertToLlm, serializeConversation } from "@earendil-works/pi-coding-agent";
 import {
+	compactAndWriteHandoff,
 	HandoffScheduler,
 	hasMeaningfulConversation,
 	type SessionStartReason,
-	shouldAttemptTimedSave,
+	shouldAttemptIdleCompaction,
 	shouldInjectHandoff,
 	shouldSaveOnShutdown,
 	TIMED_HANDOFF_INTERVAL_MS,
@@ -140,11 +141,23 @@ export default function (pi: ExtensionAPI) {
 	}
 
 	async function saveWithScheduler(ctx: ExtensionContext): Promise<void> {
+		await scheduler?.stop();
 		if (hasSavedInSession && getConversationMarker(ctx) === lastSavedLeafId) return;
-		if (scheduler) {
-			await scheduler.saveNow();
-		} else {
-			await saveAndTrack(ctx);
+		await saveAndTrack(ctx);
+	}
+
+	async function compactAndTrack(ctx: ExtensionContext): Promise<void> {
+		if (!hasMeaningfulConversation(ctx.sessionManager.getBranch())) return;
+		try {
+			const path = await compactAndWriteHandoff({
+				cwd: ctx.cwd,
+				compact: (callbacks) => ctx.compact(callbacks),
+			});
+			lastSavedLeafId = getConversationMarker(ctx);
+			hasSavedInSession = true;
+			if (ctx.hasUI) ctx.ui.notify(`Handoff saved: ${path}`, "info");
+		} catch (error) {
+			if (ctx.hasUI) ctx.ui.notify(`Auto-handoff: ${errorMessage(error)}`, "error");
 		}
 	}
 
@@ -164,15 +177,24 @@ export default function (pi: ExtensionAPI) {
 		}
 		lastSavedLeafId = getConversationMarker(ctx);
 		scheduler = new HandoffScheduler({
-			intervalMs: TIMED_HANDOFF_INTERVAL_MS,
+			idleMs: TIMED_HANDOFF_INTERVAL_MS,
 			shouldSave: () =>
-				shouldAttemptTimedSave({
+				shouldAttemptIdleCompaction({
 					tokens: ctx.getContextUsage()?.tokens,
 					hasNewContent: getConversationMarker(ctx) !== lastSavedLeafId,
+					isIdle: ctx.isIdle(),
+					hasPendingMessages: ctx.hasPendingMessages(),
 				}),
-			save: () => saveAndTrack(ctx),
+			save: () => compactAndTrack(ctx),
 		});
-		scheduler.start();
+	});
+
+	pi.on("agent_start", () => {
+		scheduler?.enterBusy();
+	});
+
+	pi.on("agent_settled", () => {
+		scheduler?.enterIdle();
 	});
 
 	pi.on("before_agent_start", async (event, _ctx) => {

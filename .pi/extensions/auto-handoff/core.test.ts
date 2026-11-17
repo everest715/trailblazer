@@ -4,6 +4,7 @@ import { tmpdir } from "node:os";
 import { resolve } from "node:path";
 import test, { mock } from "node:test";
 import {
+	compactAndWriteHandoff,
 	HandoffScheduler,
 	hasMeaningfulConversation,
 	shouldAttemptIdleCompaction,
@@ -88,6 +89,76 @@ test("blank summaries preserve an existing handoff", async (t) => {
 	await writeFile(handoffPath, "# Keep me", "utf8");
 
 	await assert.rejects(writeHandoffAtomically(directory, "  \n"), /blank/i);
+	assert.equal(await readFile(handoffPath, "utf8"), "# Keep me");
+});
+
+test("compaction summary is written to HANDOFF.md", async (t) => {
+	const directory = await mkdtemp(resolve(tmpdir(), "auto-handoff-"));
+	t.after(() => rm(directory, { recursive: true, force: true }));
+
+	const handoffPath = resolve(directory, "HANDOFF.md");
+	const result = await compactAndWriteHandoff({
+		cwd: directory,
+		compact: ({ onComplete }) => {
+			onComplete({ summary: "# Compacted" });
+		},
+	});
+
+	assert.equal(result, handoffPath);
+	assert.equal(await readFile(handoffPath, "utf8"), "# Compacted");
+});
+
+test("compaction callback failure preserves the existing handoff", async (t) => {
+	const directory = await mkdtemp(resolve(tmpdir(), "auto-handoff-"));
+	t.after(() => rm(directory, { recursive: true, force: true }));
+	const handoffPath = resolve(directory, "HANDOFF.md");
+	await writeFile(handoffPath, "# Keep me", "utf8");
+
+	await assert.rejects(
+		compactAndWriteHandoff({
+			cwd: directory,
+			compact: ({ onError }) => {
+				onError(new Error("failed"));
+			},
+		}),
+		/failed/,
+	);
+	assert.equal(await readFile(handoffPath, "utf8"), "# Keep me");
+});
+
+test("synchronous compaction failure preserves the existing handoff", async (t) => {
+	const directory = await mkdtemp(resolve(tmpdir(), "auto-handoff-"));
+	t.after(() => rm(directory, { recursive: true, force: true }));
+	const handoffPath = resolve(directory, "HANDOFF.md");
+	await writeFile(handoffPath, "# Keep me", "utf8");
+
+	await assert.rejects(
+		compactAndWriteHandoff({
+			cwd: directory,
+			compact: () => {
+				throw new Error("sync failed");
+			},
+		}),
+		/sync failed/,
+	);
+	assert.equal(await readFile(handoffPath, "utf8"), "# Keep me");
+});
+
+test("blank compaction summary preserves the existing handoff", async (t) => {
+	const directory = await mkdtemp(resolve(tmpdir(), "auto-handoff-"));
+	t.after(() => rm(directory, { recursive: true, force: true }));
+	const handoffPath = resolve(directory, "HANDOFF.md");
+	await writeFile(handoffPath, "# Keep me", "utf8");
+
+	await assert.rejects(
+		compactAndWriteHandoff({
+			cwd: directory,
+			compact: ({ onComplete }) => {
+				onComplete({ summary: "  " });
+			},
+		}),
+		/blank/i,
+	);
 	assert.equal(await readFile(handoffPath, "utf8"), "# Keep me");
 });
 
