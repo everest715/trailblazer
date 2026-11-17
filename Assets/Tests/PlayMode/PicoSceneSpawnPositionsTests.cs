@@ -13,12 +13,23 @@ public class PicoSceneSpawnPositionsTests
     private GameObject _prefab;
     private GameObject _providerObject;
 
-    private sealed class FakeProvider : MonoBehaviour, IPicoFloorAreaProvider
+    private sealed class FakeProvider : MonoBehaviour, IPicoFloorAreaProvider, ISceneCaptureDebugInfo
     {
         public IReadOnlyList<PicoFloorArea> Areas;
         public Task<IReadOnlyList<PicoFloorArea>> Pending;
         public bool Throw;
         public int Calls;
+        public int DebugFloorAreaCount => Areas?.Count ?? 0;
+        public string DebugQueryStatus => "Fake";
+        public float DebugGroundHeight => 0f;
+        public string DebugGroundHeightMethod { get; set; } = "SceneCapture table top";
+        public Vector3 DebugAnchorPosition => Vector3.zero;
+        public Vector3 DebugBoxLocalPosition => Vector3.zero;
+        public Vector3 DebugBoxExtent => Vector3.zero;
+        public Vector3 DebugAnchorEuler => Vector3.zero;
+        public Vector3 DebugBoxLocalEuler => Vector3.zero;
+        public Vector3 DebugBoxCenter => Vector3.zero;
+        public string DebugCaptureDetails => "Fake";
 
         public Task<IReadOnlyList<PicoFloorArea>> GetFloorAreasAsync()
         {
@@ -322,6 +333,51 @@ public class PicoSceneSpawnPositionsTests
         {
             Assert.IsTrue(item.Value.ContainsXZ(item.Key.transform.position, 0.2f));
         }
+    }
+
+    [Test]
+    public void StartSpawn_VirtualProvider_ReportsVirtualSourceAndHeight()
+    {
+        var spawn = CreateSceneSpawner();
+        var provider = _spawner.AddComponent<FakeProvider>();
+        provider.Areas = new[] { RectangleAtHeight(0f) };
+        provider.DebugGroundHeightMethod = "Virtual table fallback";
+
+        spawn.StartSpawn();
+
+        var instance = UnityEngine.Object.FindObjectsOfType<GameObject>().Single(item => item.name.StartsWith("SpawnProbe("));
+        Assert.AreEqual(0.1f, instance.transform.position.y, 0.0001f);
+        Assert.AreEqual("VirtualTable", spawn.LastSpawnSource);
+        Assert.AreEqual("Virtual table fallback", spawn.LastGroundHeightMethod);
+    }
+
+    [Test]
+    public void StartSpawn_AreaHeightChanges_UsesCurrentHeightInsteadOfCachedHeight()
+    {
+        var spawn = CreateSceneSpawner();
+        var provider = _spawner.AddComponent<FakeProvider>();
+        provider.Areas = new[] { Rectangle() };
+        spawn.StartSpawn();
+        var first = UnityEngine.Object.FindObjectsOfType<GameObject>().Single(item => item.name.StartsWith("SpawnProbe("));
+        Assert.AreEqual(0.3f, first.transform.position.y, 0.0001f);
+
+        provider.Areas = new[] { RectangleAtHeight(-0.4f) };
+        provider.DebugGroundHeightMethod = "Virtual table fallback";
+        spawn.StartSpawn();
+
+        var second = UnityEngine.Object.FindObjectsOfType<GameObject>().Single(item => item.name.StartsWith("SpawnProbe(") && item != first);
+        Assert.AreEqual(-0.3f, second.transform.position.y, 0.0001f);
+    }
+
+    private static PicoFloorArea RectangleAtHeight(float height)
+    {
+        return new PicoFloorArea(new[]
+        {
+            new Vector3(-1f, height, -1f),
+            new Vector3(1f, height, -1f),
+            new Vector3(1f, height, 1f),
+            new Vector3(-1f, height, 1f)
+        });
     }
 
     private PicoSceneSpawnPositions CreateSceneSpawner()

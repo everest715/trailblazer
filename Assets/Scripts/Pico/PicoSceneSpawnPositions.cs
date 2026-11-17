@@ -68,7 +68,7 @@ public class PicoSceneSpawnPositions : MonoBehaviour
             var areas = await provider.GetFloorAreasAsync();
             var spawnPoints = new List<Vector3>();
             var spawnAreas = new List<PicoFloorArea>();
-            var batchHeight = _cachedSpawnHeight;
+            float? batchHeight = null;
             if (areas != null)
             {
                 for (var i = 0; i < SpawnAmount && areas.Count > 0; i++)
@@ -93,9 +93,11 @@ public class PicoSceneSpawnPositions : MonoBehaviour
             }
 
             _cachedSpawnHeight = batchHeight;
-            LastSpawnSource = "SceneCapture";
+            var debugInfo = provider as ISceneCaptureDebugInfo;
+            var heightMethod = debugInfo?.DebugGroundHeightMethod;
+            LastSpawnSource = heightMethod == "Virtual table fallback" ? "VirtualTable" : "SceneCapture";
             LastGroundHeight = spawnPoints[0].y;
-            LastGroundHeightMethod = "SceneCapture floor anchors";
+            LastGroundHeightMethod = string.IsNullOrEmpty(heightMethod) ? "SceneCapture floor anchors" : heightMethod;
             LastSpawnPoint = spawnPoints[0];
             for (var i = 0; i < spawnPoints.Count; i++)
             {
