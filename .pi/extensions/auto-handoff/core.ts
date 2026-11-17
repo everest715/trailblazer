@@ -6,12 +6,16 @@ export type SessionStartReason = "startup" | "reload" | "new" | "resume" | "fork
 export const TIMED_HANDOFF_INTERVAL_MS = 300000;
 export const TIMED_HANDOFF_TOKEN_THRESHOLD = 100000;
 
-export function shouldAttemptTimedSave(options: {
+export function shouldAttemptIdleCompaction(options: {
 	tokens: number | null | undefined;
 	hasNewContent: boolean;
+	isIdle: boolean;
+	hasPendingMessages: boolean;
 }): boolean {
 	return (
 		options.hasNewContent &&
+		options.isIdle &&
+		!options.hasPendingMessages &&
 		typeof options.tokens === "number" &&
 		Number.isFinite(options.tokens) &&
 		options.tokens > TIMED_HANDOFF_TOKEN_THRESHOLD
@@ -56,31 +60,39 @@ export async function writeHandoffAtomically(cwd: string, summary: string): Prom
 }
 
 export class HandoffScheduler {
-	private timer: ReturnType<typeof setInterval> | undefined;
+	private timer: ReturnType<typeof setTimeout> | undefined;
 	private pending: Promise<void> | undefined;
 	private readonly options: {
-		intervalMs: number;
+		idleMs: number;
 		shouldSave: () => boolean;
 		save: () => Promise<void>;
 	};
 
 	constructor(options: {
-		intervalMs: number;
+		idleMs: number;
 		shouldSave: () => boolean;
 		save: () => Promise<void>;
 	}) {
 		this.options = options;
 	}
 
-	start(): void {
-		if (this.timer) return;
-		this.timer = setInterval(() => {
-			if (this.options.shouldSave()) void this.saveNow();
-		}, this.options.intervalMs);
+	enterIdle(): void {
+		this.enterBusy();
+		this.timer = setTimeout(() => {
+			this.timer = undefined;
+			if (this.options.shouldSave()) void this.save();
+		}, this.options.idleMs);
 		this.timer.unref();
 	}
 
-	async saveNow(): Promise<void> {
+	enterBusy(): void {
+		if (this.timer) {
+			clearTimeout(this.timer);
+			this.timer = undefined;
+		}
+	}
+
+	private async save(): Promise<void> {
 		if (this.pending) return this.pending;
 		const pending = this.options.save();
 		this.pending = pending;
@@ -92,10 +104,7 @@ export class HandoffScheduler {
 	}
 
 	async stop(): Promise<void> {
-		if (this.timer) {
-			clearInterval(this.timer);
-			this.timer = undefined;
-		}
+		this.enterBusy();
 		await this.pending;
 	}
 }

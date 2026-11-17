@@ -6,7 +6,7 @@ import test, { mock } from "node:test";
 import {
 	HandoffScheduler,
 	hasMeaningfulConversation,
-	shouldAttemptTimedSave,
+	shouldAttemptIdleCompaction,
 	shouldInjectHandoff,
 	shouldSaveOnShutdown,
 	writeHandoffAtomically,
@@ -91,80 +91,151 @@ test("blank summaries preserve an existing handoff", async (t) => {
 	assert.equal(await readFile(handoffPath, "utf8"), "# Keep me");
 });
 
-test("timed save requires new content and more than 100k tokens", () => {
+test("idle compaction requires new content, idle state, no pending messages, and more than 100k tokens", () => {
+	const defaults = {
+		tokens: 100001,
+		hasNewContent: true,
+		isIdle: true,
+		hasPendingMessages: false,
+	};
 	for (const tokens of [null, undefined, 99999, 100000]) {
-		assert.equal(shouldAttemptTimedSave({ tokens, hasNewContent: true }), false);
+		assert.equal(shouldAttemptIdleCompaction({ ...defaults, tokens }), false);
 	}
-	assert.equal(shouldAttemptTimedSave({ tokens: 100001, hasNewContent: true }), true);
-	assert.equal(shouldAttemptTimedSave({ tokens: 200000, hasNewContent: false }), false);
+	assert.equal(shouldAttemptIdleCompaction(defaults), true);
+	assert.equal(shouldAttemptIdleCompaction({ ...defaults, hasNewContent: false }), false);
+	assert.equal(shouldAttemptIdleCompaction({ ...defaults, isIdle: false }), false);
+	assert.equal(shouldAttemptIdleCompaction({ ...defaults, hasPendingMessages: true }), false);
 });
 
-test("scheduler ticks every five minutes and stops", async (t) => {
+test("scheduler runs once after the idle delay", async (t) => {
 	const timers = mock.timers;
-	timers.enable({ apis: ["setInterval"] });
+	timers.enable({ apis: ["setTimeout"] });
 	t.after(() => timers.reset());
-	let allowed = true;
 	let calls = 0;
 	const scheduler = new HandoffScheduler({
-		intervalMs: 300000,
+		idleMs: 300000,
+		shouldSave: () => true,
+		save: async () => {
+			calls++;
+		},
+	});
+
+	scheduler.enterIdle();
+	await timers.tick(299999);
+	assert.equal(calls, 0);
+	await timers.tick(1);
+	assert.equal(calls, 1);
+	await timers.tick(600000);
+	assert.equal(calls, 1);
+	await scheduler.stop();
+});
+
+test("entering busy cancels a pending idle run", async (t) => {
+	const timers = mock.timers;
+	timers.enable({ apis: ["setTimeout"] });
+	t.after(() => timers.reset());
+	let calls = 0;
+	const scheduler = new HandoffScheduler({
+		idleMs: 300000,
+		shouldSave: () => true,
+		save: async () => {
+			calls++;
+		},
+	});
+
+	scheduler.enterIdle();
+	await timers.tick(1000);
+	scheduler.enterBusy();
+	await timers.tick(600000);
+	assert.equal(calls, 0);
+	await scheduler.stop();
+});
+
+test("repeated idle entries restart the delay", async (t) => {
+	const timers = mock.timers;
+	timers.enable({ apis: ["setTimeout"] });
+	t.after(() => timers.reset());
+	let calls = 0;
+	const scheduler = new HandoffScheduler({
+		idleMs: 300000,
+		shouldSave: () => true,
+		save: async () => {
+			calls++;
+		},
+	});
+
+	scheduler.enterIdle();
+	await timers.tick(200000);
+	scheduler.enterIdle();
+	await timers.tick(299999);
+	assert.equal(calls, 0);
+	await timers.tick(1);
+	assert.equal(calls, 1);
+	await scheduler.stop();
+});
+
+test("a rejected idle check does not create a periodic retry", async (t) => {
+	const timers = mock.timers;
+	timers.enable({ apis: ["setTimeout"] });
+	t.after(() => timers.reset());
+	let allowed = false;
+	let calls = 0;
+	const scheduler = new HandoffScheduler({
+		idleMs: 300000,
 		shouldSave: () => allowed,
 		save: async () => {
 			calls++;
 		},
 	});
-	scheduler.start();
 
-	await timers.tick(299999);
+	scheduler.enterIdle();
+	await timers.tick(300000);
 	assert.equal(calls, 0);
-	await timers.tick(1);
-	assert.equal(calls, 1);
-
-	allowed = false;
+	allowed = true;
+	await timers.tick(600000);
+	assert.equal(calls, 0);
+	scheduler.enterIdle();
 	await timers.tick(300000);
 	assert.equal(calls, 1);
 	await scheduler.stop();
-	allowed = true;
-	await timers.tick(300000);
-	assert.equal(calls, 1);
 });
 
-test("repeated start creates only one timer", async (t) => {
+test("stop cancels a pending timer", async (t) => {
 	const timers = mock.timers;
-	timers.enable({ apis: ["setInterval"] });
+	timers.enable({ apis: ["setTimeout"] });
 	t.after(() => timers.reset());
 	let calls = 0;
 	const scheduler = new HandoffScheduler({
-		intervalMs: 1000,
+		idleMs: 1000,
 		shouldSave: () => true,
 		save: async () => {
 			calls++;
 		},
 	});
-	scheduler.start();
-	scheduler.start();
 
-	await timers.tick(1000);
-	assert.equal(calls, 1);
+	scheduler.enterIdle();
 	await scheduler.stop();
+	await timers.tick(1000);
+	assert.equal(calls, 0);
 });
 
-test("saveNow coalesces concurrent saves and stop awaits completion", async () => {
-	let calls = 0;
+test("stop awaits an in-flight save", async (t) => {
+	const timers = mock.timers;
+	timers.enable({ apis: ["setTimeout"] });
+	t.after(() => timers.reset());
 	let resolveSave!: () => void;
 	const scheduler = new HandoffScheduler({
-		intervalMs: 1000,
+		idleMs: 1000,
 		shouldSave: () => true,
 		save: () => {
-			calls++;
 			return new Promise<void>((resolve) => {
 				resolveSave = resolve;
 			});
 		},
 	});
 
-	const first = scheduler.saveNow();
-	const second = scheduler.saveNow();
-	assert.equal(calls, 1);
+	scheduler.enterIdle();
+	await timers.tick(1000);
 	let stopped = false;
 	const stopping = scheduler.stop().then(() => {
 		stopped = true;
@@ -173,6 +244,6 @@ test("saveNow coalesces concurrent saves and stop awaits completion", async () =
 	assert.equal(stopped, false);
 
 	resolveSave();
-	await Promise.all([first, second, stopping]);
+	await stopping;
 	assert.equal(stopped, true);
 });
