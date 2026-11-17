@@ -6,7 +6,7 @@ using ByteDance.PICO.XR;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-public class PicoSceneCaptureFloorAreaProvider : MonoBehaviour, IPicoFloorAreaProvider, ISceneCaptureDebugInfo
+public class PicoSceneCaptureFloorAreaProvider : MonoBehaviour, IPicoFloorAreaProvider, IPicoFloorAreaUpdates, ISceneCaptureDebugInfo
 {
     private bool _providerStarted;
     private bool _captureRequested;
