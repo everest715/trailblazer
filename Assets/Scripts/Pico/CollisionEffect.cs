@@ -9,6 +9,8 @@ public class CollisionEffect : MonoBehaviour
     public float effectScale = 1f;
     public float particleSpeedMultiplier = 3f;
     public float particleLifetimeMultiplier = 0.5f;
+    public bool triggerOnce;
+    public bool destroyOnHit;
 
     public AudioClip effectSound;
 
@@ -23,6 +25,7 @@ public class CollisionEffect : MonoBehaviour
     public float coinDropGravity = 9.81f;
 
     private Collider _collider;
+    private bool _hasPlayed;
 
     private void Awake()
     {
@@ -70,6 +73,12 @@ public class CollisionEffect : MonoBehaviour
 
     private void Play(Vector3 position, Vector3 coinDropDirection)
     {
+        if ((triggerOnce || destroyOnHit) && _hasPlayed)
+        {
+            return;
+        }
+
+        _hasPlayed = true;
         if (effectSound)
         {
             AudioSource.PlayClipAtPoint(effectSound, position);
@@ -86,25 +95,28 @@ public class CollisionEffect : MonoBehaviour
                 coinDropDistance, coinDropHeight, duration);
         }
 
-        if (effectPrefab == null)
+        if (effectPrefab != null)
         {
-            return;
+            var effect = Instantiate(effectPrefab, position, effectPrefab.transform.rotation);
+            effect.transform.localScale = effect.transform.localScale * effectScale;
+            foreach (var particleSystem in effect.GetComponentsInChildren<ParticleSystem>(true))
+            {
+                var main = particleSystem.main;
+                if (main.scalingMode == ParticleSystemScalingMode.Hierarchy)
+                {
+                    main.startSpeedMultiplier *= particleSpeedMultiplier;
+                    main.startLifetimeMultiplier *= particleLifetimeMultiplier;
+                    main.gravityModifierMultiplier *= effectScale;
+                }
+                particleSystem.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+                particleSystem.Play(true);
+            }
+            Destroy(effect, lifetime);
         }
 
-        var effect = Instantiate(effectPrefab, position, effectPrefab.transform.rotation);
-        effect.transform.localScale = effect.transform.localScale * effectScale;
-        foreach (var particleSystem in effect.GetComponentsInChildren<ParticleSystem>(true))
+        if (destroyOnHit)
         {
-            var main = particleSystem.main;
-            if (main.scalingMode == ParticleSystemScalingMode.Hierarchy)
-            {
-                main.startSpeedMultiplier *= particleSpeedMultiplier;
-                main.startLifetimeMultiplier *= particleLifetimeMultiplier;
-                main.gravityModifierMultiplier *= effectScale;
-            }
-            particleSystem.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
-            particleSystem.Play(true);
+            Destroy(gameObject);
         }
-        Destroy(effect, lifetime);
     }
 }

@@ -349,6 +349,64 @@ public class CollisionEffectTests
     }
 
     [Test]
+    public void OnTriggerEnter_TriggerOnce_RepeatedPlayerMessagesCreateOneEffect()
+    {
+        _effect.triggerOnce = true;
+
+        Trigger(_car);
+        Trigger(_car);
+
+        Assert.AreEqual(1, EffectInstances().Length);
+    }
+
+    [Test]
+    public void OnTriggerEnter_DefaultSettings_RepeatedPlayerMessagesKeepExistingBehavior()
+    {
+        Trigger(_car);
+        Trigger(_car);
+
+        Assert.AreEqual(2, EffectInstances().Length);
+    }
+
+    [UnityTest]
+    public IEnumerator OnTriggerEnter_DestroyOnHit_CreatesEffectBeforeDestroyingTarget()
+    {
+        _effect.destroyOnHit = true;
+
+        Trigger(_car);
+        yield return null;
+
+        Assert.IsTrue(_target == null);
+        Assert.AreEqual(1, EffectInstances().Length);
+    }
+
+    [UnityTest]
+    public IEnumerator OnTriggerEnter_DestroyOnHitWithNullEffect_StillDestroysTarget()
+    {
+        _effect.effectPrefab = null;
+        _effect.destroyOnHit = true;
+
+        Assert.DoesNotThrow(() => Trigger(_car));
+        yield return null;
+
+        Assert.IsTrue(_target == null);
+        Assert.IsEmpty(EffectInstances());
+    }
+
+    [UnityTest]
+    public IEnumerator OnTriggerEnter_NonPlayerWithDestroyOnHit_KeepsTarget()
+    {
+        _car.tag = "Untagged";
+        _effect.destroyOnHit = true;
+
+        Trigger(_car);
+        yield return null;
+
+        Assert.IsTrue(_target != null);
+        Assert.IsEmpty(EffectInstances());
+    }
+
+    [Test]
     public void CollisionEffect_HasEarlierExecutionOrderThanGame()
     {
         var attribute = typeof(CollisionEffect).GetCustomAttribute<DefaultExecutionOrder>();
