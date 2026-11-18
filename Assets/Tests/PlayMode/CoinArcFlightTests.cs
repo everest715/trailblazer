@@ -88,7 +88,7 @@ public class CoinArcFlightTests
     [UnityTest]
     public IEnumerator Launch_ZeroDirection_DoesNotProduceNaN()
     {
-        _flight.Launch(Vector3.zero, 0.6f, 0.6f, 0.05f);
+        _flight.Launch(Vector3.zero, 0.6f, 0.6f, 0.05f, SquareAroundStart(0.25f));
 
         yield return new WaitForSeconds(0.1f);
 
@@ -98,5 +98,60 @@ public class CoinArcFlightTests
         Assert.IsFalse(float.IsNaN(position.z) || float.IsInfinity(position.z));
         Assert.Less(Vector3.Distance(StartPosition, position), 0.0001f);
         Assert.IsTrue(_collider.enabled);
+    }
+
+    [UnityTest]
+    public IEnumerator Launch_TableArea_ReflectsAtEdgeAndLandsInside()
+    {
+        _flight.Launch(Vector3.right, 0.5f, 0.3f, 0.1f, SquareAroundStart(0.25f));
+
+        yield return new WaitForSeconds(0.2f);
+
+        AssertVector3Equal(StartPosition, _coin.transform.position);
+        Assert.IsTrue(_collider.enabled);
+    }
+
+    [UnityTest]
+    public IEnumerator Launch_TableAreaMultipleEdges_UsesRemainingDistance()
+    {
+        _flight.Launch(Vector3.right, 0.8f, 0.3f, 0.1f, SquareAroundStart(0.25f));
+
+        yield return new WaitForSeconds(0.2f);
+
+        AssertVector3Equal(StartPosition + Vector3.left * 0.2f, _coin.transform.position);
+    }
+
+    [UnityTest]
+    public IEnumerator Launch_TableAreaCorner_ReflectsBackInside()
+    {
+        var area = SquareAroundStart(0.25f);
+        var direction = new Vector3(1f, 0f, 1f).normalized;
+        _flight.Launch(direction, 0.4f, 0.3f, 0.1f, area);
+
+        yield return new WaitForSeconds(0.2f);
+
+        var final = _coin.transform.position;
+        Assert.IsFalse(float.IsNaN(final.x) || float.IsInfinity(final.x));
+        Assert.IsFalse(float.IsNaN(final.y) || float.IsInfinity(final.y));
+        Assert.IsFalse(float.IsNaN(final.z) || float.IsInfinity(final.z));
+        Assert.IsTrue(area.ContainsXZ(final), $"Coin landed outside the table at {final}");
+    }
+
+    private static PicoFloorArea SquareAroundStart(float halfSize)
+    {
+        return new PicoFloorArea(new[]
+        {
+            new Vector3(StartPosition.x - halfSize, StartPosition.y, StartPosition.z - halfSize),
+            new Vector3(StartPosition.x + halfSize, StartPosition.y, StartPosition.z - halfSize),
+            new Vector3(StartPosition.x + halfSize, StartPosition.y, StartPosition.z + halfSize),
+            new Vector3(StartPosition.x - halfSize, StartPosition.y, StartPosition.z + halfSize)
+        });
+    }
+
+    private static void AssertVector3Equal(Vector3 expected, Vector3 actual)
+    {
+        Assert.AreEqual(expected.x, actual.x, 0.001f);
+        Assert.AreEqual(expected.y, actual.y, 0.001f);
+        Assert.AreEqual(expected.z, actual.z, 0.001f);
     }
 }
