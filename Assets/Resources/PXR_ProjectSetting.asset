@@ -48,6 +48,7 @@ MonoBehaviour:
   lightEstimationTextureResolution: 4
   objectTracking: 0
   keyboardPassthrough: 0
+  imageTracking: 0
   arFoundation: 0
   mrSafeguard: 0
   enableRecommendMSAA: 0
