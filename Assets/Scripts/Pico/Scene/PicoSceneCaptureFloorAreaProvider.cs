@@ -236,14 +236,10 @@ public class PicoSceneCaptureFloorAreaProvider : MonoBehaviour, IPicoFloorAreaPr
         {
             var anchorHandle = query.anchorHandleList[anchorIndex];
             var locateResult = PXR_MixedReality.LocateAnchor(anchorHandle, out var position, out var rotation);
-            var rawLocateResult = PXR_MixedReality.LocateAnchorRaw(anchorHandle, out var rawPosition, out var rawRotation);
-            var alignedLocateResult = PXR_MixedReality.LocateAnchorAligned(anchorHandle, out var alignedPosition, out var alignedRotation, out var alignedScale);
             var semanticResult = PXR_MixedReality.GetSceneSemanticLabel(anchorHandle, out var semanticLabel);
             var componentResult = PXR_MixedReality.GetSceneAnchorComponentTypes(anchorHandle, out var componentTypes);
             details.AppendLine($"Anchor[{anchorIndex}] handle={anchorHandle} locate={locateResult}");
             details.AppendLine($"  Locate pos={position:F4} rotQ={rotation.ToString("F4")} rotE={rotation.eulerAngles:F2}");
-            details.AppendLine($"  Raw result={rawLocateResult} pos={rawPosition:F4} rotQ={rawRotation.ToString("F4")}");
-            details.AppendLine($"  Aligned result={alignedLocateResult} pos={alignedPosition:F4} rotQ={alignedRotation.ToString("F4")} scale={alignedScale:F4}");
             details.AppendLine($"  Semantic result={semanticResult} label={semanticLabel} componentsResult={componentResult} types={string.Join(",", componentTypes)}");
             if (locateResult != PxrResult.SUCCESS)
             {
