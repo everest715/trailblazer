@@ -7,6 +7,7 @@
 ## Added Memories
 - 当前项目默认使用中文与用户交流；除非用户明确要求其他语言，否则请用中文回答。
 - 项目后续只兼容 **PICO OS 6**，采用 **PICO Unity SDK 6.1 的 PICO XR 模式**；不再保留 Quest 3 兼容目标。
+- 后续对话中，除非用户明确要求运行测试，否则不要主动执行任何测试命令（包括 Unity Batchmode）。生成或修改测试代码后，可以提示用户切回 Unity Editor，在 Test Runner 中手动运行，并明确说明尚未自动验证。
 
 ---
 
