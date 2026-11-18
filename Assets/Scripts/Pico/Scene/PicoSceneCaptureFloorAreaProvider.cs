@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using ByteDance.PICO.XR;
 using UnityEngine;
@@ -13,6 +14,7 @@ public class PicoSceneCaptureFloorAreaProvider : MonoBehaviour, IPicoFloorAreaPr
     private bool _eventsSubscribed;
     private bool _isQuerying;
     private bool _refreshPending;
+    private readonly SemaphoreSlim _sceneCaptureOperations = new SemaphoreSlim(1, 1);
     private PicoMotionTrackerPoseSource _tracker;
 
     [Header("Scene Capture")]
@@ -59,6 +61,19 @@ public class PicoSceneCaptureFloorAreaProvider : MonoBehaviour, IPicoFloorAreaPr
     public string DebugCaptureDetails { get; private set; } = "Not queried";
 
     public async Task<IReadOnlyList<PicoFloorArea>> GetFloorAreasAsync()
+    {
+        await _sceneCaptureOperations.WaitAsync();
+        try
+        {
+            return await GetFloorAreasCoreAsync();
+        }
+        finally
+        {
+            _sceneCaptureOperations.Release();
+        }
+    }
+
+    private async Task<IReadOnlyList<PicoFloorArea>> GetFloorAreasCoreAsync()
     {
         try
         {
@@ -142,6 +157,7 @@ public class PicoSceneCaptureFloorAreaProvider : MonoBehaviour, IPicoFloorAreaPr
         }
 
         _isQuerying = true;
+        await _sceneCaptureOperations.WaitAsync();
         try
         {
             var areas = await QueryFloorAreasAsync();
@@ -162,6 +178,7 @@ public class PicoSceneCaptureFloorAreaProvider : MonoBehaviour, IPicoFloorAreaPr
         }
         finally
         {
+            _sceneCaptureOperations.Release();
             _isQuerying = false;
             if (_refreshPending)
             {
@@ -198,7 +215,7 @@ public class PicoSceneCaptureFloorAreaProvider : MonoBehaviour, IPicoFloorAreaPr
         }
     }
 
-    private async Task<List<PicoFloorArea>> QueryFloorAreasAsync()
+    protected virtual async Task<List<PicoFloorArea>> QueryFloorAreasAsync()
     {
         var details = new StringBuilder();
         details.AppendLine($"Snapshot frame={Time.frameCount} time={Time.unscaledTime:F3}");
