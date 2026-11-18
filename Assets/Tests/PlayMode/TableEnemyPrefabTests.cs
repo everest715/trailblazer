@@ -56,6 +56,21 @@ public class TableEnemyPrefabTests
     }
 
     [Test]
+    public void BobouncingEnemyPrefab_Renderers_DisableShaderWindDeformation()
+    {
+        var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(PrefabPath);
+        var renderers = prefab.GetComponentsInChildren<MeshRenderer>(true);
+        Assert.IsNotEmpty(renderers);
+        foreach (var renderer in renderers)
+        {
+            var material = renderer.sharedMaterial;
+            Assert.NotNull(material, renderer.name);
+            Assert.IsTrue(material.HasProperty("Vector1_1D6946FF"), renderer.name);
+            Assert.AreEqual(0f, material.GetFloat("Vector1_1D6946FF"), renderer.name);
+        }
+    }
+
+    [Test]
     public void BobouncingEnemyPrefab_Configure_RaisesVisualBottomToSpawnHeight()
     {
         var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(PrefabPath);
