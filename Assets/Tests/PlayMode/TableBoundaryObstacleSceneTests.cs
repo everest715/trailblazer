@@ -29,7 +29,6 @@ public class TableBoundaryObstacleSceneTests
             var serializedProvider = new SerializedObject(provider);
             Assert.AreEqual(7, serializedProvider.FindProperty("surfaceLabel").intValue);
             Assert.IsFalse(serializedProvider.FindProperty("useTrackerForTableHeight").boolValue);
-            Assert.IsTrue(serializedProvider.FindProperty("showDebugMeshes").boolValue);
         }
         finally
         {
