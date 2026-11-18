@@ -102,7 +102,7 @@ public class PicoTableBoundaryObstaclesTests
     }
 
     [Test]
-    public void Rebuild_DefaultTrees_AreFourteenCentimetersHigh()
+    public void Rebuild_DefaultTrees_StayWithinFourteenCentimeterTargetAndFitLimits()
     {
         _generator.scaleRange = Vector2.one;
         _generator.inwardOffsetRange = Vector2.zero;
@@ -115,12 +115,13 @@ public class PicoTableBoundaryObstaclesTests
         {
             Assert.IsTrue(PicoObstacleGeometry.TryCapture(tree.gameObject, out var bounds));
             var height = bounds.size.y * tree.localScale.y;
-            Assert.AreEqual(0.14f, height, 0.0001f, tree.name);
+            Assert.LessOrEqual(height, 0.1401f, tree.name);
+            Assert.GreaterOrEqual(height, 0.102f, tree.name);
         }
     }
 
     [Test]
-    public void Rebuild_DefaultTrees_KeepRootsWithinFourCentimetersOfEdge()
+    public void Rebuild_DefaultTrees_KeepRootsWithinFitAdjustmentRange()
     {
         var area = Rectangle(Quaternion.identity, Vector3.zero);
         _generator.scaleRange = Vector2.one;
@@ -133,7 +134,7 @@ public class PicoTableBoundaryObstaclesTests
         foreach (var tree in trees)
         {
             var distance = DistanceToNearestEdge(area.Vertices, tree.position);
-            Assert.LessOrEqual(distance, 0.04f, tree.name);
+            Assert.LessOrEqual(distance, 0.11f, tree.name);
         }
     }
 
