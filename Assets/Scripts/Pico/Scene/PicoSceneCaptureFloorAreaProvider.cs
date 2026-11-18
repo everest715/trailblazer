@@ -19,6 +19,7 @@ public class PicoSceneCaptureFloorAreaProvider : MonoBehaviour, IPicoFloorAreaPr
 
     [Header("Scene Capture")]
     public PxrSemanticLabel surfaceLabel = PxrSemanticLabel.Floor;
+    public Transform trackingOrigin;
 
     [Header("Virtual Table Fallback")]
     public bool useVirtualTableFallback = true;
@@ -231,6 +232,7 @@ public class PicoSceneCaptureFloorAreaProvider : MonoBehaviour, IPicoFloorAreaPr
 
         var areas = new List<PicoFloorArea>();
         var rawAreas = new List<PicoFloorArea>();
+        var anchorOrigin = ResolveTrackingOrigin();
         _debugBoxes.Clear();
         for (var anchorIndex = 0; anchorIndex < query.anchorHandleList.Count; anchorIndex++)
         {
@@ -246,6 +248,8 @@ public class PicoSceneCaptureFloorAreaProvider : MonoBehaviour, IPicoFloorAreaPr
                 continue;
             }
 
+            TransformAnchorToWorld(anchorOrigin, ref position, ref rotation);
+            details.AppendLine($"  World pos={position:F4} rotQ={rotation.ToString("F4")} origin={(anchorOrigin == null ? "null" : anchorOrigin.name)}");
             if (areas.Count == 0)
             {
                 DebugAnchorPosition = position;
@@ -336,6 +340,28 @@ public class PicoSceneCaptureFloorAreaProvider : MonoBehaviour, IPicoFloorAreaPr
         Debug.Log($"Scene capture query: {DebugQueryStatus}\n{DebugCaptureDetails}");
         RebuildDebugMeshes(areas);
         return areas;
+    }
+
+    private Transform ResolveTrackingOrigin()
+    {
+        if (trackingOrigin != null)
+        {
+            return trackingOrigin;
+        }
+
+        var trackerDriver = FindAnyObjectByType<MotionTrackerDriver>();
+        return trackerDriver == null ? null : trackerDriver.trackingOrigin;
+    }
+
+    private static void TransformAnchorToWorld(Transform origin, ref Vector3 position, ref Quaternion rotation)
+    {
+        if (origin == null)
+        {
+            return;
+        }
+
+        position = origin.TransformPoint(position);
+        rotation = origin.rotation * rotation;
     }
 
     private List<PicoFloorArea> ApplyVirtualTableFallback(List<PicoFloorArea> areas, string reason)
