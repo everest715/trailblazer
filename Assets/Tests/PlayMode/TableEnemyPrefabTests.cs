@@ -55,6 +55,40 @@ public class TableEnemyPrefabTests
         }
     }
 
+    [Test]
+    public void BobouncingEnemyPrefab_Configure_RaisesVisualBottomToSpawnHeight()
+    {
+        var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(PrefabPath);
+        var instance = PrefabUtility.InstantiatePrefab(prefab) as GameObject;
+        Assert.NotNull(instance);
+        try
+        {
+            const float spawnHeight = 0.75f;
+            instance.transform.position = new Vector3(0f, spawnHeight, 0f);
+            var renderers = instance.GetComponentsInChildren<MeshRenderer>();
+            Assert.IsNotEmpty(renderers);
+            var initialBottom = renderers.Min(renderer => renderer.bounds.min.y);
+            Assert.Less(initialBottom, spawnHeight, "The model fixture must reproduce the partially buried enemy");
+            var area = new PicoFloorArea(new[]
+            {
+                new Vector3(-1f, spawnHeight, -1f),
+                new Vector3(1f, spawnHeight, -1f),
+                new Vector3(1f, spawnHeight, 1f),
+                new Vector3(-1f, spawnHeight, 1f)
+            });
+
+            instance.GetComponent<TableEnemy>().Configure(area, null);
+
+            var visualBottom = renderers.Min(renderer => renderer.bounds.min.y);
+            Assert.Greater(instance.transform.position.y, spawnHeight);
+            Assert.AreEqual(spawnHeight, visualBottom, 0.0001f);
+        }
+        finally
+        {
+            UnityEngine.Object.DestroyImmediate(instance);
+        }
+    }
+
     [UnityTest]
     [Order(2)]
     public IEnumerator Game_StartGame_SpawnsConfiguredEnemy()

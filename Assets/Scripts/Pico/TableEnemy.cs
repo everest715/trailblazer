@@ -57,9 +57,30 @@ public class TableEnemy : MonoBehaviour
     {
         Area = area;
         this.tracker = tracker;
+        RaiseVisualBottomToRoot();
         _height = transform.position.y;
         CurrentState = State.Wandering;
         ClearTarget();
+    }
+
+    private void RaiseVisualBottomToRoot()
+    {
+        var renderers = GetComponentsInChildren<MeshRenderer>();
+        if (renderers.Length == 0)
+        {
+            return;
+        }
+
+        var bottom = renderers[0].bounds.min.y;
+        for (var i = 1; i < renderers.Length; i++)
+        {
+            bottom = Mathf.Min(bottom, renderers[i].bounds.min.y);
+        }
+        var lift = transform.position.y - bottom;
+        if (lift > 0f)
+        {
+            transform.position += Vector3.up * lift;
+        }
     }
 
     private void FixedUpdate()
