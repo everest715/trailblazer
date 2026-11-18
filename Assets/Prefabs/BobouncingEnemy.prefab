@@ -143,7 +143,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 82b21fe9c59343af9952995609172958, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  effectPrefab: {fileID: 2186909620543394829, guid: fabdcee7d4ce352469cdb68cf69037ec, type: 3}
+  effectPrefab: {fileID: 2186909620543394829, guid: 78cc351514e24591ae7be667eac4eca8, type: 3}
   lifetime: 2
   effectScale: 0.25
   particleSpeedMultiplier: 3

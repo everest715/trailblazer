@@ -56,6 +56,20 @@ public class TableEnemyPrefabTests
     }
 
     [Test]
+    public void BobouncingEnemyPrefab_CollisionSmoke_UsesHierarchyScaling()
+    {
+        var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(PrefabPath);
+        var effect = prefab.GetComponent<CollisionEffect>().effectPrefab;
+        var particleSystems = effect.GetComponentsInChildren<ParticleSystem>(true);
+        Assert.IsNotEmpty(particleSystems);
+        foreach (var particleSystem in particleSystems)
+        {
+            Assert.AreEqual(ParticleSystemScalingMode.Hierarchy,
+                particleSystem.main.scalingMode, particleSystem.name);
+        }
+    }
+
+    [Test]
     public void BobouncingEnemyPrefab_Renderers_DisableShaderWindDeformation()
     {
         var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(PrefabPath);
