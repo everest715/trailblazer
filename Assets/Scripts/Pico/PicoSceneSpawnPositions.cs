@@ -144,6 +144,11 @@ public class PicoSceneSpawnPositions : MonoBehaviour
     private void SpawnAt(Vector3 worldPosition, PicoFloorArea area)
     {
         var instance = Instantiate(SpawnObject, worldPosition, SpawnObject.transform.rotation);
+        var collisionEffect = instance.GetComponent<CollisionEffect>();
+        if (collisionEffect != null)
+        {
+            collisionEffect.ConfigureCoinDropArea(area);
+        }
         Spawned?.Invoke(instance);
         SpawnedInArea?.Invoke(instance, area);
     }

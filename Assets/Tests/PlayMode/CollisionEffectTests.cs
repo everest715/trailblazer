@@ -301,6 +301,29 @@ public class CollisionEffectTests
         Assert.IsTrue(coin.GetComponent<SphereCollider>().enabled);
     }
 
+    [UnityTest]
+    public IEnumerator OnTriggerEnter_ConfiguredTableArea_BouncesCoinAtEdge()
+    {
+        var targetPosition = new Vector3(2f, 3f, 4f);
+        _target.transform.position = targetPosition;
+        _car.transform.position = targetPosition + Vector3.left;
+        _coinPrefab.AddComponent<SphereCollider>();
+        _effect.coinPrefab = _coinPrefab;
+        _effect.dropChance = 100f;
+        _effect.coinDropDistance = 0.5f;
+        _effect.coinDropHeight = 0.3f;
+        _effect.autoCoinDropDuration = false;
+        _effect.coinDropDuration = 0.1f;
+        _effect.ConfigureCoinDropArea(SquareAround(targetPosition, 0.25f));
+
+        Trigger(_car);
+        yield return new WaitForSeconds(0.2f);
+
+        var coin = CoinInstances().Single();
+        Assert.Less(Vector3.Distance(targetPosition, coin.transform.position), 0.001f);
+        Assert.IsTrue(coin.GetComponent<SphereCollider>().enabled);
+    }
+
     [Test]
     public void OnTriggerEnter_NullCoinPrefab_DoesNotCreateCoin()
     {
@@ -413,6 +436,17 @@ public class CollisionEffectTests
 
         Assert.IsNotNull(attribute);
         Assert.Less(attribute.order, 0);
+    }
+
+    private static PicoFloorArea SquareAround(Vector3 center, float halfSize)
+    {
+        return new PicoFloorArea(new[]
+        {
+            new Vector3(center.x - halfSize, center.y, center.z - halfSize),
+            new Vector3(center.x + halfSize, center.y, center.z - halfSize),
+            new Vector3(center.x + halfSize, center.y, center.z + halfSize),
+            new Vector3(center.x - halfSize, center.y, center.z + halfSize)
+        });
     }
 
     private void Trigger(GameObject other)

@@ -369,6 +369,37 @@ public class PicoSceneSpawnPositionsTests
         Assert.AreEqual(-0.3f, second.transform.position.y, 0.0001f);
     }
 
+    [TestCase(true)]
+    [TestCase(false)]
+    public void StartSpawn_CollisionEffectReceivesActualSourceArea(bool useSceneCapture)
+    {
+        var spawn = CreateSceneSpawner();
+        _prefab.AddComponent<BoxCollider>();
+        _prefab.AddComponent<CollisionEffect>();
+        if (useSceneCapture)
+        {
+            var provider = _spawner.AddComponent<FakeProvider>();
+            provider.Areas = new[] { Rectangle() };
+        }
+        else
+        {
+            _spawner.transform.SetPositionAndRotation(new Vector3(5f, 2f, -1f), Quaternion.Euler(0f, 90f, 0f));
+            spawn.spawnBounds = new Bounds(new Vector3(0f, 0.3f, 1.5f), new Vector3(2f, 0f, 2f));
+        }
+
+        PicoFloorArea? eventArea = null;
+        spawn.SpawnedInArea += (_, area) => eventArea = area;
+        spawn.StartSpawn();
+
+        var instance = UnityEngine.Object.FindObjectsOfType<GameObject>()
+            .Single(item => item.name.StartsWith("SpawnProbe("));
+        var configuredArea = instance.GetComponent<CollisionEffect>().CoinDropArea;
+        Assert.IsTrue(eventArea.HasValue);
+        Assert.IsTrue(configuredArea.HasValue);
+        CollectionAssert.AreEqual(eventArea.Value.Vertices, configuredArea.Value.Vertices);
+        Assert.AreEqual(eventArea.Value.SurfaceHeight, configuredArea.Value.SurfaceHeight, 0.0001f);
+    }
+
     private static PicoFloorArea RectangleAtHeight(float height)
     {
         return new PicoFloorArea(new[]

@@ -23,6 +23,7 @@ public class CollisionEffect : MonoBehaviour
     public float coinDropDuration = 0.5f;
     public bool autoCoinDropDuration = true;
     public float coinDropGravity = 9.81f;
+    public PicoFloorArea? CoinDropArea { get; private set; }
 
     private Collider _collider;
     private bool _hasPlayed;
@@ -30,6 +31,11 @@ public class CollisionEffect : MonoBehaviour
     private void Awake()
     {
         _collider = GetComponent<Collider>();
+    }
+
+    public void ConfigureCoinDropArea(PicoFloorArea area)
+    {
+        CoinDropArea = area;
     }
 
     private void OnTriggerEnter(Collider other)
@@ -92,7 +98,7 @@ public class CollisionEffect : MonoBehaviour
                 ? Mathf.Sqrt(8f * Mathf.Max(0f, coinDropHeight) / Mathf.Max(0.01f, coinDropGravity))
                 : coinDropDuration;
             coin.AddComponent<CoinArcFlight>().Launch(coinDropDirection,
-                coinDropDistance, coinDropHeight, duration);
+                coinDropDistance, coinDropHeight, duration, CoinDropArea);
         }
 
         if (effectPrefab != null)
