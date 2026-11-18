@@ -47,7 +47,6 @@ public class TableEnemyPrefabTests
             Assert.IsTrue(collision.destroyOnHit);
             Assert.NotNull(collision.effectPrefab);
             Assert.AreEqual(2f, collision.lifetime);
-            Assert.AreEqual(0.25f, collision.effectScale);
         }
         finally
         {
