@@ -56,11 +56,12 @@ public class TableEnemyPrefabTests
     }
 
     [Test]
-    public void BobouncingEnemyPrefab_CollisionSmoke_UsesHierarchyScaling()
+    public void BobouncingEnemyPrefab_CollisionSmoke_UsesTabletopHierarchyScale()
     {
         var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(PrefabPath);
-        var effect = prefab.GetComponent<CollisionEffect>().effectPrefab;
-        var particleSystems = effect.GetComponentsInChildren<ParticleSystem>(true);
+        var collision = prefab.GetComponent<CollisionEffect>();
+        Assert.AreEqual(0.1f, collision.effectScale);
+        var particleSystems = collision.effectPrefab.GetComponentsInChildren<ParticleSystem>(true);
         Assert.IsNotEmpty(particleSystems);
         foreach (var particleSystem in particleSystems)
         {
