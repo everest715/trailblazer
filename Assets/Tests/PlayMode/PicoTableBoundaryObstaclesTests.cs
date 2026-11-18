@@ -102,6 +102,42 @@ public class PicoTableBoundaryObstaclesTests
     }
 
     [Test]
+    public void Rebuild_DefaultTrees_AreFourteenCentimetersHigh()
+    {
+        _generator.scaleRange = Vector2.one;
+        _generator.inwardOffsetRange = Vector2.zero;
+
+        _generator.Rebuild(Rectangle(Quaternion.identity, Vector3.zero));
+
+        var trees = Children().Where(item => item.name.StartsWith("MTree")).ToArray();
+        Assert.Greater(trees.Length, 0);
+        foreach (var tree in trees)
+        {
+            Assert.IsTrue(PicoObstacleGeometry.TryCapture(tree.gameObject, out var bounds));
+            var height = bounds.size.y * tree.localScale.y;
+            Assert.AreEqual(0.14f, height, 0.0001f, tree.name);
+        }
+    }
+
+    [Test]
+    public void Rebuild_DefaultTrees_KeepRootsWithinFourCentimetersOfEdge()
+    {
+        var area = Rectangle(Quaternion.identity, Vector3.zero);
+        _generator.scaleRange = Vector2.one;
+        _generator.inwardOffsetRange = Vector2.zero;
+
+        _generator.Rebuild(area);
+
+        var trees = Children().Where(item => item.name.StartsWith("MTree")).ToArray();
+        Assert.Greater(trees.Length, 0);
+        foreach (var tree in trees)
+        {
+            var distance = DistanceToNearestEdge(area.Vertices, tree.position);
+            Assert.LessOrEqual(distance, 0.04f, tree.name);
+        }
+    }
+
+    [Test]
     public void Rebuild_TinyOrDegenerateArea_SkipsWithoutOutsideInstances()
     {
         var tiny = new PicoFloorArea(new[]
@@ -228,6 +264,24 @@ public class PicoTableBoundaryObstaclesTests
             center + rotation * new Vector3(1f, 0f, 1f),
             center + rotation * new Vector3(-1f, 0f, 1f)
         });
+    }
+
+    private static float DistanceToNearestEdge(Vector3[] vertices, Vector3 point)
+    {
+        var bestDistance = float.MaxValue;
+        point.y = 0f;
+        for (var i = 0; i < vertices.Length; i++)
+        {
+            var a = vertices[i];
+            var b = vertices[(i + 1) % vertices.Length];
+            var segment = b - a;
+            segment.y = 0f;
+            var delta = point - a;
+            delta.y = 0f;
+            var t = Mathf.Clamp01(Vector3.Dot(delta, segment) / segment.sqrMagnitude);
+            bestDistance = Mathf.Min(bestDistance, (delta - segment * t).magnitude);
+        }
+        return bestDistance;
     }
 
     private static Vector3 NearestEdge(Vector3[] vertices, Vector3 point)

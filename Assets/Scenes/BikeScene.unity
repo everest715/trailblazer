@@ -814,7 +814,7 @@ MonoBehaviour:
   treePrefab: {fileID: 4417786085886321137, guid: 8bd4db4730a85174cbf65a95c99f0b79, type: 3}
   tree2Prefab: {fileID: 309707002457103136, guid: 927d2bb5075ea8941af7255c8d96e391, type: 3}
   fenceLength: 0.24
-  treeHeight: 0.28
+  treeHeight: 0.14
   fenceMaxYaw: 8
   edgeSafetyMargin: 0.005
   spacingRange: {x: 0.01, y: 0.04}

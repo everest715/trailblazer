@@ -15,7 +15,7 @@ public class PicoTableBoundaryObstacles : MonoBehaviour
 
     [Header("Layout")]
     public float fenceLength = 0.24f;
-    public float treeHeight = 0.28f;
+    public float treeHeight = 0.14f;
     [Range(0f, 15f)] public float fenceMaxYaw = 8f;
     public float edgeSafetyMargin = 0.005f;
     public Vector2 spacingRange = new Vector2(0.01f, 0.04f);
