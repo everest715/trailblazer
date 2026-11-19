@@ -93,6 +93,83 @@ public class GateGroundAlignmentTests
     }
 
     [Test]
+    public void AlignGatesToArea_IncludesFlagWhenFittingFormationInsideSurface()
+    {
+        var gameType = AppDomain.CurrentDomain.GetAssemblies()
+            .SelectMany(assembly => assembly.GetTypes())
+            .First(type => type.Name == "Game");
+        var car = new GameObject("Car");
+        car.AddComponent<AudioSource>();
+        var game = car.AddComponent(gameType);
+        var gatesRoot = new GameObject("Gates");
+        var gates = new[]
+        {
+            new GameObject("Gate1"), new GameObject("Gate2"),
+            new GameObject("Gate3"), new GameObject("Gate4")
+        };
+        var flag = new GameObject("Flag");
+        flag.transform.SetParent(gatesRoot.transform);
+        flag.transform.position = new Vector3(0f, 0f, 1.2f);
+        var serialized = new SerializedObject(game);
+        serialized.FindProperty("flag").objectReferenceValue = flag;
+        for (var i = 0; i < gates.Length; i++)
+        {
+            gates[i].transform.SetParent(gatesRoot.transform);
+            gates[i].transform.position = new Vector3(0f, 0f, i * 0.2f);
+            serialized.FindProperty($"gate{i + 1}").objectReferenceValue = gates[i];
+        }
+        var area = new PicoFloorArea(new[]
+        {
+            new Vector3(-0.5f, 0.75f, -0.5f), new Vector3(0.5f, 0.75f, -0.5f),
+            new Vector3(0.5f, 0.75f, 0.5f), new Vector3(-0.5f, 0.75f, 0.5f)
+        });
+        serialized.ApplyModifiedProperties();
+
+        var method = gameType.GetMethod("AlignGatesToArea", BindingFlags.Instance | BindingFlags.NonPublic);
+        method.Invoke(game, new object[] { area });
+
+        Assert.IsTrue(area.ContainsXZ(flag.transform.position),
+            $"Flag at {flag.transform.position} should be fitted inside the table");
+        UnityEngine.Object.DestroyImmediate(gatesRoot);
+        UnityEngine.Object.DestroyImmediate(car);
+    }
+
+    [Test]
+    public void AlignGatesToArea_PlacesFlagAtSurfaceHeightInsteadOfGateHeight()
+    {
+        var gameType = AppDomain.CurrentDomain.GetAssemblies()
+            .SelectMany(assembly => assembly.GetTypes())
+            .First(type => type.Name == "Game");
+        var car = new GameObject("Car");
+        car.AddComponent<AudioSource>();
+        var game = car.AddComponent(gameType);
+        var gatesRoot = new GameObject("Gates");
+        var flag = new GameObject("Flag");
+        flag.transform.SetParent(gatesRoot.transform);
+        var serialized = new SerializedObject(game);
+        serialized.FindProperty("flag").objectReferenceValue = flag;
+        for (var i = 0; i < 4; i++)
+        {
+            var gate = new GameObject($"Gate{i + 1}");
+            gate.transform.SetParent(gatesRoot.transform);
+            serialized.FindProperty($"gate{i + 1}").objectReferenceValue = gate;
+        }
+        var area = new PicoFloorArea(new[]
+        {
+            new Vector3(-1f, 0.75f, -1f), new Vector3(1f, 0.75f, -1f),
+            new Vector3(1f, 0.75f, 1f), new Vector3(-1f, 0.75f, 1f)
+        });
+        serialized.ApplyModifiedProperties();
+
+        var method = gameType.GetMethod("AlignGatesToArea", BindingFlags.Instance | BindingFlags.NonPublic);
+        method.Invoke(game, new object[] { area });
+
+        Assert.AreEqual(area.SurfaceHeight, flag.transform.position.y, 1e-5f);
+        UnityEngine.Object.DestroyImmediate(gatesRoot);
+        UnityEngine.Object.DestroyImmediate(car);
+    }
+
+    [Test]
     public void AlignGatesToArea_ZeroWidthFormationUsesAreaCenter()
     {
         var gameType = AppDomain.CurrentDomain.GetAssemblies()

@@ -112,6 +112,7 @@ public class Game : MonoBehaviour
 
     private async System.Threading.Tasks.Task AlignGatesToGround()
     {
+        var alignedToArea = false;
         var providers = Resources.FindObjectsOfTypeAll<PicoSceneCaptureFloorAreaProvider>();
         var provider = providers.Length > 0 ? providers[0] : null;
         if (provider != null)
@@ -124,6 +125,7 @@ public class Game : MonoBehaviour
                 if (areas.Count > 0)
                 {
                     AlignGatesToArea(areas[0]);
+                    alignedToArea = true;
                 }
             }
             catch (System.Exception)
@@ -140,7 +142,7 @@ public class Game : MonoBehaviour
             }
         }
 
-        if (flag != null)
+        if (!alignedToArea && flag != null)
         {
             flag.transform.position = new Vector3(flag.transform.position.x, groundHeight, flag.transform.position.z);
         }
@@ -166,10 +168,16 @@ public class Game : MonoBehaviour
             }
         }
 
-        var currentBounds = new Bounds(gates[0].transform.position, Vector3.zero);
-        foreach (var gate in gates)
+        var formation = new List<GameObject>(gates);
+        if (flag != null)
         {
-            currentBounds.Encapsulate(gate.transform.position);
+            formation.Add(flag);
+        }
+
+        var currentBounds = new Bounds(formation[0].transform.position, Vector3.zero);
+        foreach (var item in formation)
+        {
+            currentBounds.Encapsulate(item.transform.position);
         }
 
         var scale = 1f;
@@ -182,12 +190,12 @@ public class Game : MonoBehaviour
             scale = Mathf.Min(scale, area.PlanarBounds.size.z * 0.9f / currentBounds.size.z);
         }
 
-        var fitted = new Vector3[gates.Length];
+        var fitted = new Vector3[formation.Count];
         for (var attempt = 0; attempt < 20; attempt++)
         {
-            for (var i = 0; i < gates.Length; i++)
+            for (var i = 0; i < formation.Count; i++)
             {
-                var offset = gates[i].transform.position - currentBounds.center;
+                var offset = formation[i].transform.position - currentBounds.center;
                 fitted[i] = target + offset * scale;
                 fitted[i].y = groundHeight;
             }
@@ -219,7 +227,9 @@ public class Game : MonoBehaviour
 
         if (flag != null)
         {
-            flag.transform.position = new Vector3(flag.transform.position.x, groundHeight, flag.transform.position.z);
+            var flagPosition = fitted[fitted.Length - 1];
+            flagPosition.y = area.SurfaceHeight;
+            flag.transform.position = flagPosition;
         }
     }
 
