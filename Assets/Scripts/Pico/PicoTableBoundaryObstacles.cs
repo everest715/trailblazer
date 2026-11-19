@@ -153,11 +153,13 @@ public class PicoTableBoundaryObstacles : MonoBehaviour
                     : Quaternion.Euler(0f, yaw, 0f);
                 var projectedLength = ProjectedLength(localBounds, rotation, tangent, scale);
                 var inset = NextFloat(random, inwardOffsetRange);
-                var inwardHalfExtent = ProjectedLength(localBounds, rotation, inward, scale) * 0.5f;
+                var inwardHalfExtent = isFence
+                    ? ProjectedLength(localBounds, rotation, inward, scale) * 0.5f
+                    : 0f;
                 var samplePosition = edgeStart + tangent * Mathf.Clamp(cursor + projectedLength * 0.5f, 0f, edgeLength)
                     + inward * inwardHalfExtent;
 
-                if (TryPlace(area, prefab, localBounds, samplePosition, inward, inset, rotation, scale, out var instance))
+                if (TryPlace(area, prefab, localBounds, samplePosition, inward, isFence, inset, rotation, scale, out var instance))
                 {
                     GeneratedCount++;
                 }
@@ -167,7 +169,7 @@ public class PicoTableBoundaryObstacles : MonoBehaviour
     }
 
     private bool TryPlace(PicoFloorArea area, GameObject prefab, Bounds localBounds, Vector3 samplePosition, Vector3 inward,
-        float inset, Quaternion rotation, float initialScale, out GameObject instance)
+        bool isFence, float inset, Quaternion rotation, float initialScale, out GameObject instance)
     {
         instance = null;
         var scale = initialScale;
@@ -175,7 +177,10 @@ public class PicoTableBoundaryObstacles : MonoBehaviour
         {
             var position = samplePosition + inward * (inset + attempt * InwardStep);
             position.y = area.SurfaceHeight - localBounds.min.y * scale;
-            if (PicoObstacleGeometry.FitsInside(area, localBounds, position, rotation, scale, edgeSafetyMargin))
+            var fits = isFence
+                ? PicoObstacleGeometry.FitsInside(area, localBounds, position, rotation, scale, edgeSafetyMargin)
+                : area.ContainsXZ(position, edgeSafetyMargin);
+            if (fits)
             {
                 instance = Instantiate(prefab, position, rotation, GeneratedRoot);
                 instance.name = prefab.name;

@@ -85,7 +85,7 @@ public class PicoTableBoundaryObstaclesTests
     }
 
     [Test]
-    public void Rebuild_GeneratedFootprintsStayInsideRotatedArea()
+    public void Rebuild_GeneratedObstaclesKeepRequiredGeometryInsideRotatedArea()
     {
         var area = Rectangle(Quaternion.Euler(0f, 37f, 0f), new Vector3(3f, 0.75f, -2f));
 
@@ -95,7 +95,14 @@ public class PicoTableBoundaryObstaclesTests
         foreach (var instance in Children())
         {
             Assert.IsTrue(PicoObstacleGeometry.TryCapture(instance.gameObject, out var bounds));
-            Assert.IsTrue(PicoObstacleGeometry.FitsInside(area, bounds, instance.position, instance.rotation, instance.localScale.x, _generator.edgeSafetyMargin), instance.name);
+            if (instance.name.StartsWith("MFence"))
+            {
+                Assert.IsTrue(PicoObstacleGeometry.FitsInside(area, bounds, instance.position, instance.rotation, instance.localScale.x, _generator.edgeSafetyMargin), instance.name);
+            }
+            else
+            {
+                Assert.IsTrue(area.ContainsXZ(instance.position, _generator.edgeSafetyMargin), instance.name);
+            }
             var bottom = instance.position.y + bounds.min.y * instance.localScale.y;
             Assert.AreEqual(area.SurfaceHeight, bottom, 0.0001f, instance.name);
         }
@@ -135,6 +142,25 @@ public class PicoTableBoundaryObstaclesTests
         {
             var distance = DistanceToNearestEdge(area.Vertices, tree.position);
             Assert.LessOrEqual(distance, 0.11f, tree.name);
+        }
+    }
+
+    [Test]
+    public void Rebuild_Trees_KeepRootsWithinConfiguredInwardOffset()
+    {
+        var area = Rectangle(Quaternion.identity, Vector3.zero);
+        _generator.scaleRange = Vector2.one;
+        _generator.inwardOffsetRange = new Vector2(0.01f, 0.02f);
+
+        _generator.Rebuild(area);
+
+        var trees = Children().Where(item => item.name.StartsWith("MTree")).ToArray();
+        Assert.Greater(trees.Length, 0);
+        foreach (var tree in trees)
+        {
+            Assert.IsTrue(area.ContainsXZ(tree.position, _generator.edgeSafetyMargin), tree.name);
+            var distance = DistanceToNearestEdge(area.Vertices, tree.position);
+            Assert.LessOrEqual(distance, 0.0201f, tree.name);
         }
     }
 
@@ -216,7 +242,7 @@ public class PicoTableBoundaryObstaclesTests
     }
 
     [Test]
-    public void Rebuild_RealAssetPrefabs_GeneratesAllAndKeepsCapturedFootprintsInside()
+    public void Rebuild_RealAssetPrefabs_GeneratesAllAndKeepsRequiredGeometryInside()
     {
         _generator.fencePrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Super Mario Style/Prefabs/MFence.prefab");
         _generator.treePrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Super Mario Style/Prefabs/MTree.prefab");
@@ -232,7 +258,14 @@ public class PicoTableBoundaryObstaclesTests
         foreach (var instance in instances)
         {
             Assert.IsTrue(PicoObstacleGeometry.TryCapture(instance.gameObject, out var bounds));
-            Assert.IsTrue(PicoObstacleGeometry.FitsInside(area, bounds, instance.position, instance.rotation, instance.localScale.x, _generator.edgeSafetyMargin), instance.name);
+            if (instance.name.StartsWith("MFence"))
+            {
+                Assert.IsTrue(PicoObstacleGeometry.FitsInside(area, bounds, instance.position, instance.rotation, instance.localScale.x, _generator.edgeSafetyMargin), instance.name);
+            }
+            else
+            {
+                Assert.IsTrue(area.ContainsXZ(instance.position, _generator.edgeSafetyMargin), instance.name);
+            }
         }
     }
 
