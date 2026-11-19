@@ -46,7 +46,7 @@ public static class PicoSignedBuild
             PlayerSettings.Android.keyaliasPass = credentials.keyPassword;
             PlayerSettings.Android.useCustomKeystore = true;
             AssetDatabase.SaveAssets();
-            var outputPath = Path.GetFullPath("Build/PICO/Trailblazer.apk");
+            var outputPath = Path.GetFullPath("Build/PICO/RoomKarting.apk");
             Directory.CreateDirectory(Path.GetDirectoryName(outputPath));
             var report = BuildPipeline.BuildPlayer(new BuildPlayerOptions
             {
