@@ -34,9 +34,9 @@ public class VirtualTableFallbackTests
         Assert.AreEqual(4, area.Vertices.Length);
         Assert.Less(Vector3.Distance(new Vector3(0f, 0f, 1.5f), area.PlanarBounds.center), 0.0001f);
         Assert.Less(Vector3.Distance(new Vector3(1.5f, 0f, 1.5f), area.PlanarBounds.size), 0.0001f);
-        Assert.AreEqual(0f, area.SurfaceHeight, 0.0001f);
+        Assert.AreEqual(-0.03f, area.SurfaceHeight, 0.0001f);
         Assert.AreEqual(1, _provider.DebugFloorAreaCount);
-        Assert.AreEqual(0f, _provider.DebugGroundHeight);
+        Assert.AreEqual(-0.03f, _provider.DebugGroundHeight);
         Assert.AreEqual("Virtual table fallback", _provider.DebugGroundHeightMethod);
         StringAssert.Contains("test empty result", _provider.DebugCaptureDetails);
         StringAssert.Contains("Virtual table", _provider.DebugCaptureDetails);

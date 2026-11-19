@@ -38,7 +38,7 @@ public readonly struct PicoFloorArea
 
         PlanarBounds = bounds;
         AverageHeight = height / vertices.Length;
-        SurfaceHeight = useHighestVertexHeight ? highest : AverageHeight;
+        SurfaceHeight = (useHighestVertexHeight ? highest : AverageHeight) - 0.03f;
     }
 
     public static PicoFloorArea FromSceneCaptureBox3D(Vector3 anchorPosition, Quaternion anchorRotation, Vector3 localPosition, Vector3 extent)

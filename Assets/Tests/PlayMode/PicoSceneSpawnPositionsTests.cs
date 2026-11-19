@@ -71,7 +71,7 @@ public class PicoSceneSpawnPositionsTests
             Assert.LessOrEqual(point.x, 1f);
             Assert.GreaterOrEqual(point.z, -1f);
             Assert.LessOrEqual(point.z, 1f);
-            Assert.AreEqual(0.2f, point.y, 0.0001f);
+            Assert.AreEqual(0.17f, point.y, 0.0001f);
         }
     }
 
@@ -98,7 +98,7 @@ public class PicoSceneSpawnPositionsTests
         Assert.LessOrEqual(instance.transform.position.x, 1f);
         Assert.GreaterOrEqual(instance.transform.position.z, -1f);
         Assert.LessOrEqual(instance.transform.position.z, 1f);
-        Assert.AreEqual(0.3f, instance.transform.position.y, 0.0001f);
+        Assert.AreEqual(0.27f, instance.transform.position.y, 0.0001f);
     }
 
     [Test]
@@ -116,7 +116,7 @@ public class PicoSceneSpawnPositionsTests
         Assert.LessOrEqual(instance.transform.position.x, 1f);
         Assert.GreaterOrEqual(instance.transform.position.z, -1f);
         Assert.LessOrEqual(instance.transform.position.z, 1f);
-        Assert.AreEqual(0.3f, instance.transform.position.y, 0.0001f);
+        Assert.AreEqual(0.27f, instance.transform.position.y, 0.0001f);
     }
 
     [Test]
@@ -165,14 +165,14 @@ public class PicoSceneSpawnPositionsTests
         provider.Areas = new[] { Rectangle() };
         spawn.StartSpawn();
         var first = UnityEngine.Object.FindObjectsOfType<GameObject>().Single(item => item.name.StartsWith("SpawnProbe("));
-        Assert.AreEqual(0.3f, first.transform.position.y, 0.0001f);
+        Assert.AreEqual(0.27f, first.transform.position.y, 0.0001f);
 
         provider.Throw = true;
         LogAssert.Expect(LogType.Warning, "Scene capture spawn failed; using fallback");
         spawn.StartSpawn();
 
         var second = UnityEngine.Object.FindObjectsOfType<GameObject>().Single(item => item.name.StartsWith("SpawnProbe(") && item != first);
-        Assert.AreEqual(0.3f, second.transform.position.y, 0.0001f);
+        Assert.AreEqual(0.27f, second.transform.position.y, 0.0001f);
     }
 
     [Test]
@@ -230,7 +230,7 @@ public class PicoSceneSpawnPositionsTests
         spawn.StartSpawn();
 
         var instance = UnityEngine.Object.FindObjectsOfType<GameObject>().Single(item => item.name.StartsWith("SpawnProbe("));
-        Assert.AreEqual(0.3f, instance.transform.position.y, 0.0001f);
+        Assert.AreEqual(0.27f, instance.transform.position.y, 0.0001f);
         Assert.AreEqual("SceneCapture", spawn.LastSpawnSource);
     }
 
@@ -346,7 +346,7 @@ public class PicoSceneSpawnPositionsTests
         spawn.StartSpawn();
 
         var instance = UnityEngine.Object.FindObjectsOfType<GameObject>().Single(item => item.name.StartsWith("SpawnProbe("));
-        Assert.AreEqual(0.1f, instance.transform.position.y, 0.0001f);
+        Assert.AreEqual(0.07f, instance.transform.position.y, 0.0001f);
         Assert.AreEqual("VirtualTable", spawn.LastSpawnSource);
         Assert.AreEqual("Virtual table fallback", spawn.LastGroundHeightMethod);
     }
@@ -359,14 +359,14 @@ public class PicoSceneSpawnPositionsTests
         provider.Areas = new[] { Rectangle() };
         spawn.StartSpawn();
         var first = UnityEngine.Object.FindObjectsOfType<GameObject>().Single(item => item.name.StartsWith("SpawnProbe("));
-        Assert.AreEqual(0.3f, first.transform.position.y, 0.0001f);
+        Assert.AreEqual(0.27f, first.transform.position.y, 0.0001f);
 
         provider.Areas = new[] { RectangleAtHeight(-0.4f) };
         provider.DebugGroundHeightMethod = "Virtual table fallback";
         spawn.StartSpawn();
 
         var second = UnityEngine.Object.FindObjectsOfType<GameObject>().Single(item => item.name.StartsWith("SpawnProbe(") && item != first);
-        Assert.AreEqual(-0.3f, second.transform.position.y, 0.0001f);
+        Assert.AreEqual(-0.33f, second.transform.position.y, 0.0001f);
     }
 
     [TestCase(true)]

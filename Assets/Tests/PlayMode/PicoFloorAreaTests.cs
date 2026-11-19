@@ -14,8 +14,8 @@ public class PicoFloorAreaTests
             new Vector3(-1f, 0.4f, 1f)
         });
 
-        Assert.AreEqual(0.25f, area.SurfaceHeight, 1e-5f);
-        Assert.AreEqual(area.AverageHeight, area.SurfaceHeight);
+        Assert.AreEqual(0.22f, area.SurfaceHeight, 1e-5f);
+        Assert.AreEqual(area.AverageHeight - 0.03f, area.SurfaceHeight);
     }
 
     [Test]
@@ -29,7 +29,7 @@ public class PicoFloorAreaTests
             new Vector3(-1f, 0.4f, 1f)
         }, useHighestVertexHeight: true);
 
-        Assert.AreEqual(0.9f, area.SurfaceHeight, 1e-5f);
+        Assert.AreEqual(0.87f, area.SurfaceHeight, 1e-5f);
     }
 
     [Test]
@@ -39,7 +39,7 @@ public class PicoFloorAreaTests
             new Vector3(10f, 1f, 2f), Quaternion.identity,
             new Vector3(0f, 0.5f, 0f), new Vector3(2f, 1f, 4f));
 
-        Assert.AreEqual(2f, area.SurfaceHeight, 1e-5f);
+        Assert.AreEqual(1.97f, area.SurfaceHeight, 1e-5f);
         Assert.AreEqual(4, area.Vertices.Length);
         Assert.AreEqual(new Vector3(10f, 2f, 2f), area.PlanarBounds.center);
         Assert.AreEqual(new Vector3(2f, 0f, 4f), area.PlanarBounds.size);
@@ -56,7 +56,7 @@ public class PicoFloorAreaTests
 
         Assert.AreEqual(Quaternion.Euler(0f, 90f, 0f), area.SurfaceRotation);
 
-        Assert.AreEqual(0.5f, area.SurfaceHeight, 1e-5f);
+        Assert.AreEqual(0.47f, area.SurfaceHeight, 1e-5f);
         Assert.AreEqual(4f, area.PlanarBounds.size.x, 1e-5f);
         Assert.AreEqual(2f, area.PlanarBounds.size.z, 1e-5f);
     }
@@ -68,7 +68,7 @@ public class PicoFloorAreaTests
             Vector3.zero, Quaternion.Euler(90f, 0f, 0f),
             Vector3.zero, new Vector3(2f, 1f, 4f));
 
-        Assert.AreEqual(2f, area.SurfaceHeight, 1e-5f);
+        Assert.AreEqual(1.97f, area.SurfaceHeight, 1e-5f);
         foreach (var vertex in area.Vertices)
         {
             Assert.AreEqual(2f, vertex.y, 1e-5f);
@@ -107,7 +107,7 @@ public class PicoFloorAreaTests
         {
             Assert.IsTrue(area.TryGetRandomPoint(0.2f, out var point));
             Assert.IsTrue(area.ContainsXZ(point, 0.2f));
-            Assert.AreEqual(0.2f, point.y, 0.0001f);
+            Assert.AreEqual(0.17f, point.y, 0.0001f);
         }
     }
 
@@ -145,7 +145,7 @@ public class PicoFloorAreaTests
         for (var i = 0; i < 20; i++)
         {
             Assert.IsTrue(area.TryGetRandomPoint(out var point));
-            Assert.AreEqual(0.8f, point.y, 1e-5f);
+            Assert.AreEqual(0.77f, point.y, 1e-5f);
             Assert.IsTrue(area.ContainsXZ(point));
         }
     }
@@ -168,7 +168,7 @@ public class PicoFloorAreaTests
         {
             Assert.Less(Vector3.Distance(expected[i], area.Vertices[i]), 0.0001f);
         }
-        Assert.AreEqual(0.4f, area.SurfaceHeight, 0.0001f);
+        Assert.AreEqual(0.37f, area.SurfaceHeight, 0.0001f);
         Assert.Less(Quaternion.Angle(Quaternion.Euler(0f, 90f, 0f), area.SurfaceRotation), 0.001f);
         Assert.Less(Vector3.Distance(new Vector3(1f, 0.4f, 2f), area.PlanarBounds.center), 0.0001f);
         Assert.Less(Vector3.Distance(new Vector3(1f, 0f, 2f), area.PlanarBounds.size), 0.0001f);
@@ -183,7 +183,7 @@ public class PicoFloorAreaTests
         {
             Assert.IsTrue(area.TryGetRandomPoint(out var point));
             Assert.IsTrue(area.ContainsXZ(point));
-            Assert.AreEqual(0.4f, point.y, 0.0001f);
+            Assert.AreEqual(0.37f, point.y, 0.0001f);
         }
     }
 
