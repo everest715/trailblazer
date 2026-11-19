@@ -23,7 +23,7 @@ public class TableEnemyPrefabTests
         Assert.NotNull(instance);
         try
         {
-            Assert.AreEqual(Vector3.one * 0.1f, instance.transform.localScale);
+            Assert.AreEqual(Vector3.one * 0.07f, instance.transform.localScale);
             var body = instance.GetComponent<Rigidbody>();
             Assert.NotNull(body);
             Assert.IsTrue(body.isKinematic);
@@ -59,7 +59,7 @@ public class TableEnemyPrefabTests
     {
         var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(PrefabPath);
         var collision = prefab.GetComponent<CollisionEffect>();
-        Assert.AreEqual(0.1f, collision.effectScale);
+        Assert.AreEqual(0.05f, collision.effectScale);
         var particleSystems = collision.effectPrefab.GetComponentsInChildren<ParticleSystem>(true);
         Assert.IsNotEmpty(particleSystems);
         foreach (var particleSystem in particleSystems)
