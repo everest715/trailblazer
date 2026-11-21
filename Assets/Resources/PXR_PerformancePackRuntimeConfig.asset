@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b1ab01ceb174c0bb4245d61830f437b, type: 3}
+  m_Name: PXR_PerformancePackRuntimeConfig
+  m_EditorClassIdentifier: 
+  deviceProjectSwan: 1
+  devicePico4Series: 1
+  deviceOtherDevice: 0
+  editingProfile: 0
+  projectSwan:
+    renderScale: 1.15
+    refreshRate: 90Hz
+    foveation: ETFR-Med
+    superResolution: 0
+    hdr: 0
+    adaptiveResolution: 0
+    sharpeningMode: 0
+    sharpeningEnhance: 0
+  pico4Series:
+    renderScale: 1
+    refreshRate: 72Hz
+    foveation: FFR-None
+    superResolution: 0
+    hdr: 0
+    adaptiveResolution: 0
+    sharpeningMode: 0
+    sharpeningEnhance: 0
+  otherDevice:
+    renderScale: 1
+    refreshRate: Default
+    foveation: FFR-None
+    superResolution: 0
+    hdr: 0
+    adaptiveResolution: 0
+    sharpeningMode: 0
+    sharpeningEnhance: 0
