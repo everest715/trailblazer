@@ -90,11 +90,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4489477353633394905, guid: 2cdf449d3829a6e469e142ec959e7e00, type: 3}
       propertyPath: m_Materials.Array.data[0]
-      value:
+      value: 
       objectReference: {fileID: 2100000, guid: b988fc3a71bb4967b71a135ab763f4fb, type: 2}
     - target: {fileID: 7366691627175010032, guid: 2cdf449d3829a6e469e142ec959e7e00, type: 3}
       propertyPath: m_Materials.Array.data[0]
-      value:
+      value: 
       objectReference: {fileID: 2100000, guid: d6437f830682481884c3d8f3fcd852a1, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -149,7 +149,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   effectPrefab: {fileID: 7299761091380687083, guid: 78cc351514e24591ae7be667eac4eca8, type: 3}
   lifetime: 2
-  effectScale: 0.05
+  effectScale: 0.03
   particleSpeedMultiplier: 3
   particleLifetimeMultiplier: 0.5
   triggerOnce: 1
